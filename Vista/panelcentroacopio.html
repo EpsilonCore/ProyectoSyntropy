@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Panel de Centros de Acopio - Epsilon</title>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <script>
+      if (localStorage.getItem("logueado") !== "si") {
+        window.location.href = "login.html";
+      }
+    </script>
+
+    <header>
+      <div class="logo">
+        <a href="index.html">
+          <img src="logo.png" alt="Epsilon" />
+        </a>
+      </div>
+
+      <div class="header-actions">
+        <div id="usuario" class="usuario"></div>
+
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+      </div>
+
+      <nav id="menu">
+        <ul>
+          <li>
+            <button
+              class="link-button"
+              onclick="window.location.href = 'gestion.html'"
+            >
+              Gestión
+            </button>
+          </li>
+
+          <li>
+            <button
+              class="link-button"
+              onclick="window.location.href = 'panelregistro.html'"
+            >
+              Panel Registro
+            </button>
+          </li>
+
+          <li>
+            <button
+              class="link-button"
+              onclick="window.location.href = 'panelcontenedor.html'"
+            >
+              Contenedores
+            </button>
+          </li>
+
+          <li>
+            <button
+              class="link-button"
+              onclick="window.location.href = 'panelcamion.html'"
+            >
+              Camiones
+            </button>
+          </li>
+
+          <li>
+            <button
+              class="link-button"
+              onclick="window.location.href = 'panelusuario.html'"
+            >
+              Panel de Usuario
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="pagina">
+      <h2>Panel de Centros de Acopio</h2>
+
+      <p>Administración de centros de acopio del sistema.</p>
+
+      <div class="panel" id="OverlayCrearUsuario">
+        <button onclick="abrirCrearCentroAcopio()">
+          Crear Centro de Acopio
+        </button>
+      </div>
+      <div class="overlay" id="overlayCrearCentrosAcopio">
+        <div class="crear-centro-acopio">
+          <h3>Crear Centro de Acopio</h3>
+          <form id="formCrearCentroAcopio">
+            <label>Tipo de residuo</label>
+            <input id="tipoResiduoCrear" required />
+
+            <label>Capacidad</label>
+            <input id="capacidadCrear" required />
+
+            <label>Calle</label>
+            <input id="calleCrear" required />
+
+            <label>Barrio</label>
+            <input id="barrioCrear" required />
+
+            <label>Numero</label>
+            <input id="numeroCrear" required />
+
+            <button class="btn-crear-centro-acopio" type="submit">
+              Crear Centro de Acopio
+            </button>
+            <button
+              class="btn-cancelar-centro-acopio"
+              type="button"
+              onclick="
+                document
+                  .getElementById('overlayCrearCentrosAcopio')
+                  .classList.remove('activo')
+              "
+            >
+              Cancelar
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="lista-panel">
+        <h3>Lista de Centros de Acopio</h3>
+        <ul id="listaCentrosAcopio">
+          <p>Cargando centros de acopio...</p>
+        </ul>
+      </div>
+    </div>
+
+    <div
+      class="overlay"
+      id="overlayCentrosAcopio"
+      onclick="cerrarModalCentrosAcopio(event)"
+    >
+      <div class="modal-usuarios">
+        <h3>Modificar centro de acopio</h3>
+
+        <form id="formModificarCentroAcopio">
+          <input type="hidden" id="idOriginal" />
+
+          <label>Tipo de residuo</label>
+          <input
+            id="tipoResiduoEditar"
+            placeholder="Dejar vacío para no modificar"
+          />
+
+          <label>Capacidad</label>
+          <input
+            id="capacidadEditar"
+            placeholder="Dejar vacío para no modificar"
+          />
+
+          <label>Calle </label>
+          <input id="calleEditar" placeholder="Dejar vacío para no modificar" />
+          <label>Barrio </label>
+          <input
+            id="barrioEditar"
+            placeholder="Dejar vacío para no modificar"
+          />
+          <label>Numero </label>
+          <input
+            id="numeroEditar"
+            placeholder="Dejar vacío para no modificar"
+          />
+
+          <button class="btn-guardar-centro-acopio" type="submit">
+            Guardar cambios
+          </button>
+          <button
+            class="btn-cancelar-centro-acopio"
+            type="button"
+            onclick="
+              document
+                .getElementById('overlayCentrosAcopio')
+                .classList.remove('activo')
+            "
+          >
+            Cancelar
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const API_URL =
+        "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/CentrosAcopio/";
+      let centros = [];
+
+      document
+        .getElementById("formModificarCentroAcopio")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const datos = {
+            idCentroAcopio: document.getElementById("idOriginal").value,
+            tipoResiduo: document.getElementById("tipoResiduoEditar").value,
+            capacidad: document.getElementById("capacidadEditar").value,
+            calle: document.getElementById("calleEditar").value,
+            barrio: document.getElementById("barrioEditar").value,
+            numero: document.getElementById("numeroEditar").value,
+          };
+
+          const resp = await fetch(`${API_URL}Modificar`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
+
+          const resultado = await resp.json();
+
+          if (resultado.status === "success") {
+            document
+              .getElementById("overlayCentrosAcopio")
+              .classList.remove("activo");
+            obtenerCentrosAcopio(); // refresca la lista
+          } else {
+            alert(resultado.mensaje);
+          }
+        });
+      document
+        .getElementById("formCrearCentroAcopio")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const datos = {
+            tipoResiduo: document.getElementById("tipoResiduoCrear").value,
+            capacidad: document.getElementById("capacidadCrear").value,
+            calle: document.getElementById("calleCrear").value,
+            barrio: document.getElementById("barrioCrear").value,
+            numero: document.getElementById("numeroCrear").value,
+          };
+
+          const resp = await fetch(`${API_URL}Registrar`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
+
+          const resultado = await resp.json();
+
+          if (resultado.status === "success") {
+            document
+              .getElementById("overlayCrearCentrosAcopio")
+              .classList.remove("activo");
+            obtenerCentrosAcopio();
+          } else {
+            alert(resultado.mensaje);
+          }
+        });
+
+      function toggleMenu() {
+        document.getElementById("menu").classList.toggle("activo");
+      }
+
+      function cerrarSesion() {
+        localStorage.removeItem("logueado");
+        localStorage.removeItem("nombreUsuario");
+
+        window.location.href = "index.html";
+      }
+
+      function cargarUsuario() {
+        const nombre = localStorage.getItem("nombreUsuario") || "Usuario";
+        const inicial = nombre.charAt(0).toUpperCase();
+
+        document.getElementById("usuario").innerHTML = `
+
+      <span class="nombre-usuario">${nombre}</span>
+
+      <button class="usuario-btn" onclick="abrirUsuario()">
+          ${inicial}
+      </button>
+
+      <div id="menuUsuario" class="menu-usuario">
+
+          <button onclick="cerrarSesion()">
+              Cerrar Sesión
+          </button>
+
+      </div>
+
+      `;
+      }
+
+      function abrirUsuario() {
+        document.getElementById("menuUsuario").classList.toggle("activo");
+      }
+
+      cargarUsuario();
+
+      function abrirModalCentroAcopio() {
+        document.getElementById("overlayCentrosAcopio").classList.add("activo");
+      }
+      function abrirCrearCentroAcopio() {
+        document
+          .getElementById("overlayCrearCentrosAcopio")
+          .classList.add("activo");
+      }
+
+      function cerrarModalCentrosAcopio(evento) {
+        if (evento.target.id === "overlayCentrosAcopio") {
+          document
+            .getElementById("overlayCentrosAcopio")
+            .classList.remove("activo");
+        }
+      }
+
+      function seleccionarCentro(ID_acopio) {
+        const centro = centros.find((c) => c.ID_acopio === ID_acopio);
+        if (!centro) return;
+
+        document.getElementById("idOriginal").value = centro.ID_acopio;
+        document.getElementById("tipoResiduoEditar").value = centro.tipoResiduo;
+        document.getElementById("capacidadEditar").value = centro.capacidad;
+        document.getElementById("barrioEditar").value = centro.barrio;
+        document.getElementById("calleEditar").value = centro.calle;
+        document.getElementById("numeroEditar").value = centro.numero;
+
+        document.getElementById("overlayCentrosAcopio").classList.add("activo");
+      }
+      async function obtenerCentrosAcopio() {
+        try {
+          const resp = await fetch(`${API_URL}CentrosAcopio`);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          const todos = Array.isArray(data) ? data : data?.centros_acopio || [];
+          centros = todos;
+          renderizarLista();
+        } catch (error) {
+          console.error("Error al obtener centros de acopio:", error);
+        }
+      }
+      async function eliminarCentroAcopio(id) {
+        if (
+          confirm("¿Está seguro de que desea eliminar este centro de acopio?")
+        ) {
+          const resp = await fetch(`${API_URL}Borrar`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idCentroAcopio: id }),
+          });
+          try {
+            const resultado = await resp.json();
+            if (resultado.status === "success") {
+              obtenerCentrosAcopio();
+            } else {
+              alert("No se pudo eliminar el usuario.");
+            }
+          } catch (error) {
+            console.error(error);
+            alert("Error de conexión al eliminar usuario.");
+          }
+        }
+      }
+      function renderizarLista() {
+        const listaContainer = document.getElementById("listaCentrosAcopio");
+
+        if (centros.length === 0) {
+          listaContainer.innerHTML =
+            "<p>No hay centros de acopio disponibles.</p>";
+          return;
+        }
+
+        let html = '<ul style="list-style: none; padding: 0; margin: 0;">';
+
+        centros.forEach((centro) => {
+          html += `
+<li class="centro-item">
+  <span>
+    <strong>${centro.ID_acopio} ${centro.tipoResiduo} ${centro.capacidad} ${centro.barrio} ${centro.calle} ${centro.numero}</strong>
+  </span>
+  <span class="centro-acciones">
+    <button class="btn-modificar" onclick="seleccionarCentro(${centro.ID_acopio})">
+      Modificar
+    </button>
+    <button
+      class="btn-eliminar"
+      style="background-color: #e74c3c; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-size: 14px; cursor: pointer;"
+      onclick="eliminarCentroAcopio('${centro.ID_acopio}')">
+      Eliminar
+    </button>
+  </span>
+</li>`;
+        });
+
+        html += "</ul>";
+        listaContainer.innerHTML = html;
+      }
+
+      obtenerCentrosAcopio();
+    </script>
+  </body>
+</html>

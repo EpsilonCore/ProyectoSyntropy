@@ -29,7 +29,7 @@ class UsuarioController
 		public function crearUsuario(){
 			$json = file_get_contents('php://input');
 		$datos = json_decode($json);
-		if (!$datos || !isset($datos->mail) || !isset($datos->contrasenia) || !isset($datos->nombre) || !isset($datos->apellido)|| !isset($datos->usuario) || !isset($datos->rol)) {
+		if (!$datos || !isset($datos->mail) || !isset($datos->contrasenia) || !isset($datos->nombre) || !isset($datos->apellido)|| !isset($datos->usuario)  ) {
             return ["status" => "error", "mensaje" => "Faltan campos obligatorios o el JSON está mal formado."];
         }
 		$usuario = $datos->usuario;
