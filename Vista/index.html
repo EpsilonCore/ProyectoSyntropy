@@ -44,7 +44,7 @@
       <nav id="menu">
         <ul>
           <li>
-            <button
+            <button data-rol="Administrador"
               class="link-button"
               onclick="verificarAcceso('gestion.html')"
             >
@@ -53,7 +53,7 @@
           </li>
 
           <li>
-            <button class="link-button" onclick="verificarAcceso('rutas.html')">
+            <button data-rol="Administrador, Operario" class="link-button" onclick="verificarAcceso('rutas.html')">
               Rutas
             </button>
           </li>
@@ -115,6 +115,18 @@
     </section>
 
     <script>
+      document.addEventListener("DOMContentLoaded",() => {
+        const rolUsuario= localStorage.getItem("rol");
+
+        document.querySelectorAll("[data-rol]").forEach(boton => {
+          const rolesPermitidos = boton.dataset.rol.split(",");
+
+          if (!rolesPermitidos.includes(rolUsuario)){
+            boton.style.display = "none";
+          }
+        });
+      })
+
       function toggleMenu() {
         document.getElementById("menu").classList.toggle("activo");
       }
@@ -125,6 +137,7 @@
         } else {
           window.location.href = "login.html";
         }
+
       }
 
       function cerrarSesion() {

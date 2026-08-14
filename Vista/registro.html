@@ -67,17 +67,12 @@
 
             const result = await response.json();
             if (response.ok) {
-              alert(
-                "¡Solicitud de registro enviada con exito!" +
-                  (result.mensaje || ""),
-              );
               window.location.href = "login.html";
             } else {
-              alert(`Error: ${result.error || "No se pudo registrar"}`);
+              console.error("Error en la respuesta del servidor:", result);
             }
           } catch (error) {
             console.error("Error de conexion:", error);
-            alert("Error al conectar con el servidor");
           }
         });
     </script>
