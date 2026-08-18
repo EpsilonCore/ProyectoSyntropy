@@ -1,7 +1,6 @@
     <?php
 class ContenedorModel
 {
-    private $idContenedor;
     private $capacidadCarga;
     private $estado;
     private $tipo;
