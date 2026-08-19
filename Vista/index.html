@@ -5,11 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Epsilon</title>
     <link rel="stylesheet" href="style.css" />
-    <style>
-      #btnAdmin {
-        display: none;
-      }
-    </style>
   </head>
 
   <body>
@@ -20,8 +15,6 @@
         </a>
       </div>
 
-
-    <div class="header-actions">
 
       <div class="header-actions">
         <div id="registro-btn">
@@ -49,6 +42,24 @@
               onclick="verificarAcceso('gestion.html')"
             >
               Gestión
+            </button>
+          </li>
+
+          <li>
+            <button data-rol="Administrador"
+              class="link-button"
+              onclick="verificarAcceso('panelcentroacopio.html')"
+            >
+              Centros de Acopio
+            </button>
+          </li>
+
+          <li>
+            <button data-rol="Administrador"
+              class="link-button"
+              onclick="verificarAcceso('panelincidencia.html')"
+            >
+              Incidencias
             </button>
           </li>
 
@@ -116,10 +127,13 @@
 
     <script>
       document.addEventListener("DOMContentLoaded",() => {
-        const rolUsuario= localStorage.getItem("rol");
+        const rolUsuario = (localStorage.getItem("rol") || "").trim();
+        console.log('[filtro-roles] rol en localStorage:', JSON.stringify(localStorage.getItem("rol")));
 
         document.querySelectorAll("[data-rol]").forEach(boton => {
-          const rolesPermitidos = boton.dataset.rol.split(",");
+          const rolesPermitidos = boton.dataset.rol
+            .split(",")
+            .map((rol) => rol.trim());
 
           if (!rolesPermitidos.includes(rolUsuario)){
             boton.style.display = "none";
@@ -185,18 +199,7 @@
         document.getElementById("menuUsuario").classList.toggle("activo");
       }
 
-
-function abrirUsuario(){
-
-    document
-    .getElementById("menuUsuario")
-    .classList.toggle("activo");
-
-}
-
-
-
-cargarUsuario();
+      cargarUsuario();
 
 
 </script>

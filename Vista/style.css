@@ -1085,7 +1085,8 @@ nav button:not(.link-button):hover {
 .usuario-item,
 .contenedor-item,
 .camion-item,
-.centro-item {
+.centro-item,
+.incidencia-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1095,7 +1096,50 @@ nav button:not(.link-button):hover {
 .usuario-acciones,
 .contenedor-acciones,
 .camion-acciones,
-.centro-acciones {
+.centro-acciones,
+.incidencia-acciones {
   display: flex;
   gap: 8px;
+}
+
+/* La incidencia tiene varias líneas de info (mail, dirección, operario),
+   a diferencia de los demás items que son de una sola línea */
+.incidencia-item {
+  align-items: flex-start;
+}
+
+.incidencia-acciones {
+  flex-shrink: 0;
+}
+
+.incidencia-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.incidencia-info strong {
+  font-family: var(--fuente-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--tinta);
+}
+
+.incidencia-info p {
+  color: var(--tinta-suave);
+  font-size: 0.9rem;
+}
+
+.incidencia-estado {
+  display: inline-block;
+  align-self: flex-start;
+  background: var(--verde-tinte);
+  color: var(--verde-bosque);
+  font-family: var(--fuente-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 999px;
 }
