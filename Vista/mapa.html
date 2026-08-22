@@ -28,11 +28,9 @@
       </div>
 
       <div class="header-actions">
-
         <div id="usuario" class="usuario"></div>
 
         <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-
       </div>
 
       <nav id="menu">
@@ -100,6 +98,32 @@
     </div>
 
     <script>
+      async function CargarIncidenciasMapa() {
+        try {
+          const respuesta = await fetch(
+            "/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/Incidencias",
+          );
+          const incidencias = await respuesta.json();
+          console.log("Incidencias cargadas:", incidencias);
+
+          incidencias.forEach((inc) => {
+            if (!inc.lat || !inc.lon) return;
+            L.circleMarker([inc.lat, inc.lon], {
+              radius: 5,
+              color: "#000",
+              fillColor: "#000",
+              fillOpacity: 1,
+            })
+              .addTo(map)
+              .bindPopup(
+                `<strong>${inc.tipo}</strong><br>${inc.calle} ${inc.numero}, ${inc.barrio}<br>Estado: ${inc.estado}`,
+              );
+          });
+        } catch (err) {
+          console.error("Error al cargar las incidencias:", err);
+        }
+      }
+
       function toggleMenu() {
         document.getElementById("menu").classList.toggle("activo");
       }
@@ -110,12 +134,11 @@
         window.location.href = "index.html";
       }
 
-      function cargarUsuario(){
+      function cargarUsuario() {
+        const nombre = localStorage.getItem("nombreUsuario") || "Usuario";
+        const inicial = nombre.charAt(0).toUpperCase();
 
-          const nombre = localStorage.getItem("nombreUsuario") || "Usuario";
-          const inicial = nombre.charAt(0).toUpperCase();
-
-          document.getElementById("usuario").innerHTML = `
+        document.getElementById("usuario").innerHTML = `
 
           <span class="nombre-usuario">${nombre}</span>
 
@@ -132,11 +155,10 @@
           </div>
 
           `;
-
       }
 
-      function abrirUsuario(){
-          document.getElementById("menuUsuario").classList.toggle("activo");
+      function abrirUsuario() {
+        document.getElementById("menuUsuario").classList.toggle("activo");
       }
 
       cargarUsuario();
@@ -164,6 +186,7 @@
       letrasMvd.bindPopup(
         "<b>Letras de Montevideo</b><br>Contenedor inteligente de vidrio.",
       );
+      CargarIncidenciasMapa();
     </script>
   </body>
 </html>

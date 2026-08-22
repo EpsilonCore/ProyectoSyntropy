@@ -15,7 +15,6 @@
         </a>
       </div>
 
-
       <div class="header-actions">
         <div id="registro-btn">
           <button onclick="window.location.href = 'registro.html'">
@@ -31,13 +30,77 @@
 
         <div id="usuario" class="usuario"></div>
 
+        <button
+          id="btnCrearIncidencia"
+          class="btn-crear-incidencia"
+          type="button"
+          title="Reportar incidencia"
+          aria-label="Reportar incidencia"
+          onclick="
+            document
+              .getElementById('overlayCrearIncidencias')
+              .classList.add('activo')
+          "
+        >
+          Crear Incidencia
+        </button>
+
+        <div class="overlay" id="overlayCrearIncidencias">
+          <div class="crear-centro-acopio">
+            <h3>Crear Incidencia</h3>
+            <form id="formCrearIncidencia">
+              <input type="hidden" id="estadoCrear" value="Pendiente" />
+
+              <label>Mail</label>
+              <input id="mailCrear" type="email" required />
+
+              <label>Tipo</label>
+              <select id="tipoCrear" required>
+                <option value="" disabled selected>Seleccione un tipo</option>
+                <option value="rotura">Contenedor dañado</option>
+                <option value="lleno">Contenedor lleno</option>
+                <option value="desbordado">Contenedor desbordado</option>
+                <option value="incendiado">Contenedor incendiado</option>
+              </select>
+
+              <label>Imagen (URL)</label>
+              <input id="imagenCrear" />
+
+              <label>Calle</label>
+              <input id="calleCrear" required />
+
+              <label>Barrio</label>
+              <input id="barrioCrear" required />
+
+              <label>Numero</label>
+              <input id="numeroCrear" required />
+
+              <button class="btn-crear-centro-acopio" type="submit">
+                Crear Incidencia
+              </button>
+              <button
+                class="btn-cancelar-centro-acopio"
+                type="button"
+                onclick="
+                  document
+                    .getElementById('overlayCrearIncidencias')
+                    .classList.remove('activo')
+                "
+              >
+                Cancelar
+              </button>
+            </form>
+          </div>
+        </div>
+
         <div class="menu-toggle" onclick="toggleMenu()">☰</div>
       </div>
 
       <nav id="menu">
         <ul>
           <li>
-            <button data-rol="Administrador"
+            <button
+              data-rol="Administrador"
               class="link-button"
               onclick="verificarAcceso('gestion.html')"
             >
@@ -46,7 +109,8 @@
           </li>
 
           <li>
-            <button data-rol="Administrador"
+            <button
+              data-rol="Administrador"
               class="link-button"
               onclick="verificarAcceso('panelcentroacopio.html')"
             >
@@ -55,7 +119,8 @@
           </li>
 
           <li>
-            <button data-rol="Administrador"
+            <button
+              data-rol="Administrador"
               class="link-button"
               onclick="verificarAcceso('panelincidencia.html')"
             >
@@ -64,7 +129,11 @@
           </li>
 
           <li>
-            <button data-rol="Administrador, Operario" class="link-button" onclick="verificarAcceso('rutas.html')">
+            <button
+              data-rol="Administrador, Operario"
+              class="link-button"
+              onclick="verificarAcceso('rutas.html')"
+            >
               Rutas
             </button>
           </li>
@@ -126,20 +195,60 @@
     </section>
 
     <script>
-      document.addEventListener("DOMContentLoaded",() => {
-        const rolUsuario = (localStorage.getItem("rol") || "").trim();
-        console.log('[filtro-roles] rol en localStorage:', JSON.stringify(localStorage.getItem("rol")));
+      const API_URL =
+        "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/";
 
-        document.querySelectorAll("[data-rol]").forEach(boton => {
+      document.addEventListener("DOMContentLoaded", () => {
+        const rolUsuario = (localStorage.getItem("rol") || "").trim();
+        console.log(
+          "[filtro-roles] rol en localStorage:",
+          JSON.stringify(localStorage.getItem("rol")),
+        );
+
+        document.querySelectorAll("[data-rol]").forEach((boton) => {
           const rolesPermitidos = boton.dataset.rol
             .split(",")
             .map((rol) => rol.trim());
 
-          if (!rolesPermitidos.includes(rolUsuario)){
+          if (!rolesPermitidos.includes(rolUsuario)) {
             boton.style.display = "none";
           }
         });
-      })
+      });
+
+      document
+        .getElementById("formCrearIncidencia")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const datos = {
+            mail: document.getElementById("mailCrear").value,
+            tipo: document.getElementById("tipoCrear").value,
+            estado: document.getElementById("estadoCrear").value,
+            imagen: document.getElementById("imagenCrear").value,
+            calle: document.getElementById("calleCrear").value,
+            barrio: document.getElementById("barrioCrear").value,
+            numero: document.getElementById("numeroCrear").value,
+          };
+
+          const resp = await fetch(`${API_URL}Registrar`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
+
+          const resultado = await resp.text();
+          console.log(resultado);
+
+          if (resultado.status === "success") {
+            document
+              .getElementById("overlayCrearIncidencias")
+              .classList.remove("activo");
+            obtenerIncidencias();
+          } else {
+            alert(resultado.mensaje);
+          }
+        });
 
       function toggleMenu() {
         document.getElementById("menu").classList.toggle("activo");
@@ -151,7 +260,6 @@
         } else {
           window.location.href = "login.html";
         }
-
       }
 
       function cerrarSesion() {
@@ -200,11 +308,6 @@
       }
 
       cargarUsuario();
-
-
-</script>
-
-
-</body>
-
+    </script>
+  </body>
 </html>

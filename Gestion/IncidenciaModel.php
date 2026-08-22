@@ -1,4 +1,7 @@
 <?php
+
+require_once __DIR__ . "/../Gestion/geocodificacion.php";
+
 class IncidenciaModel{
     private $mail;
     private $ID_operario;
@@ -9,15 +12,18 @@ class IncidenciaModel{
     private $numero;
     private $barrio;
     private $conexion;
+    private $geocodificador;
+    private $fecha;
 
     public function __construct($bd)
     {
         $this->conexion = $bd;
+        $this->geocodificador = new geocodificacion();
     }
 
     public function getAllIncidencias()
     {
-        $sql = "SELECT ID_incidencia, mail, ID_operario, tipo, estado, imagen, calle, numero, barrio FROM incidencia";
+        $sql = "SELECT * FROM incidencia";
         $stmt = mysqli_prepare($this->conexion, $sql);
         mysqli_stmt_execute($stmt);
         $resultado = mysqli_stmt_get_result($stmt);
@@ -34,9 +40,9 @@ class IncidenciaModel{
 
     public function buscarIncidencia($id)
     {
-        $sql = "SELECT ID_incidencia, mail, ID_operario, tipo, estado, imagen, calle, numero, barrio FROM incidencia WHERE idIncidencia = ?";
+        $sql = "SELECT * FROM incidencia WHERE ID_incidencia = ?";
         $stmt = mysqli_prepare($this->conexion, $sql);
-        mysqli_stmt_bind_param($stmt, "s", $id);
+        mysqli_stmt_bind_param($stmt, "i", $id);
         mysqli_stmt_execute($stmt);
         $resultado = mysqli_stmt_get_result($stmt);
         $incidencia = mysqli_fetch_assoc($resultado);
@@ -46,8 +52,18 @@ class IncidenciaModel{
     }
 
     public function crearIncidencia($m, $t, $e, $i, $c, $n,$b){
-            $sql = "INSERT INTO incidencia (mail, ID_operario, tipo, estado, imagen, calle, numero, barrio) VALUES (?,?,?,?,?,?,?,?)";
+            $sql = "INSERT INTO incidencia (mail, ID_operario, tipo, estado, imagen, calle, numero, barrio, lat, lon, fecha_creacion) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+            $direccion = $this->geocodificador->geocodificarDireccion($c, $n, $b);
+            if($direccion === null){
+                throw new Exception("No se pudo geocodificar la dirección");
+            }
+            date_default_timezone_set('America/Montevideo');
+            $fecha = date('Y-m-d H:i:s');
             $stmt = mysqli_prepare($this->conexion, $sql);
+
+            if($stmt === false){
+                throw new Exception("Error al preparar la consulta: " . mysqli_error($this->conexion));
+            }
             $this->mail = $m;
             $this->ID_operario = "";
             $this->tipo = $t;
@@ -57,7 +73,9 @@ class IncidenciaModel{
             $this->numero = $n;
             $this->barrio = $b;
 
-            $stmt->bind_param('sissssis', $this->mail, $this->ID_operario, $this->tipo, $this->estado,  $this->imagen,  $this->calle,  $this->numero,  $this->barrio);
+            $this->fecha = $fecha;
+
+            $stmt->bind_param('sissssisdds', $this->mail, $this->ID_operario, $this->tipo, $this->estado,  $this->imagen,  $this->calle,  $this->numero,  $this->barrio, $direccion['lat'], $direccion['lon'], $this->fecha);
             if($stmt->execute()){
                 $stmt->close();
                 return true;

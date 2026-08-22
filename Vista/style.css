@@ -2,27 +2,27 @@
    FUENTES Y VARIABLES
 ========================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap");
 
 :root {
-  --verde-bosque: #1F4630;
+  --verde-bosque: #1f4630;
   --verde: #2f8f3a;
   --verde-hover: #267530;
-  --verde-tinte: #E8F1E6;
-  --brote: #8FC93A;
-  --papel: #F2F4EE;
-  --panel: #FFFFFF;
-  --tinta: #1C231F;
-  --tinta-suave: #57615A;
-  --borde: #DCDFD5;
-  --oxido: #A6472B;
-  --oxido-hover: #8C3B23;
-  --acero: #3E6274;
+  --verde-tinte: #e8f1e6;
+  --brote: #8fc93a;
+  --papel: #f2f4ee;
+  --panel: #ffffff;
+  --tinta: #1c231f;
+  --tinta-suave: #57615a;
+  --borde: #dcdfd5;
+  --oxido: #a6472b;
+  --oxido-hover: #8c3b23;
+  --acero: #3e6274;
   --acero-hover: #345268;
-  --ambar: #C97A1E;
+  --ambar: #c97a1e;
 
-  --fuente-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
-  --fuente-texto: 'Work Sans', Arial, Helvetica, sans-serif;
+  --fuente-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --fuente-texto: "Work Sans", Arial, Helvetica, sans-serif;
 }
 
 * {
@@ -740,6 +740,71 @@ nav button:not(.link-button):hover {
 }
 
 /* =========================
+   BOTON REPORTAR INCIDENCIA
+========================= */
+
+.btn-crear-incidencia {
+  width: 45px;
+  height: 45px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 50%;
+
+  background: var(--ambar);
+  color: white;
+
+  font-family: var(--fuente-display);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+
+  cursor: pointer;
+
+  box-shadow: 0 6px 16px rgba(201, 122, 30, 0.35);
+
+  transition: 0.3s;
+}
+
+.btn-crear-incidencia:hover {
+  background: var(--oxido);
+  transform: translateY(-2px) scale(1.05);
+}
+
+.btn-crear-incidencia:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* =========================
+   OVERLAY CREAR INCIDENCIA
+========================= */
+
+/* Escopado por ID: el modal reutiliza la clase .crear-centro-acopio
+   (ya estilada arriba para el ABM de Centros de Acopio), así que estas
+   reglas se limitan a este overlay puntual para no afectar ese otro modal */
+
+#overlayCrearIncidencias .crear-centro-acopio {
+  position: relative;
+  overflow: hidden;
+
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+#overlayCrearIncidencias .crear-centro-acopio::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: var(--ambar);
+}
+
+/* =========================
    MENU USUARIO
 ========================= */
 
@@ -809,6 +874,13 @@ nav button:not(.link-button):hover {
     padding: 10px 12px;
 
     font-size: 14px;
+  }
+
+  .btn-crear-incidencia {
+    width: 38px;
+    height: 38px;
+
+    font-size: 20px;
   }
 }
 /* =========================
