@@ -1,4 +1,5 @@
     <?php
+    require_once __DIR__ . "/../Gestion/geocodificacion.php";
 class ContenedorModel
 {
     private $capacidadCarga;
@@ -8,15 +9,19 @@ class ContenedorModel
     private $numero;
     private $barrio;
     private $conexion;
+    private $latitud;
+    private $longitud;
+    private $geocodificador;
 
     public function __construct($bd)
     {
         $this->conexion = $bd;
+        $this->geocodificador = new geocodificacion();
     }
 
     public function getAllContenedores()
     {
-        $sql = "SELECT ID_contenedor, tipo, capacidadCarga, estado, calle, numero, barrio FROM contenedor";
+        $sql = "SELECT ID_contenedor, tipo, capacidadCarga, estado, calle, numero, barrio, lat, lon FROM contenedor";
         $stmt = mysqli_prepare($this->conexion, $sql);
         mysqli_stmt_execute($stmt);
         $resultado = mysqli_stmt_get_result($stmt);
@@ -43,16 +48,21 @@ class ContenedorModel
         return $contenedor;
     }
     public function crearContenedor($cap, $t, $e, $c, $n,$b){
-            $sql = "INSERT INTO contenedor (capacidadCarga, tipo, estado, calle, numero, barrio) VALUES (?,?,?,?,?,?)";
+        $ubicacion = $this->geocodificador->geocodificarDireccion($c, $n, $b);
+        if($ubicacion === null){
+            throw new Exception("No se pudo geocodificar la dirección proporcionada.");
+        }
+            $sql = "INSERT INTO contenedor (capacidadCarga, tipo, estado, calle, numero, barrio, lat, lon) VALUES (?,?,?,?,?,?,?,?,?)";
             $stmt = mysqli_prepare($this->conexion, $sql);
-            $this->capacidadCarga = $cap;
+            $this->capacidadCarga = (!empty($cap)) ? $cap : 0;
             $this->tipo = $t;
-            $this->estado = $e;
+            $this->estado = (!empty($e)) ? $e : '';
             $this->calle = $c;
             $this->numero = $n;
             $this->barrio = $b;
-
-            $stmt->bind_param('isssis', $this->capacidadCarga, $this->tipo, $this->estado, $this->calle, $this->numero, $this->barrio);
+            $this->latitud = $ubicacion['lat'];
+            $this->longitud = $ubicacion['lon'];
+            $stmt->bind_param('isssisdd', $this->capacidadCarga, $this->tipo, $this->estado, $this->calle, $this->numero, $this->barrio, $this->latitud, $this->longitud);
             if($stmt->execute()){
                 $stmt->close();
                 return true;

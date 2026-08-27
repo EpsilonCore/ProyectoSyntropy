@@ -108,16 +108,54 @@
 
           incidencias.forEach((inc) => {
             if (!inc.lat || !inc.lon) return;
-            L.circleMarker([inc.lat, inc.lon], {
-              radius: 5,
-              color: "#000",
-              fillColor: "#000",
-              fillOpacity: 1,
-            })
-              .addTo(map)
-              .bindPopup(
-                `<strong>${inc.tipo}</strong><br>${inc.calle} ${inc.numero}, ${inc.barrio}<br>Estado: ${inc.estado}`,
-              );
+            if (inc.tipo === "desbordado") {
+              L.circleMarker([inc.lat, inc.lon], {
+                radius: 5,
+                color: "#936c01",
+                fillColor: "#936c01",
+                fillOpacity: 1,
+              })
+                .addTo(map)
+                .bindPopup(
+                  `<strong>${inc.tipo}</strong><br>${inc.calle} ${inc.numero}, ${inc.barrio}<br>Estado: ${inc.estado}`,
+                );
+            }
+            if (inc.tipo === "rotura") {
+              L.circleMarker([inc.lat, inc.lon], {
+                radius: 5,
+                color: "#000000",
+                fillColor: "#000000",
+                fillOpacity: 1,
+              })
+                .addTo(map)
+                .bindPopup(
+                  `<strong>${inc.tipo}</strong><br>${inc.calle} ${inc.numero}, ${inc.barrio}<br>Estado: ${inc.estado}`,
+                );
+            }
+            if (inc.tipo === "incendiado") {
+              L.circleMarker([inc.lat, inc.lon], {
+                radius: 5,
+                color: "#ffa200",
+                fillColor: "#ffa200",
+                fillOpacity: 1,
+              })
+                .addTo(map)
+                .bindPopup(
+                  `<strong>${inc.tipo}</strong><br>${inc.calle} ${inc.numero}, ${inc.barrio}<br>Estado: ${inc.estado}`,
+                );
+            }
+            if (inc.tipo === "lleno") {
+              L.circleMarker([inc.lat, inc.lon], {
+                radius: 5,
+                color: "#861313",
+                fillColor: "#861313",
+                fillOpacity: 1,
+              })
+                .addTo(map)
+                .bindPopup(
+                  `<strong>${inc.tipo}</strong><br>${inc.calle} ${inc.numero}, ${inc.barrio}<br>Estado: ${inc.estado}`,
+                );
+            }
           });
         } catch (err) {
           console.error("Error al cargar las incidencias:", err);
@@ -172,20 +210,6 @@
         },
       ).addTo(map);
 
-      var marcadorCentro = L.marker([-34.894555, -56.124376]).addTo(map);
-      marcadorCentro.bindPopup(
-        "<b>Buceo</b><br>Contenedor de la casa de emilia.",
-      );
-
-      var estadio = L.marker([-34.8944, -56.1528]).addTo(map);
-      estadio.bindPopup(
-        "<b>Estadio Centenario</b><br>Punto de reciclaje de envases plásticos.",
-      );
-
-      var letrasMvd = L.marker([-34.9066, -56.1469]).addTo(map);
-      letrasMvd.bindPopup(
-        "<b>Letras de Montevideo</b><br>Contenedor inteligente de vidrio.",
-      );
       CargarIncidenciasMapa();
     </script>
   </body>

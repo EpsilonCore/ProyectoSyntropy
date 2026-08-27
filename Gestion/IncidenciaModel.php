@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . "/../Gestion/geocodificacion.php";
+require_once __DIR__ . "/../Gestion/ContenedorModel.php";
 
 class IncidenciaModel{
     private $mail;
@@ -14,11 +15,14 @@ class IncidenciaModel{
     private $conexion;
     private $geocodificador;
     private $fecha;
+    private $tipoContenedor;
+    private $contenedorModel;
 
     public function __construct($bd)
     {
         $this->conexion = $bd;
         $this->geocodificador = new geocodificacion();
+        $this->contenedorModel = new ContenedorModel($bd);
     }
 
     public function getAllIncidencias()
@@ -51,8 +55,8 @@ class IncidenciaModel{
         return $incidencia;
     }
 
-    public function crearIncidencia($m, $t, $e, $i, $c, $n,$b){
-            $sql = "INSERT INTO incidencia (mail, ID_operario, tipo, estado, imagen, calle, numero, barrio, lat, lon, fecha_creacion) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+    public function crearIncidencia($m, $t, $e, $i, $c, $n,$b, $tipoContenedor){
+            $sql = "INSERT INTO incidencia (mail, ID_operario, tipo, estado, imagen, calle, numero, barrio, lat, lon, fecha_creacion, tipoContenedor) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
             $direccion = $this->geocodificador->geocodificarDireccion($c, $n, $b);
             if($direccion === null){
                 throw new Exception("No se pudo geocodificar la dirección");
@@ -72,10 +76,11 @@ class IncidenciaModel{
             $this->calle = $c;
             $this->numero = $n;
             $this->barrio = $b;
+            $this->tipoContenedor = $tipoContenedor;
 
             $this->fecha = $fecha;
 
-            $stmt->bind_param('sissssisdds', $this->mail, $this->ID_operario, $this->tipo, $this->estado,  $this->imagen,  $this->calle,  $this->numero,  $this->barrio, $direccion['lat'], $direccion['lon'], $this->fecha);
+            $stmt->bind_param('sissssisddss', $this->mail, $this->ID_operario, $this->tipo, $this->estado,  $this->imagen,  $this->calle,  $this->numero,  $this->barrio, $direccion['lat'], $direccion['lon'], $this->fecha, $this->tipoContenedor);
             if($stmt->execute()){
                 $stmt->close();
                 return true;
@@ -84,6 +89,7 @@ class IncidenciaModel{
                 return false;
             }
         }
+
 
     public function AsignarOperario($idIncidencia, $idOperario){
         $sql = "UPDATE incidencia SET ID_operario = ? WHERE ID_incidencia = ?";
@@ -107,5 +113,6 @@ class IncidenciaModel{
         mysqli_stmt_close($stmt);
         return $resultado;
     }
-}
 
+
+}

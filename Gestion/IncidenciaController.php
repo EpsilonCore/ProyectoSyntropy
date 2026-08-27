@@ -36,8 +36,8 @@ class IncidenciaController{
             $c = $datos->calle;
             $n = $datos->numero;
             $b = $datos->barrio;
- 
-        $resultado= $this->modeloObj -> crearIncidencia($m, $t, $e, $i, $c,$n,$b);
+            $tipoContenedor = $datos->tipoContenedor;
+        $resultado= $this->modeloObj -> crearIncidencia($m, $t, $e, $i, $c,$n,$b, $tipoContenedor);
 
         if ($resultado) {
         return ["status" => "success", "mensaje" => "Incidencia creada correctamente"];

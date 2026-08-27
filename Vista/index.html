@@ -64,16 +64,48 @@
               </select>
 
               <label>Imagen (URL)</label>
-              <input id="imagenCrear" />
+              <input
+                id="imagenCrear"
+                type="url"
+                placeholder="https://ejemplo.com/foto.jpg"
+              />
 
-              <label>Calle</label>
-              <input id="calleCrear" required />
+              <div id="previewImagenCrear" class="preview-imagen">
+                <img
+                  id="imgPreviewCrear"
+                  src=""
+                  alt="Vista previa de la imagen"
+                />
+              </div>
 
-              <label>Barrio</label>
-              <input id="barrioCrear" required />
+              <label
+                >Contenedor:
+                <select id="selectContenedor">
+                  <option value="">Cargando contenedores...</option>
+                  <option value="nuevo">
+                    No está en la lista (nueva dirección)
+                  </option>
+                </select>
+              </label>
 
-              <label>Numero</label>
-              <input id="numeroCrear" required />
+              <div id="camposDireccionNueva" style="display: none">
+                <input type="text" id="calleCrear" placeholder="Calle" />
+                <input type="text" id="numeroCrear" placeholder="Número" />
+                <input type="text" id="barrioCrear" placeholder="Barrio" />
+
+                <label
+                  >Tipo de contenedor:
+                  <select id="tipoContenedorCrear">
+                    <option value="Naranja">Reciclables</option>
+                    <option value="Metalico">
+                      Metalico - Residuos mezclados
+                    </option>
+                    <option value="Plastico">
+                      Plástico - Residuos mezclados
+                    </option>
+                  </select>
+                </label>
+              </div>
 
               <button class="btn-crear-centro-acopio" type="submit">
                 Crear Incidencia
@@ -216,40 +248,6 @@
         });
       });
 
-      document
-        .getElementById("formCrearIncidencia")
-        .addEventListener("submit", async (event) => {
-          event.preventDefault();
-
-          const datos = {
-            mail: document.getElementById("mailCrear").value,
-            tipo: document.getElementById("tipoCrear").value,
-            estado: document.getElementById("estadoCrear").value,
-            imagen: document.getElementById("imagenCrear").value,
-            calle: document.getElementById("calleCrear").value,
-            barrio: document.getElementById("barrioCrear").value,
-            numero: document.getElementById("numeroCrear").value,
-          };
-
-          const resp = await fetch(`${API_URL}Registrar`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(datos),
-          });
-
-          const resultado = await resp.text();
-          console.log(resultado);
-
-          if (resultado.status === "success") {
-            document
-              .getElementById("overlayCrearIncidencias")
-              .classList.remove("activo");
-            obtenerIncidencias();
-          } else {
-            alert(resultado.mensaje);
-          }
-        });
-
       function toggleMenu() {
         document.getElementById("menu").classList.toggle("activo");
       }
@@ -285,21 +283,21 @@
 
           usuario.innerHTML = `
 
-        <span class="nombre-usuario">${nombre}</span>
+            <span class="nombre-usuario">${nombre}</span>
 
-        <button class="usuario-btn" onclick="abrirUsuario()">
-            ${inicial}
-        </button>
-
-        <div id="menuUsuario" class="menu-usuario">
-
-            <button onclick="cerrarSesion()">
-                Cerrar Sesión
+            <button class="usuario-btn" onclick="abrirUsuario()">
+                ${inicial}
             </button>
 
-        </div>
+            <div id="menuUsuario" class="menu-usuario">
 
-        `;
+                <button onclick="cerrarSesion()">
+                    Cerrar Sesión
+                </button>
+
+            </div>
+
+            `;
         }
       }
 
@@ -308,6 +306,120 @@
       }
 
       cargarUsuario();
+
+      document
+        .getElementById("formCrearIncidencia")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const datos = {
+            mail: document.getElementById("mailCrear").value,
+            tipo: document.getElementById("tipoCrear").value,
+            estado: document.getElementById("estadoCrear").value,
+            imagen: document.getElementById("imagenCrear").value,
+            calle: document.getElementById("calleCrear").value,
+            barrio: document.getElementById("barrioCrear").value,
+            numero: document.getElementById("numeroCrear").value,
+            tipoContenedor: document.getElementById("tipoContenedorCrear")
+              .value,
+          };
+
+          const resp = await fetch(`${API_URL}Registrar`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
+
+          const resultado = await resp.text();
+          console.log(resultado);
+
+          if (resultado.status === "success") {
+            document
+              .getElementById("overlayCrearIncidencias")
+              .classList.remove("activo");
+            obtenerIncidencias();
+          } else {
+            alert(resultado.mensaje);
+          }
+        });
+
+      async function cargarContenedoresEnSelect() {
+        const respuesta = await fetch(
+          "/Proyecto/ProyectoSyntropy/Gestion/miApi/Contenedores",
+        );
+        const contenedores = await respuesta.json();
+
+        const select = document.getElementById("selectContenedor");
+        select.innerHTML = '<option value="">Seleccioná un contenedor</option>';
+
+        contenedores.forEach((c) => {
+          const opcion = document.createElement("option");
+          opcion.value = c.ID_contenedor;
+          opcion.textContent = `${c.calle} ${c.numero}, ${c.barrio}`;
+          select.appendChild(opcion);
+        });
+
+        const opcionNueva = document.createElement("option");
+        opcionNueva.value = "nuevo";
+        opcionNueva.textContent = "No está en la lista (nueva dirección)";
+        select.appendChild(opcionNueva);
+      }
+
+      document.getElementById("imagenCrear").addEventListener("input", (e) => {
+        const url = e.target.value.trim();
+        const preview = document.getElementById("previewImagenCrear");
+        const img = document.getElementById("imgPreviewCrear");
+
+        if (url) {
+          img.src = url;
+          preview.classList.add("activo");
+        } else {
+          preview.classList.remove("activo");
+        }
+      });
+
+      document
+        .getElementById("selectContenedor")
+        .addEventListener("change", (e) => {
+          document.getElementById("camposDireccionNueva").style.display =
+            e.target.value === "nuevo" ? "block" : "none";
+        });
+      document
+        .getElementById("formIncidencia")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const idSeleccionado =
+            document.getElementById("selectContenedor").value;
+
+          const body = {
+            mail: document.getElementById("mailIncidencia").value,
+            tipo: document.getElementById("tipoIncidencia").value,
+            imagenUrl: document.getElementById("imagenIncidencia").value,
+          };
+
+          if (idSeleccionado === "nuevo") {
+            body.calle = document.getElementById("calleNueva").value;
+            body.numero = document.getElementById("numeroNueva").value;
+            body.barrio = document.getElementById("barrioNueva").value;
+            body.tipoContenedor = document.getElementById(
+              "tipoContenedorNuevo",
+            ).value;
+          } else {
+            body.idContenedor = idSeleccionado;
+          }
+
+          const respuesta = await fetch(
+            "/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/Registrar",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(body),
+            },
+          );
+        });
+
+      cargarContenedoresEnSelect();
     </script>
   </body>
 </html>
