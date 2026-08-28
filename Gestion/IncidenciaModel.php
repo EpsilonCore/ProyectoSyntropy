@@ -57,7 +57,7 @@ class IncidenciaModel{
 
     public function crearIncidencia($m, $t, $e, $i, $c, $n,$b, $tipoContenedor){
             $sql = "INSERT INTO incidencia (mail, ID_operario, tipo, estado, imagen, calle, numero, barrio, lat, lon, fecha_creacion, tipoContenedor) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
-            $direccion = $this->geocodificador->geocodificarDireccion($c, $n, $b);
+            $direccion = $this->geocodificador->GYSDireccion($c, $n, $b);
             if($direccion === null){
                 throw new Exception("No se pudo geocodificar la dirección");
             }

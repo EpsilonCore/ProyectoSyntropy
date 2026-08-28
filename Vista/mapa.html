@@ -110,7 +110,7 @@
             if (!inc.lat || !inc.lon) return;
             if (inc.tipo === "desbordado") {
               L.circleMarker([inc.lat, inc.lon], {
-                radius: 5,
+                radius: 3,
                 color: "#936c01",
                 fillColor: "#936c01",
                 fillOpacity: 1,
@@ -122,7 +122,7 @@
             }
             if (inc.tipo === "rotura") {
               L.circleMarker([inc.lat, inc.lon], {
-                radius: 5,
+                radius: 3,
                 color: "#000000",
                 fillColor: "#000000",
                 fillOpacity: 1,
@@ -134,7 +134,7 @@
             }
             if (inc.tipo === "incendiado") {
               L.circleMarker([inc.lat, inc.lon], {
-                radius: 5,
+                radius: 3,
                 color: "#ffa200",
                 fillColor: "#ffa200",
                 fillOpacity: 1,
@@ -146,7 +146,7 @@
             }
             if (inc.tipo === "lleno") {
               L.circleMarker([inc.lat, inc.lon], {
-                radius: 5,
+                radius: 3,
                 color: "#861313",
                 fillColor: "#861313",
                 fillOpacity: 1,
@@ -159,6 +159,66 @@
           });
         } catch (err) {
           console.error("Error al cargar las incidencias:", err);
+        }
+      }
+      async function CargarContenedoresMapa() {
+        try {
+          const respuesta = await fetch(
+            "/Proyecto/ProyectoSyntropy/Gestion/miApi/Contenedores",
+          );
+          const contenedores = await respuesta.json();
+          console.log("Contenedores cargados:", contenedores);
+
+          contenedores.forEach((cont) => {
+            if (!cont.lat || !cont.lon) return;
+            if (cont.estado === "Vacio") {
+              L.circleMarker([cont.lat, cont.lon], {
+                radius: 3,
+                color: "#23c40e",
+                fillColor: "#23c40e",
+                fillOpacity: 1,
+              })
+                .addTo(map)
+                .bindPopup(
+                  `<strong>Contenedor</strong><br>${cont.calle} ${cont.numero}, ${cont.barrio}<br>Capacidad: ${cont.capacidadCarga}<br>Tipo: ${cont.tipo}<br>Estado: ${cont.estado}`,
+                );
+            } else if (cont.estado === "Lleno") {
+              L.circleMarker([cont.lat, cont.lon], {
+                radius: 3,
+                color: "#ff0000",
+                fillColor: "#ff0000",
+                fillOpacity: 1,
+              })
+                .addTo(map)
+                .bindPopup(
+                  `<strong>Contenedor</strong><br>${cont.calle} ${cont.numero}, ${cont.barrio}<br>Capacidad: ${cont.capacidadCarga}<br>Tipo: ${cont.tipo}<br>Estado: ${cont.estado}`,
+                );
+            } else if (cont.estado === "Desbordado") {
+              L.circleMarker([cont.lat, cont.lon], {
+                radius: 3,
+                color: "#000000",
+                fillColor: "#000000",
+                fillOpacity: 1,
+              })
+                .addTo(map)
+                .bindPopup(
+                  `<strong>Contenedor</strong><br>${cont.calle} ${cont.numero}, ${cont.barrio}<br>Capacidad: ${cont.capacidadCarga}<br>Tipo: ${cont.tipo}<br>Estado: ${cont.estado}`,
+                );
+            } else if (cont.estado === "Media capacidad") {
+              L.circleMarker([cont.lat, cont.lon], {
+                radius: 3,
+                color: "#fdd408",
+                fillColor: "#fdd408",
+                fillOpacity: 1,
+              })
+                .addTo(map)
+                .bindPopup(
+                  `<strong>Contenedor</strong><br>${cont.calle} ${cont.numero}, ${cont.barrio}<br>Capacidad: ${cont.capacidadCarga}<br>Tipo: ${cont.tipo}<br>Estado: ${cont.estado}`,
+                );
+            }
+          });
+        } catch (err) {
+          console.error("Error al cargar los contenedores:", err);
         }
       }
 
@@ -203,14 +263,13 @@
 
       var map = L.map("map").setView([-34.9011, -56.1645], 13);
 
-      L.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-        {
-          attribution: "&copy; OpenStreetMap &copy; CARTO",
-        },
-      ).addTo(map);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors",
+        maxZoom: 19,
+      }).addTo(map);
 
       CargarIncidenciasMapa();
+      CargarContenedoresMapa();
     </script>
   </body>
 </html>

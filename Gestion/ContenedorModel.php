@@ -21,7 +21,7 @@ class ContenedorModel
 
     public function getAllContenedores()
     {
-        $sql = "SELECT ID_contenedor, tipo, capacidadCarga, estado, calle, numero, barrio, lat, lon FROM contenedor";
+        $sql = "SELECT * FROM contenedor";
         $stmt = mysqli_prepare($this->conexion, $sql);
         mysqli_stmt_execute($stmt);
         $resultado = mysqli_stmt_get_result($stmt);
@@ -48,15 +48,15 @@ class ContenedorModel
         return $contenedor;
     }
     public function crearContenedor($cap, $t, $e, $c, $n,$b){
-        $ubicacion = $this->geocodificador->geocodificarDireccion($c, $n, $b);
+        $ubicacion = $this->geocodificador->GYSDireccion($c, $n, $b);
         if($ubicacion === null){
             throw new Exception("No se pudo geocodificar la dirección proporcionada.");
         }
-            $sql = "INSERT INTO contenedor (capacidadCarga, tipo, estado, calle, numero, barrio, lat, lon) VALUES (?,?,?,?,?,?,?,?,?)";
+            $sql = "INSERT INTO contenedor (capacidadCarga, tipo, estado, calle, numero, barrio, lat, lon) VALUES (?,?,?,?,?,?,?,?)";
             $stmt = mysqli_prepare($this->conexion, $sql);
-            $this->capacidadCarga = (!empty($cap)) ? $cap : 0;
+            $this->capacidadCarga = $cap;
             $this->tipo = $t;
-            $this->estado = (!empty($e)) ? $e : '';
+            $this->estado = $e;
             $this->calle = $c;
             $this->numero = $n;
             $this->barrio = $b;

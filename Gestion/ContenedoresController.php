@@ -26,7 +26,7 @@ class ContenedoresController
 	public function crearContenedor(){
 		$json = file_get_contents('php://input');
 			$datos = json_decode($json);
-			if(!$datos|| !isset($datos->tipo) || !isset($datos->calle) || !isset($datos->numero) || !isset($datos->barrio) || !isset($datos->lat) || !isset($datos->lon)){
+			if(!$datos|| !isset($datos->tipo) || !isset($datos->calle) || !isset($datos->numero) || !isset($datos->barrio) || !isset($datos->capCarga) || !isset($datos->estado)){
 				http_response_code(400);
 				return ['status' => 'error', 'mensaje' => 'Faltan campos obligatorios'];
 			}
@@ -36,10 +36,8 @@ class ContenedoresController
 			$c = $datos->calle;
 			$n = $datos->numero;
 			$b = $datos->barrio;
-			$lat = $datos->lat;
-			$lon = $datos->lon;
 
-		$resultado= $this->modeloObj -> crearContenedor($cap, $t, $e, $c,$n,$b, $lat, $lon);
+		$resultado= $this->modeloObj -> crearContenedor($cap, $t, $e, $c,$n,$b);
 
 		if ($resultado) {
         return ["status" => "success", "mensaje" => "Contenedor creado correctamente"];
