@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Panel de Incidencias - Epsilon</title>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <script>
+      if (localStorage.getItem("logueado") !== "si") {
+        window.location.href = "login.html";
+      }
+    </script>
+
+    <header>
+      <div class="logo">
+        <a href="index.html">
+          <img src="logo.png" alt="Epsilon" />
+        </a>
+      </div>
+
+      <div class="header-actions">
+        <div id="usuario" class="usuario"></div>
+
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+      </div>
+
+      <nav id="menu">
+        <ul>
+          <li>
+            <button
+              class="link-button"
+              onclick="window.location.href = 'gestion.html'"
+            >
+              Gestión
+            </button>
+          </li>
+
+          <li>
+            <button
+              class="link-button"
+              onclick="window.location.href = 'panelregistro.html'"
+            >
+              Panel Registro
+            </button>
+          </li>
+
+          <li>
+            <button
+              class="link-button"
+              onclick="window.location.href = 'panelcontenedor.html'"
+            >
+              Contenedores
+            </button>
+          </li>
+
+          <li>
+            <button
+              class="link-button"
+              onclick="window.location.href = 'panelcamion.html'"
+            >
+              Camiones
+            </button>
+          </li>
+
+          <li>
+            <button
+              class="link-button"
+              onclick="window.location.href = 'panelusuario.html'"
+            >
+              Panel de Usuario
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="pagina">
+      <h2>Panel de Incidencias</h2>
+
+      <p>Administración de Incidencias del sistema.</p>
+
+      <div class="panel" id="OverlayCrearUsuario">
+        <button onclick="abrirCrearIncidencia()">Crear Incidencia</button>
+      </div>
+
+      <div class="overlay" id="overlayCrearIncidencias">
+        <div class="crear-centro-acopio">
+          <h3>Crear Incidencia</h3>
+          <form id="formCrearIncidencia">
+            <input type="hidden" id="estadoCrear" value="Pendiente" />
+
+            <label>Mail</label>
+            <input id="mailCrear" type="email" required />
+
+            <label>Tipo</label>
+            <select id="tipoCrear" required>
+              <option value="" disabled selected>Seleccione un tipo</option>
+              <option value="rotura">Contenedor dañado</option>
+              <option value="lleno">Contenedor lleno</option>
+              <option value="desbordado">Contenedor desbordado</option>
+              <option value="incendiado">Contenedor incendiado</option>
+            </select>
+
+            <label>Imagen (URL)</label>
+            <input id="imagenCrear" />
+
+            <label>Calle</label>
+            <input id="calleCrear" required />
+
+            <label>Barrio</label>
+            <input id="barrioCrear" required />
+
+            <label>Numero</label>
+            <input id="numeroCrear" required />
+
+            <button class="btn-crear-centro-acopio" type="submit">
+              Crear Incidencia
+            </button>
+            <button
+              class="btn-cancelar-centro-acopio"
+              type="button"
+              onclick="
+                document
+                  .getElementById('overlayCrearIncidencias')
+                  .classList.remove('activo')
+              "
+            >
+              Cancelar
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="lista-panel">
+        <h3>Lista de Incidencias</h3>
+        <ul id="listaIncidencias">
+          <p>Cargando incidencias...</p>
+        </ul>
+      </div>
+    </div>
+
+    <div
+      class="overlay"
+      id="overlayAsignarOperario"
+      onclick="cerrarModalAsignarOperario(event)"
+    >
+      <div class="modal-usuarios">
+        <h3>Asignar operario</h3>
+
+        <form id="formAsignarOperario">
+          <input type="hidden" id="idOriginal" />
+
+          <label>ID Operario</label>
+          <input id="idOperarioAsignar" required />
+
+          <button class="btn-guardar-centro-acopio" type="submit">
+            Guardar cambios
+          </button>
+          <button
+            class="btn-cancelar-centro-acopio"
+            type="button"
+            onclick="
+              document
+                .getElementById('overlayAsignarOperario')
+                .classList.remove('activo')
+            "
+          >
+            Cancelar
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const API_URL =
+        "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/";
+      let incidencias = [];
+
+      document
+        .getElementById("formAsignarOperario")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const datos = {
+            idIncidencia: document.getElementById("idOriginal").value,
+            idOperario: document.getElementById("idOperarioAsignar").value,
+          };
+
+          const resp = await fetch(`${API_URL}AsignarOperario`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
+
+          const resultado = await resp.json();
+
+          if (resultado.status === "success") {
+            document
+              .getElementById("overlayAsignarOperario")
+              .classList.remove("activo");
+            obtenerIncidencias(); // refresca la lista
+          } else {
+            alert(resultado.mensaje);
+          }
+        });
+
+      document
+        .getElementById("formCrearIncidencia")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const datos = {
+            mail: document.getElementById("mailCrear").value,
+            tipo: document.getElementById("tipoCrear").value,
+            estado: document.getElementById("estadoCrear").value,
+            imagen: document.getElementById("imagenCrear").value,
+            calle: document.getElementById("calleCrear").value,
+            barrio: document.getElementById("barrioCrear").value,
+            numero: document.getElementById("numeroCrear").value,
+          };
+
+          const resp = await fetch(`${API_URL}Registrar`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
+
+          const resultado = await resp.json();
+
+          if (resultado.status === "success") {
+            document
+              .getElementById("overlayCrearIncidencias")
+              .classList.remove("activo");
+            obtenerIncidencias();
+          } else {
+            alert(resultado.mensaje);
+          }
+        });
+
+      function toggleMenu() {
+        document.getElementById("menu").classList.toggle("activo");
+      }
+
+      function cerrarSesion() {
+        localStorage.removeItem("logueado");
+        localStorage.removeItem("nombreUsuario");
+
+        window.location.href = "index.html";
+      }
+
+      function cargarUsuario() {
+        const nombre = localStorage.getItem("nombreUsuario") || "Usuario";
+        const inicial = nombre.charAt(0).toUpperCase();
+
+        document.getElementById("usuario").innerHTML = `
+
+      <span class="nombre-usuario">${nombre}</span>
+
+      <button class="usuario-btn" onclick="abrirUsuario()">
+          ${inicial}
+      </button>
+
+      <div id="menuUsuario" class="menu-usuario">
+
+          <button onclick="cerrarSesion()">
+              Cerrar Sesión
+          </button>
+
+      </div>
+
+      `;
+      }
+
+      function abrirUsuario() {
+        document.getElementById("menuUsuario").classList.toggle("activo");
+      }
+
+      cargarUsuario();
+
+      function abrirCrearIncidencia() {
+        document
+          .getElementById("overlayCrearIncidencias")
+          .classList.add("activo");
+      }
+
+      function cerrarModalAsignarOperario(evento) {
+        if (evento.target.id === "overlayAsignarOperario") {
+          document
+            .getElementById("overlayAsignarOperario")
+            .classList.remove("activo");
+        }
+      }
+
+      function seleccionarIncidencia(ID_incidencia) {
+        const incidencia = incidencias.find(
+          (i) => i.ID_incidencia === ID_incidencia,
+        );
+        if (!incidencia) return;
+
+        document.getElementById("idOriginal").value = incidencia.ID_incidencia;
+        document.getElementById("idOperarioAsignar").value =
+          incidencia.ID_operario || "";
+
+        document
+          .getElementById("overlayAsignarOperario")
+          .classList.add("activo");
+      }
+
+      async function obtenerIncidencias() {
+        try {
+          const resp = await fetch(`${API_URL}Incidencias`);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          const todas = Array.isArray(data) ? data : data?.incidencias || [];
+          incidencias = todas;
+          renderizarLista();
+        } catch (error) {
+          console.error("Error al obtener incidencias:", error);
+        }
+      }
+
+      async function eliminarIncidencia(id) {
+        if (confirm("¿Está seguro de que desea eliminar esta incidencia?")) {
+          const resp = await fetch(`${API_URL}Borrar`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idIncidencia: id }),
+          });
+          try {
+            const resultado = await resp.json();
+            if (resultado.status === "success") {
+              obtenerIncidencias();
+            } else {
+              alert("No se pudo eliminar la incidencia.");
+            }
+          } catch (error) {
+            console.error(error);
+            alert("Error de conexión al eliminar incidencia.");
+          }
+        }
+      }
+
+      function renderizarLista() {
+        const listaContainer = document.getElementById("listaIncidencias");
+
+        if (incidencias.length === 0) {
+          listaContainer.innerHTML = "<p>No hay incidencias disponibles.</p>";
+          return;
+        }
+
+        let html = '<ul style="list-style: none; padding: 0; margin: 0;">';
+
+        incidencias.forEach((incidencia) => {
+          html += `
+<li class="incidencia-item">
+  <div class="incidencia-info">
+    <strong>#${incidencia.ID_incidencia} — ${incidencia.tipo}</strong>
+    <span class="incidencia-estado">${incidencia.estado}</span>
+    <p>${incidencia.mail} · ${incidencia.calle} ${incidencia.numero}, ${incidencia.barrio}</p>
+    <p>Operario asignado: ${incidencia.ID_operario ? incidencia.ID_operario : "Sin asignar"}</p>
+  </div>
+  <span class="incidencia-acciones">
+    <button class="btn-modificar" onclick="seleccionarIncidencia(${incidencia.ID_incidencia})">
+      Asignar Operario
+    </button>
+    <button
+      class="btn-eliminar"
+      onclick="eliminarIncidencia(${incidencia.ID_incidencia})">
+      Eliminar
+    </button>
+  </span>
+</li>`;
+        });
+
+        html += "</ul>";
+        listaContainer.innerHTML = html;
+      }
+
+      obtenerIncidencias();
+    </script>
+  </body>
+</html>
