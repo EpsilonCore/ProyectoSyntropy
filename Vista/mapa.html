@@ -89,8 +89,11 @@
       <p>Visualización geográfica de la ciudad.</p>
 
       <div class="panel">
-        <button>Ver Contenedores</button>
+        <button onclick="vertodo()">Ver todo</button>
+        <button onclick="soloContenedores()">Ver Contenedores</button>
+        <button onclick="soloIncidencias()">Ver Incidencias</button>
         <button>Ver Camiones</button>
+        <button>Ver Rutas</button>
         <button>Actualizar Mapa</button>
       </div>
 
@@ -267,6 +270,27 @@
         attribution: "&copy; OpenStreetMap contributors",
         maxZoom: 19,
       }).addTo(map);
+
+      function limpiarMapa() {
+        map.eachLayer(function (layer) {
+          if (layer instanceof L.CircleMarker) {
+            map.removeLayer(layer);
+          }
+        });
+      }
+      function soloContenedores() {
+        limpiarMapa();
+        CargarContenedoresMapa();
+      }
+      function soloIncidencias() {
+        limpiarMapa();
+        CargarIncidenciasMapa();
+      }
+      function vertodo() {
+        limpiarMapa();
+        CargarContenedoresMapa();
+        CargarIncidenciasMapa();
+      }
 
       CargarIncidenciasMapa();
       CargarContenedoresMapa();
