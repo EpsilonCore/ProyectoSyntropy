@@ -817,6 +817,49 @@ nav button:not(.link-button):hover {
   background: var(--papel);
 }
 
+/* =========================
+   LISTA CONTENEDORES (INCIDENCIA)
+========================= */
+
+.lista-contenedores {
+  max-height: 220px;
+  overflow-y: auto;
+
+  margin-top: 6px;
+  margin-bottom: 6px;
+
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+}
+
+.item-contenedores {
+  padding: 10px 14px;
+
+  border-bottom: 1px solid var(--borde);
+
+  font-size: 0.9rem;
+  color: var(--tinta);
+
+  cursor: pointer;
+
+  transition: background-color 0.15s;
+}
+
+.item-contenedores:last-child {
+  border-bottom: none;
+}
+
+.item-contenedores:hover {
+  background: var(--verde-tinte);
+}
+
+.item-contenedores.seleccionado {
+  background: var(--verde-tinte);
+  border-left: 4px solid var(--verde);
+  font-weight: 600;
+  color: var(--verde-bosque);
+}
+
 .preview-imagen.activo {
   display: block;
 }

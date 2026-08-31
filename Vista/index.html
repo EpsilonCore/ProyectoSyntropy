@@ -39,7 +39,8 @@
           onclick="
             document
               .getElementById('overlayCrearIncidencias')
-              .classList.add('activo')
+              .classList.add('activo');
+            cargarListaContenedores();
           "
         >
           Crear Incidencia
@@ -78,15 +79,43 @@
                 />
               </div>
 
-              <label
-                >Contenedor:
-                <select id="selectContenedor">
-                  <option value="">Cargando contenedores...</option>
-                  <option value="nuevo">
-                    No está en la lista (nueva dirección)
-                  </option>
-                </select>
-              </label>
+              <label>Contenedor:</label>
+              <div id="listaContenedores" class="lista-contenedores"></div>
+
+              <input
+                type="hidden"
+                id="idContenedorSeleccionado"
+                name="idContenedor"
+                value=""
+              />
+              <input
+                type="hidden"
+                id="calleSeleccionada"
+                name="calleSeleccionada"
+                value=""
+              />
+              <input
+                type="hidden"
+                id="numeroSeleccionada"
+                name="numeroSeleccionada"
+                value=""
+              />
+              <input
+                type="hidden"
+                id="barrioSeleccionada"
+                name="barrioSeleccionada"
+                value=""
+              />
+              <input
+                type="hidden"
+                id="tipoSeleccionado"
+                name="tipoSeleccionado"
+                value=""
+              />
+
+              <button type="button" id="btnDireccionNueva" class="btn-link">
+                ¿No está en la lista? Ingresar dirección nueva
+              </button>
 
               <div id="camposDireccionNueva" style="display: none">
                 <input type="text" id="calleCrear" placeholder="Calle" />
@@ -248,6 +277,50 @@
         });
       });
 
+      async function cargarListaContenedores() {
+        const contenedores = document.getElementById("listaContenedores");
+        contenedores.innerHTML = "Cargando contenedores...";
+        try {
+          const respuesta = await fetch(
+            "/Proyecto/ProyectoSyntropy/Gestion/miApi/Contenedores",
+          );
+          const datos = await respuesta.json();
+
+          if (!datos || datos.length === 0) {
+            contenedores.innerHTML = "No hay contenedores disponibles.";
+            return;
+          }
+          contenedores.innerHTML = "";
+
+          datos.forEach(function (cont) {
+            const item = document.createElement("div");
+            item.classList.add("item-contenedores");
+            item.innerHTML = `<strong>ID:</strong> ${cont.ID_contenedor} - ${cont.calle} ${cont.numero}, ${cont.barrio}`;
+            item.addEventListener("click", function (event) {
+              seleccionarContenedor(cont, event);
+            });
+            contenedores.appendChild(item);
+          });
+        } catch (error) {
+          console.error("Error al cargar la lista de contenedores:", error);
+          contenedores.innerHTML = "Error al cargar los contenedores.";
+        }
+      }
+
+      function seleccionarContenedor(cont, event) {
+        document.getElementById("idContenedorSeleccionado").value =
+          cont.ID_contenedor;
+        document.getElementById("calleSeleccionada").value = cont.calle;
+        document.getElementById("numeroSeleccionada").value = cont.numero;
+        document.getElementById("barrioSeleccionada").value = cont.barrio;
+        document.getElementById("tipoSeleccionado").value = cont.tipo;
+
+        document
+          .querySelectorAll(".item-contenedores")
+          .forEach((el) => el.classList.remove("seleccionado"));
+        event.currentTarget.classList.add("seleccionado");
+      }
+
       function toggleMenu() {
         document.getElementById("menu").classList.toggle("activo");
       }
@@ -312,58 +385,58 @@
         .addEventListener("submit", async (event) => {
           event.preventDefault();
 
+          const idContenedor = document.getElementById(
+            "idContenedorSeleccionado",
+          ).value;
+
           const datos = {
             mail: document.getElementById("mailCrear").value,
             tipo: document.getElementById("tipoCrear").value,
             estado: document.getElementById("estadoCrear").value,
             imagen: document.getElementById("imagenCrear").value,
-            calle: document.getElementById("calleCrear").value,
-            barrio: document.getElementById("barrioCrear").value,
-            numero: document.getElementById("numeroCrear").value,
-            tipoContenedor: document.getElementById("tipoContenedorCrear")
-              .value,
           };
 
-          const resp = await fetch(`${API_URL}Registrar`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(datos),
-          });
-
-          const resultado = await resp.text();
-          console.log(resultado);
-
-          if (resultado.status === "success") {
-            document
-              .getElementById("overlayCrearIncidencias")
-              .classList.remove("activo");
-            obtenerIncidencias();
+          if (idContenedor) {
+            // Se eligió un contenedor existente de la lista
+            datos.idContenedor = idContenedor;
+            datos.calle = document.getElementById("calleSeleccionada").value;
+            datos.numero = document.getElementById("numeroSeleccionada").value;
+            datos.barrio = document.getElementById("barrioSeleccionada").value;
+            datos.tipoContenedor =
+              document.getElementById("tipoSeleccionado").value;
           } else {
-            alert(resultado.mensaje);
+            // No hay contenedor seleccionado: se ingresó una dirección nueva
+            datos.calle = document.getElementById("calleCrear").value;
+            datos.numero = document.getElementById("numeroCrear").value;
+            datos.barrio = document.getElementById("barrioCrear").value;
+            datos.tipoContenedor = document.getElementById(
+              "tipoContenedorCrear",
+            ).value;
+          }
+
+          try {
+            const resp = await fetch(`${API_URL}Registrar`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(datos),
+            });
+
+            const resultado = await resp.json();
+
+            if (resultado.status === "success") {
+              document
+                .getElementById("overlayCrearIncidencias")
+                .classList.remove("activo");
+              document.getElementById("formCrearIncidencia").reset();
+              document.getElementById("idContenedorSeleccionado").value = "";
+            } else {
+              alert(resultado.mensaje);
+            }
+          } catch (error) {
+            console.error("Error al registrar la incidencia:", error);
+            alert("No se pudo registrar la incidencia.");
           }
         });
-
-      async function cargarContenedoresEnSelect() {
-        const respuesta = await fetch(
-          "/Proyecto/ProyectoSyntropy/Gestion/miApi/Contenedores",
-        );
-        const contenedores = await respuesta.json();
-
-        const select = document.getElementById("selectContenedor");
-        select.innerHTML = '<option value="">Seleccioná un contenedor</option>';
-
-        contenedores.forEach((c) => {
-          const opcion = document.createElement("option");
-          opcion.value = c.ID_contenedor;
-          opcion.textContent = `${c.calle} ${c.numero}, ${c.barrio}`;
-          select.appendChild(opcion);
-        });
-
-        const opcionNueva = document.createElement("option");
-        opcionNueva.value = "nuevo";
-        opcionNueva.textContent = "No está en la lista (nueva dirección)";
-        select.appendChild(opcionNueva);
-      }
 
       document.getElementById("imagenCrear").addEventListener("input", (e) => {
         const url = e.target.value.trim();
@@ -379,47 +452,37 @@
       });
 
       document
-        .getElementById("selectContenedor")
-        .addEventListener("change", (e) => {
-          document.getElementById("camposDireccionNueva").style.display =
-            e.target.value === "nuevo" ? "block" : "none";
-        });
-      document
-        .getElementById("formIncidencia")
-        .addEventListener("submit", async (e) => {
-          e.preventDefault();
+        .getElementById("btnDireccionNueva")
+        .addEventListener("click", () => {
+          const listaDiv = document.getElementById("listaContenedores");
+          const camposDiv = document.getElementById("camposDireccionNueva");
+          const boton = document.getElementById("btnDireccionNueva");
 
-          const idSeleccionado =
-            document.getElementById("selectContenedor").value;
+          const mostrandoDireccionNueva = camposDiv.style.display === "block";
 
-          const body = {
-            mail: document.getElementById("mailIncidencia").value,
-            tipo: document.getElementById("tipoIncidencia").value,
-            imagenUrl: document.getElementById("imagenIncidencia").value,
-          };
-
-          if (idSeleccionado === "nuevo") {
-            body.calle = document.getElementById("calleNueva").value;
-            body.numero = document.getElementById("numeroNueva").value;
-            body.barrio = document.getElementById("barrioNueva").value;
-            body.tipoContenedor = document.getElementById(
-              "tipoContenedorNuevo",
-            ).value;
+          if (mostrandoDireccionNueva) {
+            // Volver a la lista de contenedores
+            camposDiv.style.display = "none";
+            listaDiv.style.display = "block";
+            document.getElementById("idContenedorSeleccionado").value = "";
+            document.getElementById("calleSeleccionada").value = "";
+            document.getElementById("numeroSeleccionada").value = "";
+            document.getElementById("barrioSeleccionada").value = "";
+            document.getElementById("tipoSeleccionado").value = "";
+            boton.textContent =
+              "¿No está en la lista? Ingresar dirección nueva";
           } else {
-            body.idContenedor = idSeleccionado;
+            // Mostrar campos de dirección nueva y limpiar el contenedor elegido
+            camposDiv.style.display = "block";
+            listaDiv.style.display = "none";
+            document.getElementById("idContenedorSeleccionado").value = "";
+            document.getElementById("calleSeleccionada").value = "";
+            document.getElementById("numeroSeleccionada").value = "";
+            document.getElementById("barrioSeleccionada").value = "";
+            document.getElementById("tipoSeleccionado").value = "";
+            boton.textContent = "Volver a la lista de contenedores";
           }
-
-          const respuesta = await fetch(
-            "/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/Registrar",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(body),
-            },
-          );
         });
-
-      cargarContenedoresEnSelect();
     </script>
   </body>
 </html>
