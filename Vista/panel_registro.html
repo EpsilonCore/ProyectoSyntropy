@@ -43,7 +43,7 @@
           if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
           const resultado = await resp.json();
 
-          if (resultado?.status === "success") {
+          if (resultado?.status === "ok") {
             const usuario = usuarios.find((u) => u.mail === mail);
             if (usuario) {
               usuario.estado =

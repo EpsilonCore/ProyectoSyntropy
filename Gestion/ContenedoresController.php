@@ -27,7 +27,6 @@ class ContenedoresController
 		$json = file_get_contents('php://input');
 			$datos = json_decode($json);
 			if(!$datos|| !isset($datos->tipo) || !isset($datos->calle) || !isset($datos->numero) || !isset($datos->barrio) || !isset($datos->capCarga) || !isset($datos->estado)){
-				http_response_code(400);
 				return ['status' => 'error', 'mensaje' => 'Faltan campos obligatorios'];
 			}
 			$cap = $datos->capCarga;
@@ -40,7 +39,7 @@ class ContenedoresController
 		$resultado= $this->modeloObj -> crearContenedor($cap, $t, $e, $c,$n,$b);
 
 		if ($resultado) {
-        return ["status" => "success", "mensaje" => "Contenedor creado correctamente"];
+        return ["status" => "creado", "mensaje" => "Contenedor creado correctamente"];
     } else {
         return ["status" => "error", "mensaje" => "No se pudo crear el contenedor"];
     }
@@ -53,7 +52,7 @@ class ContenedoresController
 		$resultado = $this->modeloObj->eliminarContenedor($id);
 
 if ($resultado) {
-    return ["status" => "success", "mensaje" => "Contenedor eliminado correctamente"];
+    return ["status" => "ok", "mensaje" => "Contenedor eliminado correctamente"];
 } else {
     return ["status" => "error", "mensaje" => "No se pudo eliminar el contenedor"];
 }
@@ -63,9 +62,7 @@ if ($resultado) {
 		$json = file_get_contents('php://input');
 		$datos = json_decode($json);
 		if (!$datos || !isset($datos->idContenedor) || !isset($datos->capCarga) || !isset($datos->tipo) || !isset($datos->estado) || !isset($datos->calle) || !isset($datos->numero) || !isset($datos->barrio)) {
-			http_response_code(400);
 			return ['status' => 'error', 'mensaje' => 'Faltan campos obligatorios'];
-			exit;
 		}
 		$id = $datos->idContenedor;
 		$cap = $datos->capCarga;
@@ -77,7 +74,7 @@ if ($resultado) {
 
 		$resultado = $this->modeloObj->actualizarContenedor($id, $cap, $t, $e, $c, $n, $b);
 		if ($resultado) {
-    return ["status" => "success", "mensaje" => "Contenedor actualizado correctamente"];
+    return ["status" => "ok", "mensaje" => "Contenedor actualizado correctamente"];
 } else {
     return ["status" => "error", "mensaje" => "No se pudo actualizar el contenedor"];
 }

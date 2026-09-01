@@ -16,6 +16,7 @@ $controladorObj = new UsuarioController();
 
 $method =           $_SERVER['REQUEST_METHOD'];
 $uri    = parse_url($_SERVER['REQUEST_URI'],    PHP_URL_PATH);
+$resultado = "";
 
 switch ($method) {
 	case 'GET':
@@ -23,10 +24,10 @@ switch ($method) {
 		//Mostrar todos los usuarios
 		if($uri === '/Proyecto/ProyectoSyntropy/Usuarios/miApi/Usuarios'){
 					
-			echo json_encode( $controladorObj->getAllUsuarios() );
+			$resultado = $controladorObj->getAllUsuarios();
 		}
 		if($uri === '/Proyecto/ProyectoSyntropy/Usuarios/miApi/ListarPendientes'){
-			echo json_encode( $controladorObj->getAllPendientes() );
+			$resultado = $controladorObj->getAllPendientes();
 		}
 
 		//Buscar usuario
@@ -34,42 +35,56 @@ switch ($method) {
 			$mail = trim(str_replace('/miApi/Usuario/', '', $uri));
 		}
 		if(!empty($mail)){
-			echo json_encode($controladorObj -> buscarMail($mail));
+			$resultado = $controladorObj -> buscarMail($mail);
 			}
         
 break;
-		case 'POST';
+		case 'POST':
 		
 		//Registrar un usuario
 		if($uri === '/Proyecto/ProyectoSyntropy/Usuarios/miApi/Registrar'){
 
-			echo json_encode ($controladorObj->crearUsuario());
+			$resultado = $controladorObj->crearUsuario();
 		//Loguear usuario
 		}
 		if($uri === '/Proyecto/ProyectoSyntropy/Usuarios/miApi/Login'){
-			echo json_encode($controladorObj->LoguearUsuario());
+			$resultado = $controladorObj->LoguearUsuario();
 			}
 break;
-		case 'DELETE';
+		case 'DELETE':
 
 		//Eliminar usuario
 		if($uri === '/Proyecto/ProyectoSyntropy/Usuarios/miApi/Borrar'){
-			echo json_encode($resultado = $controladorObj->eliminarUsuario());
+			$resultado = $controladorObj->eliminarUsuario();
 			}
 		break;
-		case 'PATCH';
+		case 'PATCH':
 		if($uri === '/Proyecto/ProyectoSyntropy/Usuarios/miApi/Actualizar'){
-			echo json_encode($controladorObj->responderSolicitud());
+			$resultado = $controladorObj->responderSolicitud();
 			}
 			if ($uri === '/Proyecto/ProyectoSyntropy/Usuarios/miApi/Modificar') {
-    		echo json_encode($controladorObj->modificarUsuario());
+    		$resultado = $controladorObj->modificarUsuario();
 }
 		break;
     default:
         http_response_code(405);
-        echo json_encode(["error" => "Método no permitido"]);
+       $resultado = ["error" => "Método no permitido"];
         break;
+
 	
  
 
 }
+
+$codigoshttp = [
+    "ok"                 => 200,
+    "creado"             => 201,
+    "datos_invalidos"    => 400,
+    "no_autorizado"      => 401,
+    "cuenta_pendiente"   => 403,
+    "no_encontrado"      => 404,
+    "error"              => 500,
+];
+
+http_response_code($codigoshttp[$resultado["status"]] ?? 500);
+echo json_encode($resultado);

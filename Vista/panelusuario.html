@@ -218,7 +218,7 @@
 
           const resultado = await resp.json();
 
-          if (resultado.status === "success") {
+          if (resultado.status === "ok") {
             document
               .getElementById("overlayUsuarios")
               .classList.remove("activo");
@@ -249,7 +249,7 @@
 
           const resultado = await resp.json();
 
-          if (resultado.status === "success") {
+          if (resultado.status === "ok") {
             document
               .getElementById("overlayCrearUsuarios")
               .classList.remove("activo");
@@ -347,7 +347,7 @@
           });
           try {
             const resultado = await resp.json();
-            if (resultado.status === "success") {
+            if (resultado?.status === "ok") {
               obtenerUsuarios();
             } else {
               alert("No se pudo eliminar el usuario.");
