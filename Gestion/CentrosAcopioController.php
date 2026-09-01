@@ -1,84 +1,76 @@
 <?php
 class CentrosAcopioController
 {
-    private $modeloObj;
-    
-    public function __construct(){
-        
-        $conexionbd = mysqli_connect("localhost","root","","syntropy");
-        if (!$conexionbd){
-            die("Error de conexion ". mysqli_connect_error());
-        }
-        require "CentrosAcopioModel.php";
-        $this->modeloObj = new CentrosAcopioModel($conexionbd);
-    }
-    public function getAllCentrosAcopio()
-    {
-        return $this->modeloObj->getAllCentrosAcopio();
-    }
+	private $modeloObj;
 
-    public function buscarCentroAcopio(){
-        $json = file_get_contents('php://input');
-        $datos = json_decode($json);
-        return $this->modeloObj -> buscarCentroAcopio($datos->idCentroAcopio);
-    }
-    public function crearCentroAcopio(){
-        $json = file_get_contents('php://input');
-        $datos = json_decode($json);
-        if(!$datos|| !isset($datos->tipoResiduo) || !isset($datos->capacidad) || !isset($datos->barrio) || !isset($datos->calle) || !isset($datos->numero)){
-            http_response_code(400);
-            return ['status' => 'error', 'mensaje' => 'Faltan campos obligatorios'];
-    }
-        $tipoResiduo = $datos->tipoResiduo;
-        $capacidad = $datos->capacidad;
-        $barrio = $datos->barrio;
-        $calle = $datos->calle;
-        $numero = $datos->numero;
+	public function __construct()
+	{
+		$conexionbd = mysqli_connect("localhost", "root", "", "syntropy");
+		if (!$conexionbd) {
+			die(json_encode(["status" => "error", "mensaje" => "Error de conexión: " . mysqli_connect_error(), "data" => null]));
+		}
+		require "CentrosAcopioModel.php";
+		$this->modeloObj = new CentrosAcopioModel($conexionbd);
+	}
 
-        $resultado= $this->modeloObj -> crearCentroAcopio($tipoResiduo, $capacidad, $barrio, $calle,$numero);
+	public function getAllCentrosAcopio()
+	{
+		return ["status" => "ok", "mensaje" => "Centros de acopio obtenidos correctamente.", "data" => $this->modeloObj->getAllCentrosAcopio()];
+	}
 
-        if ($resultado) {
-            return ["status" => "success", "mensaje" => "Centro de acopio creado correctamente"];
-        } else {
-            return ["status" => "error", "mensaje" => "No se pudo crear el centro de acopio"];
-        }
-    }
-    public function eliminarCentroAcopio(){
-        $json = file_get_contents('php://input');
-        $datos = json_decode($json);
-        if(!$datos || !isset($datos->idCentroAcopio)){
-            http_response_code(400);
-            return ['status' => 'error', 'mensaje' => 'Faltan campos obligatorios'];
-        }
-        $idCentroAcopio = $datos->idCentroAcopio;
-        $resultado= $this->modeloObj -> eliminarCentroAcopio($idCentroAcopio);
+	public function buscarCentroAcopio()
+	{
+		$json = file_get_contents('php://input');
+		$datos = json_decode($json);
+		if (!$datos || !isset($datos->idCentroAcopio)) {
+			return ["status" => "datos_invalidos", "mensaje" => "Falta el ID del centro de acopio.", "data" => null];
+		}
+		$centro = $this->modeloObj->buscarCentroAcopio($datos->idCentroAcopio);
+		if ($centro) {
+			return ["status" => "ok", "mensaje" => "Centro de acopio encontrado.", "data" => $centro];
+		}
+		return ["status" => "no_encontrado", "mensaje" => "No se encontró el centro de acopio.", "data" => null];
+	}
 
-        if ($resultado) {
-            return ["status" => "success", "mensaje" => "Centro de acopio eliminado correctamente"];
-        } else {
-            return ["status" => "error", "mensaje" => "No se pudo eliminar el centro de acopio"];
-        }
-    }
-    public function actualizarCentroAcopio(){
-        $json = file_get_contents('php://input');
-        $datos = json_decode($json);
-        if(!$datos || !isset($datos->idCentroAcopio) || !isset($datos->tipoResiduo) || !isset($datos->capacidad) || !isset($datos->barrio) || !isset($datos->calle) || !isset($datos->numero)){
-            http_response_code(400);
-            return ['status' => 'error', 'mensaje' => 'Faltan campos obligatorios'];
-        }
-        $idCentroAcopio = $datos->idCentroAcopio;
-        $tipoResiduo = $datos->tipoResiduo;
-        $capacidad = $datos->capacidad;
-        $barrio = $datos->barrio;
-        $calle = $datos->calle;
-        $numero = $datos->numero;
+	public function crearCentroAcopio()
+	{
+		$json = file_get_contents('php://input');
+		$datos = json_decode($json);
+		if (!$datos || !isset($datos->tipoResiduo) || !isset($datos->capacidad) || !isset($datos->barrio) || !isset($datos->calle) || !isset($datos->numero)) {
+			return ["status" => "datos_invalidos", "mensaje" => "Faltan campos obligatorios.", "data" => null];
+		}
+		$resultado = $this->modeloObj->crearCentroAcopio($datos->tipoResiduo, $datos->capacidad, $datos->barrio, $datos->calle, $datos->numero);
+		if ($resultado) {
+			return ["status" => "creado", "mensaje" => "Centro de acopio creado correctamente.", "data" => null];
+		}
+		return ["status" => "error", "mensaje" => "No se pudo crear el centro de acopio.", "data" => null];
+	}
 
-        $resultado= $this->modeloObj -> actualizarCentroAcopio($idCentroAcopio, $tipoResiduo, $capacidad, $barrio, $calle,$numero);
+	public function eliminarCentroAcopio()
+	{
+		$json = file_get_contents('php://input');
+		$datos = json_decode($json);
+		if (!$datos || !isset($datos->idCentroAcopio)) {
+			return ["status" => "datos_invalidos", "mensaje" => "Faltan campos obligatorios.", "data" => null];
+		}
+		$resultado = $this->modeloObj->eliminarCentroAcopio($datos->idCentroAcopio);
+		if ($resultado) {
+			return ["status" => "ok", "mensaje" => "Centro de acopio eliminado correctamente.", "data" => null];
+		}
+		return ["status" => "error", "mensaje" => "No se pudo eliminar el centro de acopio.", "data" => null];
+	}
 
-        if ($resultado) {
-            return ["status" => "success", "mensaje" => "Centro de acopio actualizado correctamente"];
-        } else {
-            return ["status" => "error", "mensaje" => "No se pudo actualizar el centro de acopio"];
-        }
-    }
+	public function actualizarCentroAcopio()
+	{
+		$json = file_get_contents('php://input');
+		$datos = json_decode($json);
+		if (!$datos || !isset($datos->idCentroAcopio) || !isset($datos->tipoResiduo) || !isset($datos->capacidad) || !isset($datos->barrio) || !isset($datos->calle) || !isset($datos->numero)) {
+			return ["status" => "datos_invalidos", "mensaje" => "Faltan campos obligatorios.", "data" => null];
+		}
+		$resultado = $this->modeloObj->actualizarCentroAcopio($datos->idCentroAcopio, $datos->tipoResiduo, $datos->capacidad, $datos->barrio, $datos->calle, $datos->numero);
+		if ($resultado) {
+			return ["status" => "ok", "mensaje" => "Centro de acopio actualizado correctamente.", "data" => null];
+		}
+		return ["status" => "error", "mensaje" => "No se pudo actualizar el centro de acopio.", "data" => null];
+	}
 }

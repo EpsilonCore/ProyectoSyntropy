@@ -106,7 +106,10 @@
           const respuesta = await fetch(
             "/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/Incidencias",
           );
-          const incidencias = await respuesta.json();
+          const respuestaJson = await respuesta.json();
+          const incidencias = Array.isArray(respuestaJson)
+            ? respuestaJson
+            : respuestaJson?.data || [];
           console.log("Incidencias cargadas:", incidencias);
 
           incidencias.forEach((inc) => {
@@ -169,7 +172,10 @@
           const respuesta = await fetch(
             "/Proyecto/ProyectoSyntropy/Gestion/miApi/Contenedores",
           );
-          const contenedores = await respuesta.json();
+          const respuestaJson = await respuesta.json();
+          const contenedores = Array.isArray(respuestaJson)
+            ? respuestaJson
+            : respuestaJson?.data || [];
           console.log("Contenedores cargados:", contenedores);
 
           contenedores.forEach((cont) => {

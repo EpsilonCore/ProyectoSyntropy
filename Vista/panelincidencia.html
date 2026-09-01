@@ -106,6 +106,14 @@
               <option value="incendiado">Contenedor incendiado</option>
             </select>
 
+            <label>Tipo de contenedor</label>
+            <select id="tipoContenedorCrear" required>
+              <option value="" disabled selected>Seleccione un tipo</option>
+              <option value="Naranja">Naranja - Reciclables</option>
+              <option value="Metalico">Metalico - Residuos mezclados</option>
+              <option value="Plastico">Plastico - Residuos mezclados</option>
+            </select>
+
             <label>Imagen (URL)</label>
             <input id="imagenCrear" />
 
@@ -199,7 +207,7 @@
 
           const resultado = await resp.json();
 
-          if (resultado.status === "success") {
+          if (resultado.status === "ok") {
             document
               .getElementById("overlayAsignarOperario")
               .classList.remove("activo");
@@ -218,6 +226,7 @@
             mail: document.getElementById("mailCrear").value,
             tipo: document.getElementById("tipoCrear").value,
             estado: document.getElementById("estadoCrear").value,
+            tipoContenedor: document.getElementById("tipoContenedorCrear").value,
             imagen: document.getElementById("imagenCrear").value,
             calle: document.getElementById("calleCrear").value,
             barrio: document.getElementById("barrioCrear").value,
@@ -232,7 +241,7 @@
 
           const resultado = await resp.json();
 
-          if (resultado.status === "success") {
+          if (resultado.status === "creado") {
             document
               .getElementById("overlayCrearIncidencias")
               .classList.remove("activo");
@@ -316,7 +325,7 @@
           const resp = await fetch(`${API_URL}Incidencias`);
           if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
           const data = await resp.json();
-          const todas = Array.isArray(data) ? data : data?.incidencias || [];
+          const todas = Array.isArray(data) ? data : data?.data || [];
           incidencias = todas;
           renderizarLista();
         } catch (error) {
@@ -333,7 +342,7 @@
           });
           try {
             const resultado = await resp.json();
-            if (resultado.status === "success") {
+            if (resultado.status === "ok") {
               obtenerIncidencias();
             } else {
               alert("No se pudo eliminar la incidencia.");
