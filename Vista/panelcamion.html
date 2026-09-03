@@ -14,6 +14,9 @@
       if (localStorage.getItem("logueado") !== "si") {
         window.location.href = "login.html";
       }
+      if ((localStorage.getItem("rol") || "").trim() !== "Administrador") {
+        window.location.href = "index.html";
+      }
     </script>
 
     <header>
@@ -33,6 +36,7 @@
         <ul>
           <li>
             <button
+              data-rol="Administrador"
               class="link-button"
               onclick="window.location.href = 'gestion.html'"
             >
@@ -42,6 +46,7 @@
 
           <li>
             <button
+              data-rol="Administrador"
               class="link-button"
               onclick="window.location.href = 'panelregistro.html'"
             >
@@ -51,6 +56,7 @@
 
           <li>
             <button
+              data-rol="Administrador"
               class="link-button"
               onclick="window.location.href = 'panelcontenedor.html'"
             >
@@ -60,6 +66,7 @@
 
           <li>
             <button
+              data-rol="Administrador"
               class="link-button"
               onclick="window.location.href = 'panelcamion.html'"
             >
@@ -69,6 +76,7 @@
 
           <li>
             <button
+              data-rol="Administrador"
               class="link-button"
               onclick="window.location.href = 'panelusuario.html'"
             >
@@ -263,6 +271,18 @@
             alert("No se pudo crear el camión.");
           }
         });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const rolUsuario = (localStorage.getItem("rol") || "").trim();
+        document.querySelectorAll("[data-rol]").forEach((boton) => {
+          const rolesPermitidos = boton.dataset.rol
+            .split(",")
+            .map((rol) => rol.trim());
+          if (!rolesPermitidos.includes(rolUsuario)) {
+            boton.style.display = "none";
+          }
+        });
+      });
 
       function toggleMenu() {
         document.getElementById("menu").classList.toggle("activo");

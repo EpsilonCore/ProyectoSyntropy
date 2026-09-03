@@ -12,6 +12,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+function verificarRol(array $rolesPermitidos)
+{
+    $rolActual = $_SESSION['rol'] ?? 'Vecino';
+    if (!in_array($rolActual, $rolesPermitidos, true)) {
+        return ["status" => "prohibido", "mensaje" => "No tenés permiso para realizar esta acción.", "data" => null];
+    }
+    return null;
+}
+
 require_once 'CamionController.php';
 $controladorCamion = new CamionController();
 
@@ -19,36 +32,39 @@ $method = $_SERVER['REQUEST_METHOD'];
 $uri    = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $resultado = ["status" => "no_encontrado", "mensaje" => "Ruta no encontrada.", "data" => null];
 
+// Todo el panel de Camiones es exclusivo de Administrador.
+$rolesCamiones = ['Administrador'];
+
 switch ($method) {
     case 'GET':
         $matricula = '';
 
         if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Camiones') {
-            $resultado = $controladorCamion->getAllMatriculas();
+            $resultado = verificarRol($rolesCamiones) ?? $controladorCamion->getAllMatriculas();
         }
         if (strpos($uri, '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Camion/') === 0) {
             $matricula = trim(str_replace('/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Camion/', '', $uri));
         }
         if (!empty($matricula)) {
-            $resultado = $controladorCamion->buscarMatricula($matricula);
+            $resultado = verificarRol($rolesCamiones) ?? $controladorCamion->buscarMatricula($matricula);
         }
         break;
 
     case 'POST':
         if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/RegistrarCamion') {
-            $resultado = $controladorCamion->crearCamion();
+            $resultado = verificarRol($rolesCamiones) ?? $controladorCamion->crearCamion();
         }
         break;
 
     case 'PATCH':
         if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/ActualizarCamion') {
-            $resultado = $controladorCamion->actualizarCamion();
+            $resultado = verificarRol($rolesCamiones) ?? $controladorCamion->actualizarCamion();
         }
         break;
 
     case 'DELETE':
         if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/EliminarCamion') {
-            $resultado = $controladorCamion->eliminarCamion();
+            $resultado = verificarRol($rolesCamiones) ?? $controladorCamion->eliminarCamion();
         }
         break;
 
@@ -63,6 +79,7 @@ $codigosHttp = [
     "datos_invalidos"  => 400,
     "no_autorizado"    => 401,
     "cuenta_pendiente" => 403,
+    "prohibido"        => 403,
     "no_encontrado"    => 404,
     "no_permitido"     => 405,
     "error"            => 500,

@@ -12,6 +12,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+function verificarRol(array $rolesPermitidos)
+{
+    $rolActual = $_SESSION['rol'] ?? 'Vecino';
+    if (!in_array($rolActual, $rolesPermitidos, true)) {
+        return ["status" => "prohibido", "mensaje" => "No tenés permiso para realizar esta acción.", "data" => null];
+    }
+    return null;
+}
+
 require_once 'ContenedoresController.php';
 require_once 'CentrosAcopioController.php';
 require_once 'IncidenciaController.php';
@@ -24,14 +37,19 @@ $method = $_SERVER['REQUEST_METHOD'];
 $uri    = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $resultado = ["status" => "no_encontrado", "mensaje" => "Ruta no encontrada.", "data" => null];
 
+$soloAdministrador = ['Administrador'];
+
 switch ($method) {
     case 'GET':
+        // Abierto a cualquier logueado: lo usa mapa.html para pintar el mapa, además del panel.
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Contenedores') {
             $resultado = $controladorContenedor->getAllContenedores();
         }
+        // Panel de Centros de Acopio: exclusivo de Administrador.
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/CentrosAcopio/CentrosAcopio') {
-            $resultado = $controladorCentroAcopio->getAllCentrosAcopio();
+            $resultado = verificarRol($soloAdministrador) ?? $controladorCentroAcopio->getAllCentrosAcopio();
         }
+        // Abierto a cualquier logueado: lo usa mapa.html, además del panel de Incidencias.
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/Incidencias') {
             $resultado = $controladorIncidencia->getAllIncidencias();
         }
@@ -39,11 +57,12 @@ switch ($method) {
 
     case 'POST':
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/RegistrarContenedor') {
-            $resultado = $controladorContenedor->crearContenedor();
+            $resultado = verificarRol($soloAdministrador) ?? $controladorContenedor->crearContenedor();
         }
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/CentrosAcopio/Registrar') {
-            $resultado = $controladorCentroAcopio->crearCentroAcopio();
+            $resultado = verificarRol($soloAdministrador) ?? $controladorCentroAcopio->crearCentroAcopio();
         }
+        // Abierto a cualquier logueado: cualquier vecino puede reportar una incidencia desde index.html.
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/Registrar') {
             $resultado = $controladorIncidencia->crearIncidencia();
         }
@@ -51,25 +70,25 @@ switch ($method) {
 
     case 'DELETE':
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/EliminarContenedor') {
-            $resultado = $controladorContenedor->eliminarContenedor();
+            $resultado = verificarRol($soloAdministrador) ?? $controladorContenedor->eliminarContenedor();
         }
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/CentrosAcopio/Borrar') {
-            $resultado = $controladorCentroAcopio->eliminarCentroAcopio();
+            $resultado = verificarRol($soloAdministrador) ?? $controladorCentroAcopio->eliminarCentroAcopio();
         }
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/Borrar') {
-            $resultado = $controladorIncidencia->eliminarIncidencia();
+            $resultado = verificarRol($soloAdministrador) ?? $controladorIncidencia->eliminarIncidencia();
         }
         break;
 
     case 'PATCH':
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/ActualizarContenedor') {
-            $resultado = $controladorContenedor->actualizarContenedor();
+            $resultado = verificarRol($soloAdministrador) ?? $controladorContenedor->actualizarContenedor();
         }
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/CentrosAcopio/Modificar') {
-            $resultado = $controladorCentroAcopio->actualizarCentroAcopio();
+            $resultado = verificarRol($soloAdministrador) ?? $controladorCentroAcopio->actualizarCentroAcopio();
         }
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/AsignarOperario') {
-            $resultado = $controladorIncidencia->AsignarOperario();
+            $resultado = verificarRol($soloAdministrador) ?? $controladorIncidencia->AsignarOperario();
         }
         break;
 
@@ -84,6 +103,7 @@ $codigosHttp = [
     "datos_invalidos"  => 400,
     "no_autorizado"    => 401,
     "cuenta_pendiente" => 403,
+    "prohibido"        => 403,
     "no_encontrado"    => 404,
     "no_permitido"     => 405,
     "error"            => 500,

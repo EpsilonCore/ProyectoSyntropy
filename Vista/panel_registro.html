@@ -6,6 +6,15 @@
     <title>Usuarios pendientes</title>
   </head>
   <body>
+    <script>
+      if (localStorage.getItem("logueado") !== "si") {
+        window.location.href = "login.html";
+      }
+      if ((localStorage.getItem("rol") || "").trim() !== "Administrador") {
+        window.location.href = "index.html";
+      }
+    </script>
+
     <div id="app">
       <h1>Usuarios pendientes</h1>
       <div id="listaUsuarios"></div>

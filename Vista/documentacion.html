@@ -39,14 +39,14 @@ if(localStorage.getItem("logueado") !== "si"){
         <ul>
 
             <li>
-                <button class="link-button"
+                <button class="link-button" data-rol="Administrador"
                 onclick="window.location.href='gestion.html'">
                     Gestión
                 </button>
             </li>
 
             <li>
-                <button class="link-button"
+                <button class="link-button" data-rol="Administrador, Operario"
                 onclick="window.location.href='rutas.html'">
                     Rutas
                 </button>
@@ -106,6 +106,18 @@ if(localStorage.getItem("logueado") !== "si"){
 </div>
 
 <script>
+
+document.addEventListener("DOMContentLoaded", () => {
+    const rolUsuario = (localStorage.getItem("rol") || "").trim();
+    document.querySelectorAll("[data-rol]").forEach((boton) => {
+        const rolesPermitidos = boton.dataset.rol
+            .split(",")
+            .map((rol) => rol.trim());
+        if (!rolesPermitidos.includes(rolUsuario)) {
+            boton.style.display = "none";
+        }
+    });
+});
 
 function toggleMenu(){
     document.getElementById("menu").classList.toggle("activo");
