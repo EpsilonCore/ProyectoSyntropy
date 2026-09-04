@@ -16,8 +16,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Devuelve null si el rol actual (el de $_SESSION, no el del navegador) está permitido,
-// o un array de respuesta {status, mensaje, data} si no lo está.
+
 function verificarRol(array $rolesPermitidos)
 {
     $rolActual = $_SESSION['rol'] ?? 'Vecino';
@@ -54,7 +53,6 @@ switch ($method) {
         break;
 
     case 'POST':
-        // Login y Registrar quedan abiertos: cualquiera (incluso sin sesión) necesita poder
         // loguearse o crear una cuenta nueva.
         if ($uri === '/Proyecto/ProyectoSyntropy/Usuarios/miApi/Registrar') {
             $resultado = $controladorObj->crearUsuario();

@@ -26,21 +26,24 @@ function verificarRol(array $rolesPermitidos)
 }
 
 require_once 'CamionController.php';
+require_once 'RutaController.php';
 $controladorCamion = new CamionController();
+$controladorRuta = new RutaController();
 
 $method = $_SERVER['REQUEST_METHOD'];
 $uri    = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $resultado = ["status" => "no_encontrado", "mensaje" => "Ruta no encontrada.", "data" => null];
 
-// Todo el panel de Camiones es exclusivo de Administrador.
 $rolesCamiones = ['Administrador'];
+                
+$rolesRutas = ['Administrador', 'Operario'];
 
 switch ($method) {
     case 'GET':
         $matricula = '';
 
         if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Camiones') {
-            $resultado = verificarRol($rolesCamiones) ?? $controladorCamion->getAllMatriculas();
+            $resultado = verificarRol($rolesRutas) ?? $controladorCamion->getAllMatriculas();
         }
         if (strpos($uri, '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Camion/') === 0) {
             $matricula = trim(str_replace('/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Camion/', '', $uri));
@@ -48,11 +51,17 @@ switch ($method) {
         if (!empty($matricula)) {
             $resultado = verificarRol($rolesCamiones) ?? $controladorCamion->buscarMatricula($matricula);
         }
+        if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas') {
+            $resultado = verificarRol($rolesRutas) ?? $controladorRuta->getAllRutas();
+        }
         break;
 
     case 'POST':
         if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/RegistrarCamion') {
             $resultado = verificarRol($rolesCamiones) ?? $controladorCamion->crearCamion();
+        }
+        if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas/Registrar') {
+            $resultado = verificarRol($rolesRutas) ?? $controladorRuta->crearRuta();
         }
         break;
 
