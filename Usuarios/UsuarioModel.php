@@ -23,9 +23,8 @@ class UsuarioModel
     //Registrar usuario---------------------------------------------------
 
 
-   public function crearUsuario($n, $a, $co, $m, $a2f, $u){
+   public function crearUsuario($n, $a, $co, $m, $a2f,$r, $u){
     try {
-        // 1. Insertar PRIMERO en la tabla usuario
         $sql = "INSERT INTO usuario (nombre, apellido, mail, contrasena, a2f, rol, nickname) VALUES (?,?,?,?,?,?,?)";
         $stmt = mysqli_prepare($this->conexion, $sql);
         
@@ -39,7 +38,7 @@ class UsuarioModel
         $this->Mail = $m;
         $this->A2F = $a2f;
         $this->nickname = $u;
-        $this->rol = 'Vecino';
+        $this->rol = $r;
         
         $stmt->bind_param('ssssiss', $this->Nombre, $this->Apellido, $this->Mail, $this->Contrasenia, $this->A2F, $this->rol, $this->nickname);
         
@@ -48,7 +47,6 @@ class UsuarioModel
         }
         $stmt->close();
 
-        // 2. Insertar SEGUNDO en la tabla registro (ahora que el usuario ya existe)
         $sql2 = "INSERT INTO registro (mail, fecha, estado) VALUES (?,?,?)"; 
         $stmt2 = mysqli_prepare($this->conexion, $sql2);
         
@@ -85,7 +83,9 @@ class UsuarioModel
     //Obtener todos los usuarios ----------------------------------------------
     public function getAllUsuarios()
     {
-        $sql = "SELECT Nombre FROM Usuarios";
+       $sql = "SELECT u.nombre, u.apellido, u.mail,u.nickname, u.rol, r.estado AS estado_registro, u.estado AS estado_usuario
+        FROM usuario u
+        LEFT JOIN registro r ON r.mail = u.mail";
         $stmt = mysqli_prepare($this->conexion, $sql);
         mysqli_stmt_execute($stmt);
         $resultado = mysqli_stmt_get_result($stmt);
@@ -135,14 +135,21 @@ class UsuarioModel
 
     //Eliminar usuario------------------------------------------------------------------------------
     public function eliminarUsuario($m){
-    $sql = "DELETE FROM Usuarios where Mail = ?";
+    $sql = "UPDATE usuario SET estado = 'Inactivo' WHERE mail = ?";
     $stmt = mysqli_prepare($this->conexion, $sql);
     mysqli_stmt_bind_param($stmt, "s", $m);
-    mysqli_stmt_execute($stmt);
-    $resultado = mysqli_stmt_get_result($stmt);
-    mysqli_stmt_close($stmt);
-    return $resultado;
+    $ejecutado = mysqli_stmt_execute($stmt);
+    
+    if ($ejecutado) {
+        $filasAfectadas = mysqli_stmt_affected_rows($stmt);
+        mysqli_stmt_close($stmt);
+        return $filasAfectadas > 0;
+    } else {
+        error_log("Error al eliminar usuario: " . mysqli_stmt_error($stmt));
+        mysqli_stmt_close($stmt);
+        return false;
     }
+}
 
 //-------------------------------------------------------------------------------------------------
 //Guardar registro del login
@@ -201,5 +208,18 @@ class UsuarioModel
         mysqli_stmt_close($stmt);
         return $usuariosPendientes;
     }
+    public function modificarUsuario($mail, $nombre, $apellido, $nickname, $rol) {
+    $sql = "UPDATE usuario
+            SET nombre = ?, apellido = ?, nickname = ?, rol = ?
+            WHERE mail = ?";
+
+    $stmt = mysqli_prepare($this->conexion, $sql);
+    mysqli_stmt_bind_param($stmt, "sssss", $nombre, $apellido, $nickname, $rol, $mail);
+
+    $resultado = mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+
+    return $resultado;
+}
 }
 

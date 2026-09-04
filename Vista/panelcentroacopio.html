@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Panel de Usuario - Epsilon</title>
+    <title>Panel de Centros de Acopio - Epsilon</title>
 
     <link rel="stylesheet" href="style.css" />
   </head>
@@ -88,48 +88,43 @@
     </header>
 
     <div class="pagina">
-      <h2>Panel de Usuario</h2>
+      <h2>Panel de Centros de Acopio</h2>
 
-      <p>Administración de usuarios del sistema.</p>
+      <p>Administración de centros de acopio del sistema.</p>
 
       <div class="panel" id="OverlayCrearUsuario">
-        <button onclick="abrirCrearUsuario()">Crear Usuario</button>
+        <button onclick="abrirCrearCentroAcopio()">
+          Crear Centro de Acopio
+        </button>
       </div>
-      <div class="overlay" id="overlayCrearUsuarios">
-        <div class="crear-usuario">
-          <h3>Crear Usuario</h3>
-          <form id="formCrearUsuario">
-            <label>Nombre</label>
-            <input id="nombreCrear" required />
+      <div class="overlay" id="overlayCrearCentrosAcopio">
+        <div class="crear-centro-acopio">
+          <h3>Crear Centro de Acopio</h3>
+          <form id="formCrearCentroAcopio">
+            <label>Tipo de residuo</label>
+            <input id="tipoResiduoCrear" required />
 
-            <label>Apellido</label>
-            <input id="apellidoCrear" required />
+            <label>Capacidad</label>
+            <input id="capacidadCrear" required />
 
-            <label>Mail</label>
-            <input id="mailCrear" type="email" required />
+            <label>Calle</label>
+            <input id="calleCrear" required />
 
-            <label>Contraseña</label>
-            <input id="passwordCrear" type="password" required />
+            <label>Barrio</label>
+            <input id="barrioCrear" required />
 
-            <label>Usuario</label>
-            <input id="nicknameCrear" />
+            <label>Numero</label>
+            <input id="numeroCrear" required />
 
-            <label>Rol</label>
-            <select id="rolCrear" required>
-              <option value="" disabled>Seleccione un rol</option>
-              <option value="Vecino">Vecino</option>
-              <option value="Operario">Operario</option>
-              <option value="Administrador">Administrador</option>
-            </select>
-
-            <button class="btn-crear-usuario" type="submit">
-              Crear Usuario
+            <button class="btn-crear-centro-acopio" type="submit">
+              Crear Centro de Acopio
             </button>
             <button
-              class="btn-cancelar-usuario"
+              class="btn-cancelar-centro-acopio"
+              type="button"
               onclick="
                 document
-                  .getElementById('overlayCrearUsuarios')
+                  .getElementById('overlayCrearCentrosAcopio')
                   .classList.remove('activo')
               "
             >
@@ -140,57 +135,58 @@
       </div>
 
       <div class="lista-panel">
-        <h3>Lista de Usuarios</h3>
-        <ul id="listaUsuarios">
-          <p>Cargando usuarios...</p>
+        <h3>Lista de Centros de Acopio</h3>
+        <ul id="listaCentrosAcopio">
+          <p>Cargando centros de acopio...</p>
         </ul>
       </div>
     </div>
 
     <div
       class="overlay"
-      id="overlayUsuarios"
-      onclick="cerrarModalUsuarios(event)"
+      id="overlayCentrosAcopio"
+      onclick="cerrarModalCentrosAcopio(event)"
     >
       <div class="modal-usuarios">
-        <h3>Modificar usuario</h3>
+        <h3>Modificar centro de acopio</h3>
 
-        <form id="formModificarUsuario">
-          <input type="hidden" id="mailOriginal" />
+        <form id="formModificarCentroAcopio">
+          <input type="hidden" id="idOriginal" />
 
-          <label>Nombre</label>
+          <label>Tipo de residuo</label>
           <input
-            id="nombreEditar"
+            id="tipoResiduoEditar"
             placeholder="Dejar vacío para no modificar"
           />
 
-          <label>Apellido</label>
+          <label>Capacidad</label>
           <input
-            id="apellidoEditar"
+            id="capacidadEditar"
             placeholder="Dejar vacío para no modificar"
           />
 
-          <label>Usuario</label>
+          <label>Calle </label>
+          <input id="calleEditar" placeholder="Dejar vacío para no modificar" />
+          <label>Barrio </label>
           <input
-            id="nicknameEditar"
+            id="barrioEditar"
             placeholder="Dejar vacío para no modificar"
           />
-          <label>Rol</label>
-          <select id="rolEditar" required>
-            <option value="" disabled>Seleccione un rol</option>
-            <option value="Vecino">Vecino</option>
-            <option value="Operario">Operario</option>
-            <option value="Administrador">Administrador</option>
-          </select>
-          <button class="btn-guardar-usuario" type="submit">
+          <label>Numero </label>
+          <input
+            id="numeroEditar"
+            placeholder="Dejar vacío para no modificar"
+          />
+
+          <button class="btn-guardar-centro-acopio" type="submit">
             Guardar cambios
           </button>
           <button
-            class="btn-cancelar-usuario"
+            class="btn-cancelar-centro-acopio"
             type="button"
             onclick="
               document
-                .getElementById('overlayUsuarios')
+                .getElementById('overlayCentrosAcopio')
                 .classList.remove('activo')
             "
           >
@@ -202,20 +198,21 @@
 
     <script>
       const API_URL =
-        "http://localhost/Proyecto/ProyectoSyntropy/Usuarios/miApi/";
-      let usuarios = [];
+        "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/CentrosAcopio/";
+      let centros = [];
 
       document
-        .getElementById("formModificarUsuario")
+        .getElementById("formModificarCentroAcopio")
         .addEventListener("submit", async (event) => {
           event.preventDefault();
 
           const datos = {
-            mail: document.getElementById("mailOriginal").value,
-            nombre: document.getElementById("nombreEditar").value,
-            apellido: document.getElementById("apellidoEditar").value,
-            nickname: document.getElementById("nicknameEditar").value,
-            rol: document.getElementById("rolEditar").value,
+            idCentroAcopio: document.getElementById("idOriginal").value,
+            tipoResiduo: document.getElementById("tipoResiduoEditar").value,
+            capacidad: document.getElementById("capacidadEditar").value,
+            calle: document.getElementById("calleEditar").value,
+            barrio: document.getElementById("barrioEditar").value,
+            numero: document.getElementById("numeroEditar").value,
           };
 
           const resp = await fetch(`${API_URL}Modificar`, {
@@ -228,25 +225,24 @@
 
           if (resultado.status === "ok") {
             document
-              .getElementById("overlayUsuarios")
+              .getElementById("overlayCentrosAcopio")
               .classList.remove("activo");
-            obtenerUsuarios(); // refresca la lista
+            obtenerCentrosAcopio(); // refresca la lista
           } else {
             alert(resultado.mensaje);
           }
         });
       document
-        .getElementById("formCrearUsuario")
+        .getElementById("formCrearCentroAcopio")
         .addEventListener("submit", async (event) => {
           event.preventDefault();
 
           const datos = {
-            nombre: document.getElementById("nombreCrear").value,
-            apellido: document.getElementById("apellidoCrear").value,
-            mail: document.getElementById("mailCrear").value,
-            contrasenia: document.getElementById("passwordCrear").value,
-            usuario: document.getElementById("nicknameCrear").value,
-            rol: document.getElementById("rolCrear").value,
+            tipoResiduo: document.getElementById("tipoResiduoCrear").value,
+            capacidad: document.getElementById("capacidadCrear").value,
+            calle: document.getElementById("calleCrear").value,
+            barrio: document.getElementById("barrioCrear").value,
+            numero: document.getElementById("numeroCrear").value,
           };
 
           const resp = await fetch(`${API_URL}Registrar`, {
@@ -257,11 +253,11 @@
 
           const resultado = await resp.json();
 
-          if (resultado.status === "ok") {
+          if (resultado.status === "creado") {
             document
-              .getElementById("overlayCrearUsuarios")
+              .getElementById("overlayCrearCentrosAcopio")
               .classList.remove("activo");
-            obtenerUsuarios();
+            obtenerCentrosAcopio();
           } else {
             alert(resultado.mensaje);
           }
@@ -319,56 +315,61 @@
 
       cargarUsuario();
 
-      function abrirModalUsuarios() {
-        document.getElementById("overlayUsuarios").classList.add("activo");
+      function abrirModalCentroAcopio() {
+        document.getElementById("overlayCentrosAcopio").classList.add("activo");
       }
-      function abrirCrearUsuario() {
-        document.getElementById("overlayCrearUsuarios").classList.add("activo");
+      function abrirCrearCentroAcopio() {
+        document
+          .getElementById("overlayCrearCentrosAcopio")
+          .classList.add("activo");
       }
 
-      function cerrarModalUsuarios(evento) {
-        if (evento.target.id === "overlayUsuarios") {
-          document.getElementById("overlayUsuarios").classList.remove("activo");
+      function cerrarModalCentrosAcopio(evento) {
+        if (evento.target.id === "overlayCentrosAcopio") {
+          document
+            .getElementById("overlayCentrosAcopio")
+            .classList.remove("activo");
         }
       }
 
-      function seleccionarUsuario(mail) {
-        const usuario = usuarios.find((u) => u.mail === mail);
-        if (!usuario) return;
+      function seleccionarCentro(ID_acopio) {
+        const centro = centros.find((c) => c.ID_acopio === ID_acopio);
+        if (!centro) return;
 
-        document.getElementById("mailOriginal").value = usuario.mail;
-        document.getElementById("nombreEditar").value = usuario.nombre;
-        document.getElementById("apellidoEditar").value = usuario.apellido;
-        document.getElementById("nicknameEditar").value =
-          usuario.nickname ?? "";
-        document.getElementById("rolEditar").value = usuario.rol ?? "";
+        document.getElementById("idOriginal").value = centro.ID_acopio;
+        document.getElementById("tipoResiduoEditar").value = centro.tipoResiduo;
+        document.getElementById("capacidadEditar").value = centro.capacidad;
+        document.getElementById("barrioEditar").value = centro.barrio;
+        document.getElementById("calleEditar").value = centro.calle;
+        document.getElementById("numeroEditar").value = centro.numero;
 
-        document.getElementById("overlayUsuarios").classList.add("activo");
+        document.getElementById("overlayCentrosAcopio").classList.add("activo");
       }
-      async function obtenerUsuarios() {
+      async function obtenerCentrosAcopio() {
         try {
-          const resp = await fetch(`${API_URL}Usuarios`);
+          const resp = await fetch(`${API_URL}CentrosAcopio`);
           if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
           const data = await resp.json();
-          const todos = Array.isArray(data) ? data : data?.usuarios || [];
-          usuarios = todos.filter((u) => u.estado_usuario === "Activo");
+          const todos = Array.isArray(data) ? data : data?.data || [];
+          centros = todos;
           renderizarLista();
         } catch (error) {
-          console.error("Error al obtener usuarios:", error);
+          console.error("Error al obtener centros de acopio:", error);
         }
       }
-      async function eliminarUsuario(mail) {
-        const usuario = usuarios.find((u) => u.mail === mail);
-        if (confirm("¿Está seguro de que desea eliminar este usuario?")) {
+      async function eliminarCentroAcopio(id) {
+        if (
+          confirm("¿Está seguro de que desea eliminar este centro de acopio?")
+        ) {
           const resp = await fetch(`${API_URL}Borrar`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mail }),
+            body: JSON.stringify({ idCentroAcopio: id }),
           });
           try {
             const resultado = await resp.json();
-            if (resultado?.status === "ok") {
-              obtenerUsuarios();
+            if (resultado.status === "ok") {
+              obtenerCentrosAcopio();
             } else {
               alert("No se pudo eliminar el usuario.");
             }
@@ -379,31 +380,30 @@
         }
       }
       function renderizarLista() {
-        const listaContainer = document.getElementById("listaUsuarios");
+        const listaContainer = document.getElementById("listaCentrosAcopio");
 
-        if (usuarios.length === 0) {
-          listaContainer.innerHTML = "<p>No hay usuarios disponibles.</p>";
+        if (centros.length === 0) {
+          listaContainer.innerHTML =
+            "<p>No hay centros de acopio disponibles.</p>";
           return;
         }
 
         let html = '<ul style="list-style: none; padding: 0; margin: 0;">';
 
-        usuarios.forEach((usuario) => {
+        centros.forEach((centro) => {
           html += `
-<li class="usuario-item">
+<li class="centro-item">
   <span>
-    <strong>${usuario.nombre} ${usuario.apellido} ${usuario.nickname ?? "Sin nickname"} ${usuario.mail}</strong>
-    - ${usuario.rol ?? "Sin rol"}
-    - ${usuario.estado_registro ?? "Sin estado"}
+    <strong>${centro.ID_acopio} ${centro.tipoResiduo} ${centro.capacidad} ${centro.barrio} ${centro.calle} ${centro.numero}</strong>
   </span>
-  <span class="usuario-acciones">
-    <button class="btn-modificar" onclick="seleccionarUsuario('${usuario.mail}')">
+  <span class="centro-acciones">
+    <button class="btn-modificar" onclick="seleccionarCentro(${centro.ID_acopio})">
       Modificar
     </button>
     <button
       class="btn-eliminar"
       style="background-color: #e74c3c; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-size: 14px; cursor: pointer;"
-      onclick="eliminarUsuario('${usuario.mail}')">
+      onclick="eliminarCentroAcopio('${centro.ID_acopio}')">
       Eliminar
     </button>
   </span>
@@ -414,7 +414,7 @@
         listaContainer.innerHTML = html;
       }
 
-      obtenerUsuarios();
+      obtenerCentrosAcopio();
     </script>
   </body>
 </html>

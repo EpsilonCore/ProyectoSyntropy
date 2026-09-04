@@ -1,252 +1,155 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-
-<head>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Gestión - Epsilon</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-</head>
+  <body>
+    <script>
+      if (localStorage.getItem("logueado") !== "si") {
+        window.location.href = "login.html";
+      }
 
+      if ((localStorage.getItem("rol") || "").trim() !== "Administrador") {
+        window.location.href = "index.html";
+      }
+    </script>
 
-<body>
-
-
-<script>
-
-if(localStorage.getItem("logueado") !== "si"){
-
-    window.location.href = "login.html";
-
-}
-
-</script>
-
-
-
-
-<header>
-
-
-    <div class="logo">
-
+    <header>
+      <div class="logo">
         <a href="index.html">
-
-            <img src="logo.png" alt="Epsilon">
-
+          <img src="logo.png" alt="Epsilon" />
         </a>
+      </div>
 
-    </div>
-
-
-
-
-    <div class="header-actions">
-
+      <div class="header-actions">
         <div id="usuario" class="usuario"></div>
 
-        <div class="menu-toggle" onclick="toggleMenu()">
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+      </div>
 
-            ☰
-
-        </div>
-
-
-    </div>
-
-
-
-
-
-    <nav id="menu">
-
-
+      <nav id="menu">
         <ul>
+          <li>
+            <button
+              class="link-button"
+              data-rol="Administrador"
+              onclick="window.location.href = 'gestion.html'"
+            >
+              Gestión
+            </button>
+          </li>
 
+          <li>
+            <button
+              class="link-button"
+              data-rol="Administrador, Operario"
+              onclick="window.location.href = 'rutas.html'"
+            >
+              Rutas
+            </button>
+          </li>
 
-            <li>
+          <li>
+            <button
+              class="link-button"
+              onclick="window.location.href = 'mapa.html'"
+            >
+              Mapa
+            </button>
+          </li>
 
-                <button class="link-button"
-                onclick="window.location.href='gestion.html'">
+          <li>
+            <button
+              class="link-button"
+              onclick="window.location.href = 'estadisticas.html'"
+            >
+              Estadísticas
+            </button>
+          </li>
 
-                    Gestión
-
-                </button>
-
-            </li>
-
-
-
-            <li>
-
-                <button class="link-button"
-                onclick="window.location.href='rutas.html'">
-
-                    Rutas
-
-                </button>
-
-            </li>
-
-
-
-            <li>
-
-                <button class="link-button"
-                onclick="window.location.href='mapa.html'">
-
-                    Mapa
-
-                </button>
-
-            </li>
-
-
-
-            <li>
-
-                <button class="link-button"
-                onclick="window.location.href='estadisticas.html'">
-
-                    Estadísticas
-
-                </button>
-
-            </li>
-
-
-
-            <li>
-
-                <button class="link-button"
-                onclick="window.location.href='documentacion.html'">
-
-                    Documentación
-
-                </button>
-
-            </li>
-
-
-
+          <li>
+            <button
+              class="link-button"
+              onclick="window.location.href = 'documentacion.html'"
+            >
+              Documentación
+            </button>
+          </li>
         </ul>
+      </nav>
+    </header>
 
+    <div class="pagina">
+      <h2>Gestión de Residuos</h2>
 
-    </nav>
+      <p>Administración general del sistema Epsilon.</p>
 
-
-</header>
-
-
-
-
-
-
-
-<div class="pagina">
-
-
-    <h2>
-
-        Gestión de Residuos
-
-    </h2>
-
-
-
-    <p>
-
-        Administración general del sistema Epsilon.
-
-    </p>
-
-
-
-
-
-    <div class="panel">
-
-
-
-        <button onclick="window.location.href='panelregistro.html'">
-
-            Panel Registro
-
+      <div class="panel">
+        <button onclick="window.location.href = 'panelregistro.html'">
+          Panel Registro
         </button>
 
-
-
-
-        <button onclick="window.location.href='panelcontenedor.html'">
-
-            Panel Contenedores
-
+        <button onclick="window.location.href = 'panelcontenedor.html'">
+          Panel Contenedores
         </button>
 
-
-
-
-        <button onclick="window.location.href='panelcamion.html'">
-
-            Panel Camiones
-
+        <button onclick="window.location.href = 'panelcamion.html'">
+          Panel Camiones
         </button>
 
-
-
-        <button onclick="window.location.href='panelusuario.html'">
-
-            Panel de Usuario
-
+        <button onclick="window.location.href = 'panelusuario.html'">
+          Panel de Usuario
         </button>
 
+        <button onclick="window.location.href = 'panelcentroacopio.html'">
+          Panel Centros de Acopio
+        </button>
 
+        <button onclick="window.location.href = 'panelrutas.html'">
+          Panel Rutas
+        </button>
 
+        <button onclick="window.location.href = 'panelincidencia.html'">
+          Panel Incidencias
+        </button>
+      </div>
     </div>
 
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const rolUsuario = (localStorage.getItem("rol") || "").trim();
+        document.querySelectorAll("[data-rol]").forEach((boton) => {
+          const rolesPermitidos = boton.dataset.rol
+            .split(",")
+            .map((rol) => rol.trim());
+          if (!rolesPermitidos.includes(rolUsuario)) {
+            boton.style.display = "none";
+          }
+        });
+      });
 
+      function toggleMenu() {
+        document.getElementById("menu").classList.toggle("activo");
+      }
 
+      function cerrarSesion() {
+        localStorage.removeItem("logueado");
+        localStorage.removeItem("nombreUsuario");
 
-</div>
+        window.location.href = "index.html";
+      }
 
+      function cargarUsuario() {
+        const nombre = localStorage.getItem("nombreUsuario") || "Usuario";
+        const inicial = nombre.charAt(0).toUpperCase();
 
-
-
-
-
-
-<script>
-
-
-function toggleMenu(){
-
-    document
-    .getElementById("menu")
-    .classList.toggle("activo");
-
-}
-
-
-function cerrarSesion(){
-
-    localStorage.removeItem("logueado");
-    localStorage.removeItem("nombreUsuario");
-
-    window.location.href = "index.html";
-
-}
-
-
-function cargarUsuario(){
-
-    const nombre = localStorage.getItem("nombreUsuario") || "Usuario";
-    const inicial = nombre.charAt(0).toUpperCase();
-
-    document.getElementById("usuario").innerHTML = `
+        document.getElementById("usuario").innerHTML = `
 
     <span class="nombre-usuario">${nombre}</span>
 
@@ -263,28 +166,13 @@ function cargarUsuario(){
     </div>
 
     `;
+      }
 
-}
+      function abrirUsuario() {
+        document.getElementById("menuUsuario").classList.toggle("activo");
+      }
 
-
-function abrirUsuario(){
-
-    document
-    .getElementById("menuUsuario")
-    .classList.toggle("activo");
-
-}
-
-
-cargarUsuario();
-
-
-</script>
-
-
-
-
-
-</body>
-
+      cargarUsuario();
+    </script>
+  </body>
 </html>

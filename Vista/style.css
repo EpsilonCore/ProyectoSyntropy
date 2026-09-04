@@ -1,13 +1,56 @@
+/* =========================
+   FUENTES Y VARIABLES
+========================= */
+
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap");
+
+:root {
+  --verde-bosque: #1f4630;
+  --verde: #2f8f3a;
+  --verde-hover: #267530;
+  --verde-tinte: #e8f1e6;
+  --brote: #8fc93a;
+  --papel: #f2f4ee;
+  --panel: #ffffff;
+  --tinta: #1c231f;
+  --tinta-suave: #57615a;
+  --borde: #dcdfd5;
+  --oxido: #a6472b;
+  --oxido-hover: #8c3b23;
+  --acero: #3e6274;
+  --acero-hover: #345268;
+  --ambar: #c97a1e;
+
+  --fuente-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --fuente-texto: "Work Sans", Arial, Helvetica, sans-serif;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--fuente-texto);
 }
 
 body {
   min-height: 100vh;
-  background: #f4f6f9;
+  background: var(--papel);
+  color: var(--tinta);
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid var(--brote);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
 }
 
 /* =========================
@@ -15,12 +58,13 @@ body {
 ========================= */
 
 header {
-  background: white;
+  background: var(--panel);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 40px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  padding: 18px 40px;
+  border-bottom: 3px solid var(--verde-bosque);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
   position: relative;
 }
 
@@ -35,7 +79,7 @@ header {
 }
 
 .logo img {
-  height: 70px;
+  height: 64px;
   width: auto;
   transition: 0.3s;
 }
@@ -49,18 +93,18 @@ header {
 ========================= */
 
 .menu-toggle {
-  font-size: 32px;
-  color: #1c2745;
+  font-size: 30px;
+  color: var(--tinta);
   cursor: pointer;
   padding: 10px;
-  border-radius: 10px;
+  border-radius: 8px;
   transition: 0.3s;
   user-select: none;
 }
 
 .menu-toggle:hover {
-  background: #eef7ef;
-  color: #2f8f3a;
+  background: var(--verde-tinte);
+  color: var(--verde-bosque);
 }
 
 /* =========================
@@ -75,11 +119,12 @@ nav {
 
   width: 260px;
 
-  background: white;
+  background: var(--panel);
+  border: 1px solid var(--borde);
 
-  border-radius: 18px;
+  border-radius: 14px;
 
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 15px 35px rgba(28, 35, 31, 0.14);
 
   padding: 12px;
 
@@ -94,7 +139,7 @@ nav ul {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .link-button {
@@ -107,13 +152,15 @@ nav ul {
 
   padding: 14px 18px;
 
-  border-radius: 12px;
+  border-radius: 8px;
 
-  font-size: 15px;
+  font-family: var(--fuente-display);
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 
-  font-weight: bold;
-
-  color: #1c2745;
+  color: var(--tinta);
 
   cursor: pointer;
 
@@ -121,9 +168,9 @@ nav ul {
 }
 
 .link-button:hover {
-  background: #eef7ef;
+  background: var(--verde-tinte);
 
-  color: #2f8f3a;
+  color: var(--verde-bosque);
 
   transform: translateX(4px);
 }
@@ -133,7 +180,7 @@ nav button:not(.link-button) {
 
   margin-top: 8px;
 
-  background: #2f8f3a;
+  background: var(--verde);
 
   color: white;
 
@@ -141,9 +188,12 @@ nav button:not(.link-button) {
 
   padding: 14px;
 
-  border-radius: 12px;
+  border-radius: 8px;
 
-  font-weight: bold;
+  font-family: var(--fuente-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 
   cursor: pointer;
 
@@ -151,7 +201,7 @@ nav button:not(.link-button) {
 }
 
 nav button:not(.link-button):hover {
-  background: #267530;
+  background: var(--verde-hover);
 
   transform: translateY(-1px);
 }
@@ -173,20 +223,31 @@ nav button:not(.link-button):hover {
 }
 
 .texto h4 {
-  color: #2f8f3a;
-  margin-bottom: 15px;
+  display: inline-block;
+  background: var(--verde-bosque);
+  color: white;
+  font-family: var(--fuente-display);
+  font-size: 14px;
+  font-weight: 700;
   letter-spacing: 3px;
+  padding: 6px 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
 }
 
 .texto h2 {
-  font-size: 60px;
-  color: #1c2745;
+  font-family: var(--fuente-display);
+  font-weight: 800;
+  font-size: 64px;
+  line-height: 1.05;
+  color: var(--tinta);
   margin-bottom: 20px;
 }
 
 .texto p {
-  color: #666;
+  color: var(--tinta-suave);
   font-size: 18px;
+  line-height: 1.5;
   margin-bottom: 30px;
 }
 
@@ -198,39 +259,59 @@ nav button:not(.link-button):hover {
 .botones button {
   padding: 14px 25px;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: bold;
+  font-family: var(--fuente-display);
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   transition: 0.3s;
 }
 
 .botones button:first-child {
-  background: #2f8f3a;
+  background: var(--verde);
   color: white;
 }
 
 .botones button:first-child:hover {
-  background: #267530;
+  background: var(--verde-hover);
 }
 
 .botones button:last-child {
   background: white;
-  border: 2px solid #2f8f3a;
-  color: #2f8f3a;
+  border: 2px solid var(--verde);
+  color: var(--verde-bosque);
 }
 
 .botones button:last-child:hover {
-  background: #eef7ef;
+  background: var(--verde-tinte);
 }
 
 .imagen {
   flex: 1;
+  position: relative;
+}
+
+.imagen::before {
+  content: "";
+  position: absolute;
+  top: 16px;
+  left: -16px;
+  width: 100%;
+  height: 100%;
+  background: var(--verde-bosque);
+  border-radius: 10px;
+  z-index: 0;
 }
 
 .imagen img {
+  position: relative;
+  z-index: 1;
   width: 100%;
-  border-radius: 15px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  display: block;
+  border-radius: 10px;
+  box-shadow: 0 14px 30px rgba(28, 35, 31, 0.2);
 }
 
 /* =========================
@@ -239,21 +320,34 @@ nav button:not(.link-button):hover {
 
 .login-container {
   width: 450px;
-  background: white;
+  background: var(--panel);
   padding: 50px;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 20px 45px rgba(28, 35, 31, 0.16);
 
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+
+  overflow: hidden;
+}
+
+.login-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: var(--verde-bosque);
 }
 
 .login-container h1 {
   text-align: center;
-  color: #1c2745;
+  color: var(--tinta);
   margin-bottom: 30px;
+  font-family: var(--fuente-display);
   font-size: 38px;
 }
 
@@ -262,28 +356,33 @@ nav button:not(.link-button):hover {
   padding: 16px;
   margin-bottom: 20px;
   border: none;
-  border-bottom: 2px solid #ccc;
+  border-bottom: 2px solid var(--borde);
   background: transparent;
+  font-family: var(--fuente-texto);
   font-size: 16px;
+  color: var(--tinta);
 }
 
 .login-container input:focus {
   outline: none;
-  border-bottom: 2px solid #2f8f3a;
+  border-bottom: 2px solid var(--verde);
 }
 
 .login-container input[type="submit"] {
-  background: #2f8f3a;
+  background: var(--verde);
   color: white;
   border: none;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: bold;
+  border-radius: 8px;
+  font-family: var(--fuente-display);
+  font-size: 17px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   cursor: pointer;
 }
 
 .login-container input[type="submit"]:hover {
-  background: #267530;
+  background: var(--verde-hover);
 }
 
 .login-links {
@@ -294,9 +393,9 @@ nav button:not(.link-button):hover {
 
 .login-links a {
   text-decoration: none;
-  color: #2f8f3a;
+  color: var(--verde-bosque);
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 .login-links a:hover {
@@ -312,12 +411,19 @@ nav button:not(.link-button):hover {
 }
 
 .pagina h2 {
-  color: #1c2745;
-  margin-bottom: 15px;
+  font-family: var(--fuente-display);
+  font-weight: 700;
+  font-size: 36px;
+  color: var(--tinta);
+  margin-bottom: 8px;
+  display: inline-block;
+  border-bottom: 3px solid var(--verde);
+  padding-bottom: 8px;
 }
 
 .pagina p {
-  color: #666;
+  color: var(--tinta-suave);
+  margin-top: 15px;
   margin-bottom: 30px;
 }
 
@@ -328,30 +434,35 @@ nav button:not(.link-button):hover {
 }
 
 .panel button {
-  background: #2f8f3a;
+  background: var(--verde);
   color: white;
   border: none;
   padding: 15px 25px;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: bold;
+  font-family: var(--fuente-display);
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   transition: 0.3s;
 }
 
 .panel button:hover {
-  background: #267530;
+  background: var(--verde-hover);
   transform: translateY(-2px);
 }
 
 /* =========================
-   MAPA LEAFLET (AÑADIDO Y CORREGIDO)
+   MAPA LEAFLET
 ========================= */
 #map {
   width: 100%;
   height: 500px;
-  border-radius: 15px;
+  border-radius: 12px;
+  border: 1px solid var(--borde);
   margin-top: 30px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 25px rgba(28, 35, 31, 0.1);
   z-index: 1;
 }
 
@@ -364,12 +475,19 @@ nav button:not(.link-button):hover {
 }
 
 .dashboard h2 {
-  color: #1c2745;
-  margin-bottom: 10px;
+  font-family: var(--fuente-display);
+  font-weight: 700;
+  font-size: 36px;
+  color: var(--tinta);
+  margin-bottom: 8px;
+  display: inline-block;
+  border-bottom: 3px solid var(--verde);
+  padding-bottom: 8px;
 }
 
 .dashboard p {
-  color: #666;
+  color: var(--tinta-suave);
+  margin-top: 15px;
   margin-bottom: 30px;
 }
 
@@ -381,27 +499,40 @@ nav button:not(.link-button):hover {
 }
 
 .card-stat {
-  background: white;
+  background: var(--panel);
+  border: 1px solid var(--borde);
   padding: 25px;
-  border-radius: 15px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(28, 35, 31, 0.06);
   transition: 0.3s;
 }
 
 .card-stat:hover {
   transform: translateY(-5px);
+  box-shadow: 0 16px 30px rgba(28, 35, 31, 0.12);
 }
 
 .card-stat h3 {
-  font-size: 16px;
-  color: #666;
-  margin-bottom: 10px;
+  font-family: var(--fuente-texto);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--tinta-suave);
+  margin-bottom: 12px;
 }
 
 .card-stat p {
-  font-size: 28px;
-  font-weight: bold;
-  color: #2f8f3a;
+  display: inline-block;
+  font-family: var(--fuente-display);
+  font-variant-numeric: tabular-nums;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--brote);
+  background: var(--tinta);
+  padding: 6px 14px;
+  border-radius: 6px;
 }
 
 .panel-actions {
@@ -411,18 +542,22 @@ nav button:not(.link-button):hover {
 }
 
 .panel-actions button {
-  background: #2f8f3a;
+  background: var(--verde);
   color: white;
   border: none;
   padding: 15px 20px;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: bold;
+  font-family: var(--fuente-display);
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   transition: 0.3s;
 }
 
 .panel-actions button:hover {
-  background: #267530;
+  background: var(--verde-hover);
   transform: translateY(-2px);
 }
 
@@ -436,7 +571,7 @@ nav button:not(.link-button):hover {
   }
 
   .logo img {
-    height: 55px;
+    height: 50px;
   }
 
   .contenido {
@@ -446,7 +581,7 @@ nav button:not(.link-button):hover {
   }
 
   .texto h2 {
-    font-size: 36px;
+    font-size: 42px;
   }
 
   .texto p {
@@ -460,6 +595,11 @@ nav button:not(.link-button):hover {
 
   .botones button {
     width: 100%;
+  }
+
+  .imagen::before {
+    left: -8px;
+    top: 8px;
   }
 
   .login-container {
@@ -508,19 +648,59 @@ nav button:not(.link-button):hover {
 ========================= */
 
 #registro-btn button {
-    background: #2f8f3a;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 10px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
+  background: var(--verde);
+  color: white;
+
+  border: none;
+
+  padding: 12px 20px;
+
+  border-radius: 8px;
+
+  font-family: var(--fuente-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  cursor: pointer;
+
+  transition: 0.3s;
 }
 
 #registro-btn button:hover {
-    background: #267530;
-    transform: translateY(-2px);
+  background: var(--verde-hover);
+
+  transform: translateY(-2px);
+}
+
+/* =========================
+   BOTON INICIAR SESION
+========================= */
+
+#login-btn button {
+  background: white;
+  color: var(--verde-bosque);
+
+  border: 2px solid var(--verde);
+
+  padding: 12px 20px;
+
+  border-radius: 8px;
+
+  font-family: var(--fuente-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+#login-btn button:hover {
+  background: var(--verde-tinte);
+
+  transform: translateY(-2px);
 }
 
 /* =========================
@@ -528,24 +708,171 @@ nav button:not(.link-button):hover {
 ========================= */
 
 .usuario {
-    position: relative;
+  position: relative;
 }
 
 .usuario-btn {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    border: none;
-    background: #eef7ef;
-    color: #2f8f3a;
-    font-size: 24px;
-    cursor: pointer;
-    transition: 0.3s;
+  width: 45px;
+
+  height: 45px;
+
+  border-radius: 50%;
+
+  border: none;
+
+  background: var(--verde-tinte);
+
+  color: var(--verde-bosque);
+
+  font-family: var(--fuente-display);
+  font-size: 22px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.3s;
 }
 
 .usuario-btn:hover {
-    background: #2f8f3a;
-    color:white;
+  background: var(--verde);
+
+  color: white;
+}
+
+/* =========================
+   BOTON REPORTAR INCIDENCIA
+========================= */
+
+.btn-crear-incidencia {
+  width: 45px;
+  height: 45px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 50%;
+
+  background: var(--ambar);
+  color: white;
+
+  font-family: var(--fuente-display);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+
+  cursor: pointer;
+
+  box-shadow: 0 6px 16px rgba(201, 122, 30, 0.35);
+
+  transition: 0.3s;
+}
+
+.btn-crear-incidencia:hover {
+  background: var(--oxido);
+  transform: translateY(-2px) scale(1.05);
+}
+
+.btn-crear-incidencia:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* =========================
+   OVERLAY CREAR INCIDENCIA
+========================= */
+
+/* Escopado por ID: el modal reutiliza la clase .crear-centro-acopio
+   (ya estilada arriba para el ABM de Centros de Acopio), así que estas
+   reglas se limitan a este overlay puntual para no afectar ese otro modal */
+
+#overlayCrearIncidencias .crear-centro-acopio {
+  position: relative;
+  overflow: hidden;
+
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+#overlayCrearIncidencias .crear-centro-acopio::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: var(--ambar);
+}
+
+.preview-imagen {
+  display: none;
+
+  margin-top: 4px;
+
+  border: 1px dashed var(--borde);
+  border-radius: 8px;
+
+  padding: 8px;
+
+  background: var(--papel);
+}
+
+/* =========================
+   LISTA CONTENEDORES (INCIDENCIA)
+========================= */
+
+.lista-contenedores {
+  max-height: 220px;
+  overflow-y: auto;
+
+  margin-top: 6px;
+  margin-bottom: 6px;
+
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+}
+
+.item-contenedores {
+  padding: 10px 14px;
+
+  border-bottom: 1px solid var(--borde);
+
+  font-size: 0.9rem;
+  color: var(--tinta);
+
+  cursor: pointer;
+
+  transition: background-color 0.15s;
+}
+
+.item-contenedores:last-child {
+  border-bottom: none;
+}
+
+.item-contenedores:hover {
+  background: var(--verde-tinte);
+}
+
+.item-contenedores.seleccionado {
+  background: var(--verde-tinte);
+  border-left: 4px solid var(--verde);
+  font-weight: 600;
+  color: var(--verde-bosque);
+}
+
+.preview-imagen.activo {
+  display: block;
+}
+
+.preview-imagen img {
+  display: block;
+
+  width: 100%;
+  max-height: 180px;
+
+  object-fit: cover;
+
+  border-radius: 6px;
 }
 
 /* =========================
@@ -553,84 +880,409 @@ nav button:not(.link-button):hover {
 ========================= */
 
 .menu-usuario {
-    display:none;
-    position:absolute;
-    right:0;
-    top:55px;
-    width:180px;
-    background:white;
-    padding:12px;
-    border-radius:15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-    z-index:2000;
+  display: none;
+
+  position: absolute;
+
+  right: 0;
+
+  top: 55px;
+
+  width: 180px;
+
+  background: var(--panel);
+  border: 1px solid var(--borde);
+
+  padding: 12px;
+
+  border-radius: 12px;
+
+  box-shadow: 0 10px 30px rgba(28, 35, 31, 0.15);
+
+  z-index: 2000;
 }
 
 .menu-usuario.activo {
-    display:block;
+  display: block;
 }
 
 .menu-usuario button {
-    width:100%;
-    padding:12px;
-    border:none;
-    border-radius:10px;
-    background:#2f8f3a;
-    color:white;
-    font-weight:bold;
-    cursor:pointer;
+  width: 100%;
+
+  padding: 12px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  background: var(--verde);
+
+  color: white;
+
+  font-family: var(--fuente-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  cursor: pointer;
 }
 
 .menu-usuario button:hover {
-    background:#267530;
+  background: var(--verde-hover);
 }
 
 /* =========================
    MOVIL
 ========================= */
 
-@media(max-width:768px){
-    .header-actions{
-        gap:8px;
-    }
+@media (max-width: 768px) {
+  .header-actions {
+    gap: 8px;
+  }
 
-    #registro-btn button{
-        padding:10px 12px;
-        font-size:14px;
-    }
+  #registro-btn button,
+  #login-btn button {
+    padding: 10px 12px;
 
-    #login-btn button{
-        padding:10px 12px;
-        font-size:14px;
-    }
+    font-size: 14px;
+  }
+
+  .btn-crear-incidencia {
+    width: 38px;
+    height: 38px;
+
+    font-size: 20px;
+  }
 }
 /* =========================
    LISTAS PANELES
 ========================= */
 
-.lista-panel{
-    margin-top:40px;
-    background:white;
-    padding:25px;
-    border-radius:15px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+.lista-panel {
+  margin-top: 40px;
+
+  background: var(--panel);
+
+  padding: 25px;
+
+  border-radius: 12px;
+  border: 1px solid var(--borde);
+
+  box-shadow: 0 10px 25px rgba(28, 35, 31, 0.05);
 }
 
-.lista-panel h3{
-    color:#1c2745;
-    margin-bottom:20px;
+.lista-panel h3 {
+  font-family: var(--fuente-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--tinta);
+
+  margin-bottom: 20px;
 }
 
-.lista-panel ul{
-    list-style:none;
+.lista-panel ul {
+  list-style: none;
 }
 
-.lista-panel li{
-    padding:15px;
-    background:#f4f6f9;
-    margin-bottom:10px;
-    border-radius:10px;
-    color:#555;
+.lista-panel li {
+  padding: 15px;
+
+  background: var(--papel);
+
+  margin-bottom: 10px;
+
+  border-radius: 8px;
+
+  color: var(--tinta-suave);
 }
 
 /* =========================
-   BOTON INICIAR SESION
+   OVERLAY Y MODALES
+========================= */
+
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgba(28, 35, 31, 0.55);
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay.activo {
+  display: flex;
+}
+
+@keyframes aparecer-modal {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Caja de los modales de crear y modificar (todas las entidades del sistema) */
+.modal-usuarios,
+.modal-contenedores,
+.modal-camiones,
+.crear-usuario,
+.crear-contenedor,
+.crear-camion,
+.crear-centro-acopio {
+  background: var(--panel);
+  width: min(460px, calc(100% - 32px));
+  padding: 30px;
+  border-radius: 14px;
+  box-shadow: 0 20px 45px rgba(28, 35, 31, 0.22);
+  animation: aparecer-modal 0.2s ease-out;
+}
+
+.modal-usuarios h3,
+.modal-contenedores h3,
+.modal-camiones h3,
+.crear-usuario h3,
+.crear-contenedor h3,
+.crear-camion h3,
+.crear-centro-acopio h3 {
+  font-family: var(--fuente-display);
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: var(--tinta);
+}
+
+.modal-usuarios form,
+.modal-contenedores form,
+.modal-camiones form,
+.crear-usuario form,
+.crear-contenedor form,
+.crear-camion form,
+.crear-centro-acopio form {
+  display: grid;
+  gap: 10px;
+}
+
+.modal-usuarios label,
+.modal-contenedores label,
+.modal-camiones label,
+.crear-usuario label,
+.crear-contenedor label,
+.crear-camion label,
+.crear-centro-acopio label {
+  margin-top: 6px;
+  color: var(--tinta);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.modal-usuarios input:not([type="hidden"]),
+.modal-usuarios select,
+.modal-contenedores input:not([type="hidden"]),
+.modal-contenedores select,
+.modal-camiones input:not([type="hidden"]),
+.modal-camiones select,
+.crear-usuario input:not([type="hidden"]),
+.crear-usuario select,
+.crear-contenedor input:not([type="hidden"]),
+.crear-contenedor select,
+.crear-camion input:not([type="hidden"]),
+.crear-camion select,
+.crear-centro-acopio input:not([type="hidden"]),
+.crear-centro-acopio select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  color: var(--tinta);
+  font-family: var(--fuente-texto);
+  font-size: 0.95rem;
+  outline: none;
+  background: white;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.modal-usuarios input:focus,
+.modal-usuarios select:focus,
+.modal-contenedores input:focus,
+.modal-contenedores select:focus,
+.modal-camiones input:focus,
+.modal-camiones select:focus,
+.crear-usuario input:focus,
+.crear-usuario select:focus,
+.crear-contenedor input:focus,
+.crear-contenedor select:focus,
+.crear-camion input:focus,
+.crear-camion select:focus,
+.crear-centro-acopio input:focus,
+.crear-centro-acopio select:focus {
+  border-color: var(--verde);
+  box-shadow: 0 0 0 3px rgba(47, 143, 58, 0.16);
+}
+
+.modal-usuarios .btn-guardar-usuario,
+.modal-contenedores .btn-guardar-usuario,
+.modal-camiones .btn-guardar-usuario {
+  margin-top: 16px;
+}
+
+/* Botones de accion dentro de paneles y modales */
+.btn-modificar,
+.btn-guardar-usuario,
+.btn-guardar-centro-acopio,
+.btn-cancelar-usuario,
+.btn-cancelar-centro-acopio,
+.btn-crear-usuario,
+.btn-crear-contenedor,
+.btn-crear-camion,
+.btn-crear-centro-acopio {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  color: #fff;
+  font-family: var(--fuente-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition:
+    opacity 0.2s,
+    transform 0.2s,
+    background-color 0.2s;
+}
+
+.btn-guardar-usuario,
+.btn-guardar-centro-acopio,
+.btn-crear-usuario,
+.btn-crear-contenedor,
+.btn-crear-camion,
+.btn-crear-centro-acopio {
+  background: var(--verde);
+  margin-top: 16px;
+}
+
+.btn-guardar-usuario:hover,
+.btn-guardar-centro-acopio:hover,
+.btn-crear-usuario:hover,
+.btn-crear-contenedor:hover,
+.btn-crear-camion:hover,
+.btn-crear-centro-acopio:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  background: var(--verde-hover);
+}
+
+.btn-cancelar-usuario,
+.btn-cancelar-centro-acopio {
+  background: var(--tinta-suave);
+}
+
+.btn-cancelar-usuario:hover,
+.btn-cancelar-centro-acopio:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+.btn-modificar {
+  background-color: var(--acero);
+  padding: 8px 16px;
+  margin-right: 6px;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
+}
+
+.btn-modificar:hover {
+  background-color: var(--acero-hover);
+}
+
+.btn-modificar:active {
+  transform: scale(0.97);
+}
+
+/* Los botones "Eliminar" traen su color inline desde el HTML/JS de cada panel;
+   se sobreescribe aca (sin tocar esos archivos) para que respeten la paleta */
+.btn-eliminar {
+  background-color: var(--oxido) !important;
+  font-family: var(--fuente-display) !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease !important;
+}
+
+.btn-eliminar:hover {
+  background-color: var(--oxido-hover) !important;
+}
+
+.usuario-item,
+.contenedor-item,
+.camion-item,
+.centro-item,
+.incidencia-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.usuario-acciones,
+.contenedor-acciones,
+.camion-acciones,
+.centro-acciones,
+.incidencia-acciones {
+  display: flex;
+  gap: 8px;
+}
+
+/* La incidencia tiene varias líneas de info (mail, dirección, operario),
+   a diferencia de los demás items que son de una sola línea */
+.incidencia-item {
+  align-items: flex-start;
+}
+
+.incidencia-acciones {
+  flex-shrink: 0;
+}
+
+.incidencia-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.incidencia-info strong {
+  font-family: var(--fuente-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--tinta);
+}
+
+.incidencia-info p {
+  color: var(--tinta-suave);
+  font-size: 0.9rem;
+}
+
+.incidencia-estado {
+  display: inline-block;
+  align-self: flex-start;
+  background: var(--verde-tinte);
+  color: var(--verde-bosque);
+  font-family: var(--fuente-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+}

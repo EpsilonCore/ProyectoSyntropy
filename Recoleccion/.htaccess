@@ -5,4 +5,4 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
 # Enviar todo a api.php
-RewriteRule ^(.*)$ APIUsuario.php [QSA,L]
+RewriteRule ^(.*)$ APIRecoleccion.php [QSA,L]

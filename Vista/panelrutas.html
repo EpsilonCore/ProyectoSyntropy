@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rutas - Epsilon</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <style>
+      .instruccion-mapa {
+        margin: 8px 0 16px;
+        font-size: 0.9rem;
+        color: #555;
+      }
+      .form-nueva-ruta {
+        display: none;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+      }
+      .form-nueva-ruta.activo {
+        display: flex;
+      }
+      .form-nueva-ruta input,
+      .form-nueva-ruta select {
+        padding: 8px 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+      }
+      #map {
+        height: 420px;
+        border-radius: 8px;
+        margin-top: 4px;
+      }
+      .numero-parada {
+        background: #2a6df4;
+        color: #fff;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: bold;
+        box-shadow: 0 0 0 2px #fff;
+      }
+      #listaParadasRuta {
+        margin: 10px 0;
+      }
+      #listaParadasRuta li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 4px 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <script>
+      if (localStorage.getItem("logueado") !== "si") {
+        window.location.href = "login.html";
+      }
+      if (!["Administrador", "Operario"].includes((localStorage.getItem("rol") || "").trim())) {
+        window.location.href = "index.html";
+      }
+    </script>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <header>
+      <div class="logo">
+        <a href="index.html">
+          <img src="logo.png" alt="Epsilon" />
+        </a>
+      </div>
+
+      <div class="header-actions">
+        <div id="usuario" class="usuario"></div>
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+      </div>
+
+      <nav id="menu">
+        <ul>
+          <li>
+            <button
+              data-rol="Administrador"
+              class="link-button"
+              onclick="window.location.href = 'gestion.html'"
+            >
+              Gestión
+            </button>
+          </li>
+          <li>
+            <button
+              data-rol="Administrador, Operario"
+              class="link-button"
+              onclick="window.location.href = 'panelrutas.html'"
+            >
+              Rutas
+            </button>
+          </li>
+          <li>
+            <button
+              class="link-button"
+              onclick="window.location.href = 'mapa.html'"
+            >
+              Mapa
+            </button>
+          </li>
+          <li>
+            <button
+              class="link-button"
+              onclick="window.location.href = 'estadisticas.html'"
+            >
+              Estadísticas
+            </button>
+          </li>
+          <li>
+            <button
+              class="link-button"
+              onclick="window.location.href = 'documentacion.html'"
+            >
+              Documentación
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="pagina">
+      <h2>Rutas</h2>
+      <p>Planificación de recorridos de recolección.</p>
+
+      <div class="panel">
+        <button id="btnCrearRuta" onclick="iniciarCreacionRuta()">
+          Crear Ruta
+        </button>
+      </div>
+
+      <form id="formNuevaRuta" class="form-nueva-ruta">
+        <input id="nombreRuta" placeholder="Nombre de la ruta" required />
+
+        <select id="camionRuta" required>
+          <option value="" disabled selected>Cargando camiones...</option>
+        </select>
+
+        <button type="submit">Guardar Ruta</button>
+        <button type="button" onclick="cancelarCreacionRuta()">
+          Cancelar
+        </button>
+      </form>
+
+      <p id="instruccionMapa" class="instruccion-mapa" style="display: none">
+        Hacé click en el mapa para agregar paradas, en el orden en que el
+        camión debe recorrerlas.
+      </p>
+
+      <div id="map"></div>
+
+      <ul id="listaParadasRuta"></ul>
+
+      <div class="lista-panel">
+        <h3>Rutas guardadas</h3>
+        <div id="listaRutas">
+          <p>Cargando rutas...</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_URL =
+        "http://localhost/Proyecto/ProyectoSyntropy/Recoleccion/miApi/";
+
+      let modoCreacion = false;
+      let paradas = [];
+      let marcadores = [];
+      let lineaRuta = null;
+      let rutas = [];
+
+      const map = L.map("map").setView([-34.9011, -56.1645], 13);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors",
+        maxZoom: 19,
+      }).addTo(map);
+
+      map.on("click", (e) => {
+        if (!modoCreacion) return;
+        agregarParada({
+          lat: e.latlng.lat,
+          lon: e.latlng.lng,
+          etiqueta: `Punto (${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)})`,
+        });
+      });
+
+      function iniciarCreacionRuta() {
+        modoCreacion = true;
+        paradas = [];
+        redibujarParadas();
+
+        document.getElementById("btnCrearRuta").style.display = "none";
+        document.getElementById("formNuevaRuta").classList.add("activo");
+        document.getElementById("instruccionMapa").style.display = "block";
+
+        cargarCamionesDisponibles();
+      }
+
+      function cancelarCreacionRuta() {
+        modoCreacion = false;
+        paradas = [];
+        redibujarParadas();
+
+        document.getElementById("nombreRuta").value = "";
+        document.getElementById("btnCrearRuta").style.display = "inline-block";
+        document.getElementById("formNuevaRuta").classList.remove("activo");
+        document.getElementById("instruccionMapa").style.display = "none";
+      }
+
+      function agregarParada(parada) {
+        paradas.push(parada);
+        redibujarParadas();
+      }
+
+      function quitarParada(indice) {
+        paradas.splice(indice, 1);
+        redibujarParadas();
+      }
+
+      function redibujarParadas() {
+        marcadores.forEach((m) => map.removeLayer(m));
+        marcadores = paradas.map((p, i) =>
+          L.marker([p.lat, p.lon], {
+            icon: L.divIcon({
+              className: "",
+              html: `<div class="numero-parada">${i + 1}</div>`,
+            }),
+          }).addTo(map),
+        );
+
+        if (lineaRuta) {
+          map.removeLayer(lineaRuta);
+          lineaRuta = null;
+        }
+        if (paradas.length >= 2) {
+          lineaRuta = L.polyline(
+            paradas.map((p) => [p.lat, p.lon]),
+            { color: "#2a6df4" },
+          ).addTo(map);
+        }
+
+        const contenedor = document.getElementById("listaParadasRuta");
+        if (paradas.length === 0) {
+          contenedor.innerHTML = "";
+          return;
+        }
+        contenedor.innerHTML = paradas
+          .map(
+            (p, i) => `
+          <li>
+            <span>${i + 1}. ${p.etiqueta}</span>
+            <button type="button" onclick="quitarParada(${i})">Quitar</button>
+          </li>`,
+          )
+          .join("");
+      }
+
+      async function cargarCamionesDisponibles() {
+        const select = document.getElementById("camionRuta");
+        try {
+          const resp = await fetch(`${API_URL}Camiones`);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          const disponibles = (data?.data || []).filter(
+            (c) => c.estado === "Disponible",
+          );
+
+          if (disponibles.length === 0) {
+            select.innerHTML =
+              '<option value="" disabled selected>No hay camiones disponibles</option>';
+            return;
+          }
+
+          select.innerHTML = disponibles
+            .map(
+              (c) =>
+                `<option value="${c.matricula}">${c.matricula} - ${c.tipo ?? "Sin tipo"}</option>`,
+            )
+            .join("");
+        } catch (error) {
+          console.error("Error al obtener camiones:", error);
+          select.innerHTML =
+            '<option value="" disabled selected>Error al cargar camiones</option>';
+        }
+      }
+
+      document
+        .getElementById("formNuevaRuta")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          if (paradas.length < 2) {
+            alert("Agregá al menos 2 paradas en el mapa antes de guardar.");
+            return;
+          }
+
+          const datos = {
+            nombre: document.getElementById("nombreRuta").value,
+            matricula: document.getElementById("camionRuta").value,
+            paradas: paradas.map(({ lat, lon }) => ({ lat, lon })),
+          };
+
+          const resp = await fetch(`${API_URL}Rutas/Registrar`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
+
+          const resultado = await resp.json();
+
+          if (resultado.status === "creado") {
+            cancelarCreacionRuta();
+            obtenerRutas();
+          } else {
+            alert(resultado.mensaje);
+          }
+        });
+
+      async function obtenerRutas() {
+        try {
+          const resp = await fetch(`${API_URL}Rutas`);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          rutas = data?.data || [];
+          renderizarListaRutas();
+        } catch (error) {
+          console.error("Error al obtener rutas:", error);
+          document.getElementById("listaRutas").innerHTML =
+            "<p>Error al cargar rutas.</p>";
+        }
+      }
+
+      function renderizarListaRutas() {
+        const contenedor = document.getElementById("listaRutas");
+        if (rutas.length === 0) {
+          contenedor.innerHTML = "<p>No hay rutas registradas.</p>";
+          return;
+        }
+        contenedor.innerHTML =
+          '<ul style="list-style: none; padding: 0; margin: 0;">' +
+          rutas
+            .map(
+              (r) => `
+            <li class="ruta-item">
+              <strong>${r.nombre}</strong>
+              — Camión ${r.matricula ?? "Sin asignar"}
+              — ${r.cantidad_paradas} paradas
+              — ${r.estado}
+            </li>`,
+            )
+            .join("") +
+          "</ul>";
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const rolUsuario = (localStorage.getItem("rol") || "").trim();
+        document.querySelectorAll("[data-rol]").forEach((boton) => {
+          const rolesPermitidos = boton.dataset.rol
+            .split(",")
+            .map((rol) => rol.trim());
+          if (!rolesPermitidos.includes(rolUsuario)) {
+            boton.style.display = "none";
+          }
+        });
+      });
+
+      function toggleMenu() {
+        document.getElementById("menu").classList.toggle("activo");
+      }
+
+      function cerrarSesion() {
+        localStorage.removeItem("logueado");
+        localStorage.removeItem("nombreUsuario");
+        window.location.href = "index.html";
+      }
+
+      function cargarUsuario() {
+        const nombre = localStorage.getItem("nombreUsuario") || "Usuario";
+        const inicial = nombre.charAt(0).toUpperCase();
+
+        document.getElementById("usuario").innerHTML = `
+          <span class="nombre-usuario">${nombre}</span>
+          <button class="usuario-btn" onclick="abrirUsuario()">
+              ${inicial}
+          </button>
+          <div id="menuUsuario" class="menu-usuario">
+              <button onclick="cerrarSesion()">
+                  Cerrar Sesión
+              </button>
+          </div>
+        `;
+      }
+
+      function abrirUsuario() {
+        document.getElementById("menuUsuario").classList.toggle("activo");
+      }
+
+      cargarUsuario();
+      obtenerRutas();
+    </script>
+  </body>
+</html>

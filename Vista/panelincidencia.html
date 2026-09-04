@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Panel de Usuario - Epsilon</title>
+    <title>Panel de Incidencias - Epsilon</title>
 
     <link rel="stylesheet" href="style.css" />
   </head>
@@ -88,48 +88,61 @@
     </header>
 
     <div class="pagina">
-      <h2>Panel de Usuario</h2>
+      <h2>Panel de Incidencias</h2>
 
-      <p>Administración de usuarios del sistema.</p>
+      <p>Administración de Incidencias del sistema.</p>
 
       <div class="panel" id="OverlayCrearUsuario">
-        <button onclick="abrirCrearUsuario()">Crear Usuario</button>
+        <button onclick="abrirCrearIncidencia()">Crear Incidencia</button>
       </div>
-      <div class="overlay" id="overlayCrearUsuarios">
-        <div class="crear-usuario">
-          <h3>Crear Usuario</h3>
-          <form id="formCrearUsuario">
-            <label>Nombre</label>
-            <input id="nombreCrear" required />
 
-            <label>Apellido</label>
-            <input id="apellidoCrear" required />
+      <div class="overlay" id="overlayCrearIncidencias">
+        <div class="crear-centro-acopio">
+          <h3>Crear Incidencia</h3>
+          <form id="formCrearIncidencia">
+            <input type="hidden" id="estadoCrear" value="Pendiente" />
 
             <label>Mail</label>
             <input id="mailCrear" type="email" required />
 
-            <label>Contraseña</label>
-            <input id="passwordCrear" type="password" required />
-
-            <label>Usuario</label>
-            <input id="nicknameCrear" />
-
-            <label>Rol</label>
-            <select id="rolCrear" required>
-              <option value="" disabled>Seleccione un rol</option>
-              <option value="Vecino">Vecino</option>
-              <option value="Operario">Operario</option>
-              <option value="Administrador">Administrador</option>
+            <label>Tipo</label>
+            <select id="tipoCrear" required>
+              <option value="" disabled selected>Seleccione un tipo</option>
+              <option value="rotura">Contenedor dañado</option>
+              <option value="lleno">Contenedor lleno</option>
+              <option value="desbordado">Contenedor desbordado</option>
+              <option value="incendiado">Contenedor incendiado</option>
             </select>
 
-            <button class="btn-crear-usuario" type="submit">
-              Crear Usuario
+            <label>Tipo de contenedor</label>
+            <select id="tipoContenedorCrear" required>
+              <option value="" disabled selected>Seleccione un tipo</option>
+              <option value="Naranja">Naranja - Reciclables</option>
+              <option value="Metalico">Metalico - Residuos mezclados</option>
+              <option value="Plastico">Plastico - Residuos mezclados</option>
+            </select>
+
+            <label>Imagen (URL)</label>
+            <input id="imagenCrear" />
+
+            <label>Calle</label>
+            <input id="calleCrear" required />
+
+            <label>Barrio</label>
+            <input id="barrioCrear" required />
+
+            <label>Numero</label>
+            <input id="numeroCrear" required />
+
+            <button class="btn-crear-centro-acopio" type="submit">
+              Crear Incidencia
             </button>
             <button
-              class="btn-cancelar-usuario"
+              class="btn-cancelar-centro-acopio"
+              type="button"
               onclick="
                 document
-                  .getElementById('overlayCrearUsuarios')
+                  .getElementById('overlayCrearIncidencias')
                   .classList.remove('activo')
               "
             >
@@ -140,57 +153,36 @@
       </div>
 
       <div class="lista-panel">
-        <h3>Lista de Usuarios</h3>
-        <ul id="listaUsuarios">
-          <p>Cargando usuarios...</p>
+        <h3>Lista de Incidencias</h3>
+        <ul id="listaIncidencias">
+          <p>Cargando incidencias...</p>
         </ul>
       </div>
     </div>
 
     <div
       class="overlay"
-      id="overlayUsuarios"
-      onclick="cerrarModalUsuarios(event)"
+      id="overlayAsignarOperario"
+      onclick="cerrarModalAsignarOperario(event)"
     >
       <div class="modal-usuarios">
-        <h3>Modificar usuario</h3>
+        <h3>Asignar operario</h3>
 
-        <form id="formModificarUsuario">
-          <input type="hidden" id="mailOriginal" />
+        <form id="formAsignarOperario">
+          <input type="hidden" id="idOriginal" />
 
-          <label>Nombre</label>
-          <input
-            id="nombreEditar"
-            placeholder="Dejar vacío para no modificar"
-          />
+          <label>ID Operario</label>
+          <input id="idOperarioAsignar" required />
 
-          <label>Apellido</label>
-          <input
-            id="apellidoEditar"
-            placeholder="Dejar vacío para no modificar"
-          />
-
-          <label>Usuario</label>
-          <input
-            id="nicknameEditar"
-            placeholder="Dejar vacío para no modificar"
-          />
-          <label>Rol</label>
-          <select id="rolEditar" required>
-            <option value="" disabled>Seleccione un rol</option>
-            <option value="Vecino">Vecino</option>
-            <option value="Operario">Operario</option>
-            <option value="Administrador">Administrador</option>
-          </select>
-          <button class="btn-guardar-usuario" type="submit">
+          <button class="btn-guardar-centro-acopio" type="submit">
             Guardar cambios
           </button>
           <button
-            class="btn-cancelar-usuario"
+            class="btn-cancelar-centro-acopio"
             type="button"
             onclick="
               document
-                .getElementById('overlayUsuarios')
+                .getElementById('overlayAsignarOperario')
                 .classList.remove('activo')
             "
           >
@@ -202,23 +194,20 @@
 
     <script>
       const API_URL =
-        "http://localhost/Proyecto/ProyectoSyntropy/Usuarios/miApi/";
-      let usuarios = [];
+        "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/";
+      let incidencias = [];
 
       document
-        .getElementById("formModificarUsuario")
+        .getElementById("formAsignarOperario")
         .addEventListener("submit", async (event) => {
           event.preventDefault();
 
           const datos = {
-            mail: document.getElementById("mailOriginal").value,
-            nombre: document.getElementById("nombreEditar").value,
-            apellido: document.getElementById("apellidoEditar").value,
-            nickname: document.getElementById("nicknameEditar").value,
-            rol: document.getElementById("rolEditar").value,
+            idIncidencia: document.getElementById("idOriginal").value,
+            idOperario: document.getElementById("idOperarioAsignar").value,
           };
 
-          const resp = await fetch(`${API_URL}Modificar`, {
+          const resp = await fetch(`${API_URL}AsignarOperario`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(datos),
@@ -228,25 +217,28 @@
 
           if (resultado.status === "ok") {
             document
-              .getElementById("overlayUsuarios")
+              .getElementById("overlayAsignarOperario")
               .classList.remove("activo");
-            obtenerUsuarios(); // refresca la lista
+            obtenerIncidencias(); // refresca la lista
           } else {
             alert(resultado.mensaje);
           }
         });
+
       document
-        .getElementById("formCrearUsuario")
+        .getElementById("formCrearIncidencia")
         .addEventListener("submit", async (event) => {
           event.preventDefault();
 
           const datos = {
-            nombre: document.getElementById("nombreCrear").value,
-            apellido: document.getElementById("apellidoCrear").value,
             mail: document.getElementById("mailCrear").value,
-            contrasenia: document.getElementById("passwordCrear").value,
-            usuario: document.getElementById("nicknameCrear").value,
-            rol: document.getElementById("rolCrear").value,
+            tipo: document.getElementById("tipoCrear").value,
+            estado: document.getElementById("estadoCrear").value,
+            tipoContenedor: document.getElementById("tipoContenedorCrear").value,
+            imagen: document.getElementById("imagenCrear").value,
+            calle: document.getElementById("calleCrear").value,
+            barrio: document.getElementById("barrioCrear").value,
+            numero: document.getElementById("numeroCrear").value,
           };
 
           const resp = await fetch(`${API_URL}Registrar`, {
@@ -257,11 +249,11 @@
 
           const resultado = await resp.json();
 
-          if (resultado.status === "ok") {
+          if (resultado.status === "creado") {
             document
-              .getElementById("overlayCrearUsuarios")
+              .getElementById("overlayCrearIncidencias")
               .classList.remove("activo");
-            obtenerUsuarios();
+            obtenerIncidencias();
           } else {
             alert(resultado.mensaje);
           }
@@ -319,91 +311,95 @@
 
       cargarUsuario();
 
-      function abrirModalUsuarios() {
-        document.getElementById("overlayUsuarios").classList.add("activo");
-      }
-      function abrirCrearUsuario() {
-        document.getElementById("overlayCrearUsuarios").classList.add("activo");
+      function abrirCrearIncidencia() {
+        document
+          .getElementById("overlayCrearIncidencias")
+          .classList.add("activo");
       }
 
-      function cerrarModalUsuarios(evento) {
-        if (evento.target.id === "overlayUsuarios") {
-          document.getElementById("overlayUsuarios").classList.remove("activo");
+      function cerrarModalAsignarOperario(evento) {
+        if (evento.target.id === "overlayAsignarOperario") {
+          document
+            .getElementById("overlayAsignarOperario")
+            .classList.remove("activo");
         }
       }
 
-      function seleccionarUsuario(mail) {
-        const usuario = usuarios.find((u) => u.mail === mail);
-        if (!usuario) return;
+      function seleccionarIncidencia(ID_incidencia) {
+        const incidencia = incidencias.find(
+          (i) => i.ID_incidencia === ID_incidencia,
+        );
+        if (!incidencia) return;
 
-        document.getElementById("mailOriginal").value = usuario.mail;
-        document.getElementById("nombreEditar").value = usuario.nombre;
-        document.getElementById("apellidoEditar").value = usuario.apellido;
-        document.getElementById("nicknameEditar").value =
-          usuario.nickname ?? "";
-        document.getElementById("rolEditar").value = usuario.rol ?? "";
+        document.getElementById("idOriginal").value = incidencia.ID_incidencia;
+        document.getElementById("idOperarioAsignar").value =
+          incidencia.ID_operario || "";
 
-        document.getElementById("overlayUsuarios").classList.add("activo");
+        document
+          .getElementById("overlayAsignarOperario")
+          .classList.add("activo");
       }
-      async function obtenerUsuarios() {
+
+      async function obtenerIncidencias() {
         try {
-          const resp = await fetch(`${API_URL}Usuarios`);
+          const resp = await fetch(`${API_URL}Incidencias`);
           if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
           const data = await resp.json();
-          const todos = Array.isArray(data) ? data : data?.usuarios || [];
-          usuarios = todos.filter((u) => u.estado_usuario === "Activo");
+          const todas = Array.isArray(data) ? data : data?.data || [];
+          incidencias = todas;
           renderizarLista();
         } catch (error) {
-          console.error("Error al obtener usuarios:", error);
+          console.error("Error al obtener incidencias:", error);
         }
       }
-      async function eliminarUsuario(mail) {
-        const usuario = usuarios.find((u) => u.mail === mail);
-        if (confirm("¿Está seguro de que desea eliminar este usuario?")) {
+
+      async function eliminarIncidencia(id) {
+        if (confirm("¿Está seguro de que desea eliminar esta incidencia?")) {
           const resp = await fetch(`${API_URL}Borrar`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mail }),
+            body: JSON.stringify({ idIncidencia: id }),
           });
           try {
             const resultado = await resp.json();
-            if (resultado?.status === "ok") {
-              obtenerUsuarios();
+            if (resultado.status === "ok") {
+              obtenerIncidencias();
             } else {
-              alert("No se pudo eliminar el usuario.");
+              alert("No se pudo eliminar la incidencia.");
             }
           } catch (error) {
             console.error(error);
-            alert("Error de conexión al eliminar usuario.");
+            alert("Error de conexión al eliminar incidencia.");
           }
         }
       }
-      function renderizarLista() {
-        const listaContainer = document.getElementById("listaUsuarios");
 
-        if (usuarios.length === 0) {
-          listaContainer.innerHTML = "<p>No hay usuarios disponibles.</p>";
+      function renderizarLista() {
+        const listaContainer = document.getElementById("listaIncidencias");
+
+        if (incidencias.length === 0) {
+          listaContainer.innerHTML = "<p>No hay incidencias disponibles.</p>";
           return;
         }
 
         let html = '<ul style="list-style: none; padding: 0; margin: 0;">';
 
-        usuarios.forEach((usuario) => {
+        incidencias.forEach((incidencia) => {
           html += `
-<li class="usuario-item">
-  <span>
-    <strong>${usuario.nombre} ${usuario.apellido} ${usuario.nickname ?? "Sin nickname"} ${usuario.mail}</strong>
-    - ${usuario.rol ?? "Sin rol"}
-    - ${usuario.estado_registro ?? "Sin estado"}
-  </span>
-  <span class="usuario-acciones">
-    <button class="btn-modificar" onclick="seleccionarUsuario('${usuario.mail}')">
-      Modificar
+<li class="incidencia-item">
+  <div class="incidencia-info">
+    <strong>#${incidencia.ID_incidencia} — ${incidencia.tipo}</strong>
+    <span class="incidencia-estado">${incidencia.estado}</span>
+    <p>${incidencia.mail} · ${incidencia.calle} ${incidencia.numero}, ${incidencia.barrio}</p>
+    <p>Operario asignado: ${incidencia.ID_operario ? incidencia.ID_operario : "Sin asignar"}</p>
+  </div>
+  <span class="incidencia-acciones">
+    <button class="btn-modificar" onclick="seleccionarIncidencia(${incidencia.ID_incidencia})">
+      Asignar Operario
     </button>
     <button
       class="btn-eliminar"
-      style="background-color: #e74c3c; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-size: 14px; cursor: pointer;"
-      onclick="eliminarUsuario('${usuario.mail}')">
+      onclick="eliminarIncidencia(${incidencia.ID_incidencia})">
       Eliminar
     </button>
   </span>
@@ -414,7 +410,7 @@
         listaContainer.innerHTML = html;
       }
 
-      obtenerUsuarios();
+      obtenerIncidencias();
     </script>
   </body>
 </html>

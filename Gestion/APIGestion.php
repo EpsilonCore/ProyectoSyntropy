@@ -1,47 +1,113 @@
 <?php
-header('Content-Type: application/json');
-require_once 'ContenedoresController.php';
-require_once 'CamionController.php';
-$controladorContenedor= new ContenedoresController();
-$controladorCamion = new CamionController();
+error_reporting(0);
+ini_set('display_errors', 0);
 
-$method =           $_SERVER['REQUEST_METHOD'];
-$uri    = parse_url($_SERVER['REQUEST_URI'],    PHP_URL_PATH);
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Methods: GET, POST, DELETE, PATCH, OPTIONS");
+header("Content-Type: application/json; charset=UTF-8");
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+function verificarRol(array $rolesPermitidos)
+{
+    $rolActual = $_SESSION['rol'] ?? 'Vecino';
+    if (!in_array($rolActual, $rolesPermitidos, true)) {
+        return ["status" => "prohibido", "mensaje" => "No tenés permiso para realizar esta acción.", "data" => null];
+    }
+    return null;
+}
+
+require_once 'ContenedoresController.php';
+require_once 'CentrosAcopioController.php';
+require_once 'IncidenciaController.php';
+
+$controladorContenedor   = new ContenedoresController();
+$controladorCentroAcopio = new CentrosAcopioController();
+$controladorIncidencia   = new IncidenciaController();
+
+$method = $_SERVER['REQUEST_METHOD'];
+$uri    = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$resultado = ["status" => "no_encontrado", "mensaje" => "Ruta no encontrada.", "data" => null];
+
+$soloAdministrador = ['Administrador'];
 
 switch ($method) {
-	case 'GET':
-		$Matricula = '';
-
-		if($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Contenedores'){
-					
-			echo json_encode( $controladorContenedor->getAllContenedores() );
-		}
-	
-        
-break;
-    case 'POST';
-    if($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/RegistrarContenedor'){
-			echo json_encode($controladorContenedor->crearContenedor());
-			
-		}
-break; 
-		case 'DELETE':
-		if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/EliminarContenedor') {
-			echo json_encode($controladorContenedor->eliminarContenedor());
-		}
-		break;
-		case 'PATCH';
-		if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/ActualizarContenedor') {
-			echo json_encode($controladorContenedor->actualizarContenedor());
-		}
-		break;
-    default:
-        http_response_code(405);
-        echo json_encode(["error" => "Método no permitido"]);
+    case 'GET':
+        // Abierto a cualquier logueado: lo usa mapa.html para pintar el mapa, además del panel.
+        if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Contenedores') {
+            $resultado = $controladorContenedor->getAllContenedores();
+        }
+        // Panel de Centros de Acopio: exclusivo de Administrador.
+        if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/CentrosAcopio/CentrosAcopio') {
+            $resultado = verificarRol($soloAdministrador) ?? $controladorCentroAcopio->getAllCentrosAcopio();
+        }
+        // Abierto a cualquier logueado: lo usa mapa.html, además del panel de Incidencias.
+        if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/Incidencias') {
+            $resultado = $controladorIncidencia->getAllIncidencias();
+        }
         break;
-	//case 'POST':
-	
-	//default:
-		// Maneja métodos no permitidos
 
+    case 'POST':
+        if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/RegistrarContenedor') {
+            $resultado = verificarRol($soloAdministrador) ?? $controladorContenedor->crearContenedor();
+        }
+        if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/CentrosAcopio/Registrar') {
+            $resultado = verificarRol($soloAdministrador) ?? $controladorCentroAcopio->crearCentroAcopio();
+        }
+        // Abierto a cualquier logueado: cualquier vecino puede reportar una incidencia desde index.html.
+        if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/Registrar') {
+            $resultado = $controladorIncidencia->crearIncidencia();
+        }
+        break;
+
+    case 'DELETE':
+        if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/EliminarContenedor') {
+            $resultado = verificarRol($soloAdministrador) ?? $controladorContenedor->eliminarContenedor();
+        }
+        if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/CentrosAcopio/Borrar') {
+            $resultado = verificarRol($soloAdministrador) ?? $controladorCentroAcopio->eliminarCentroAcopio();
+        }
+        if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/Borrar') {
+            $resultado = verificarRol($soloAdministrador) ?? $controladorIncidencia->eliminarIncidencia();
+        }
+        break;
+
+    case 'PATCH':
+        if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/ActualizarContenedor') {
+            $resultado = verificarRol($soloAdministrador) ?? $controladorContenedor->actualizarContenedor();
+        }
+        if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/CentrosAcopio/Modificar') {
+            $resultado = verificarRol($soloAdministrador) ?? $controladorCentroAcopio->actualizarCentroAcopio();
+        }
+        if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/AsignarOperario') {
+            $resultado = verificarRol($soloAdministrador) ?? $controladorIncidencia->AsignarOperario();
+        }
+        break;
+
+    default:
+        $resultado = ["status" => "no_permitido", "mensaje" => "Método no permitido.", "data" => null];
+        break;
 }
+
+$codigosHttp = [
+    "ok"               => 200,
+    "creado"           => 201,
+    "datos_invalidos"  => 400,
+    "no_autorizado"    => 401,
+    "cuenta_pendiente" => 403,
+    "prohibido"        => 403,
+    "no_encontrado"    => 404,
+    "no_permitido"     => 405,
+    "error"            => 500,
+];
+
+http_response_code($codigosHttp[$resultado["status"]] ?? 500);
+echo json_encode($resultado);
