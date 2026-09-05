@@ -4,226 +4,353 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Epsilon</title>
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,400;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="style.css" />
   </head>
 
   <body>
-    <header>
-      <div class="logo">
-        <a href="index.html">
-          <img src="logo.png" alt="Epsilon" />
-        </a>
-      </div>
-
-      <div class="header-actions">
-        <div id="registro-btn">
-          <button onclick="window.location.href = 'registro.html'">
-            Registrar
-          </button>
-        </div>
-
-        <div id="login-btn">
-          <button onclick="window.location.href = 'login.html'">
-            Iniciar Sesión
-          </button>
-        </div>
-
-        <div id="usuario" class="usuario"></div>
-
-        <button
-          id="btnCrearIncidencia"
-          class="btn-crear-incidencia"
-          type="button"
-          title="Reportar incidencia"
-          aria-label="Reportar incidencia"
-          onclick="
-            document
-              .getElementById('overlayCrearIncidencias')
-              .classList.add('activo');
-            cargarListaContenedores();
-          "
-        >
-          Crear Incidencia
-        </button>
-
-        <div class="overlay" id="overlayCrearIncidencias">
-          <div class="crear-centro-acopio">
-            <h3>Crear Incidencia</h3>
-            <form id="formCrearIncidencia">
-              <input type="hidden" id="estadoCrear" value="Pendiente" />
-
-              <label>Mail</label>
-              <input id="mailCrear" type="email" required />
-
-              <label>Tipo</label>
-              <select id="tipoCrear" required>
-                <option value="" disabled selected>Seleccione un tipo</option>
-                <option value="rotura">Contenedor dañado</option>
-                <option value="lleno">Contenedor lleno</option>
-                <option value="desbordado">Contenedor desbordado</option>
-                <option value="incendiado">Contenedor incendiado</option>
-              </select>
-
-              <label>Imagen (URL)</label>
-              <input
-                id="imagenCrear"
-                type="url"
-                placeholder="https://ejemplo.com/foto.jpg"
-              />
-
-              <div id="previewImagenCrear" class="preview-imagen">
-                <img
-                  id="imgPreviewCrear"
-                  src=""
-                  alt="Vista previa de la imagen"
-                />
-              </div>
-
-              <label>Contenedor:</label>
-              <div id="listaContenedores" class="lista-contenedores"></div>
-
-              <input
-                type="hidden"
-                id="idContenedorSeleccionado"
-                name="idContenedor"
-                value=""
-              />
-              <input
-                type="hidden"
-                id="calleSeleccionada"
-                name="calleSeleccionada"
-                value=""
-              />
-              <input
-                type="hidden"
-                id="numeroSeleccionada"
-                name="numeroSeleccionada"
-                value=""
-              />
-              <input
-                type="hidden"
-                id="barrioSeleccionada"
-                name="barrioSeleccionada"
-                value=""
-              />
-              <input
-                type="hidden"
-                id="tipoSeleccionado"
-                name="tipoSeleccionado"
-                value=""
-              />
-
-              <button type="button" id="btnDireccionNueva" class="btn-link">
-                ¿No está en la lista? Ingresar dirección nueva
-              </button>
-
-              <div id="camposDireccionNueva" style="display: none">
-                <input type="text" id="calleCrear" placeholder="Calle" />
-                <input type="text" id="numeroCrear" placeholder="Número" />
-                <input type="text" id="barrioCrear" placeholder="Barrio" />
-
-                <label
-                  >Tipo de contenedor:
-                  <select id="tipoContenedorCrear">
-                    <option value="Naranja">Reciclables</option>
-                    <option value="Metalico">
-                      Metalico - Residuos mezclados
-                    </option>
-                    <option value="Plastico">
-                      Plástico - Residuos mezclados
-                    </option>
-                  </select>
-                </label>
-              </div>
-
-              <button class="btn-crear-centro-acopio" type="submit">
-                Crear Incidencia
-              </button>
-              <button
-                class="btn-cancelar-centro-acopio"
-                type="button"
-                onclick="
-                  document
-                    .getElementById('overlayCrearIncidencias')
-                    .classList.remove('activo')
-                "
-              >
-                Cancelar
-              </button>
-            </form>
+    <div class="hero-portada">
+      <header class="header-epsilon">
+        <div class="logo-tarjeta">
+          <a href="index.html">
+            <img src="logo.png" alt="Epsilon" />
+          </a>
+          <div class="logo-subtexto">
+            Recolección y Gestión Integral de Residuos
           </div>
         </div>
 
-        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-      </div>
-
-      <nav id="menu">
-        <ul>
-          <li>
-            <button
-              data-rol="Administrador"
-              class="link-button"
-              onclick="verificarAcceso('gestion.html')"
-            >
-              Gestión
+        <div class="header-actions">
+          <div id="registro-btn">
+            <button class="btn-fantasma" onclick="window.location.href = 'registro.html'">
+              Registrar
             </button>
-          </li>
+          </div>
 
-          <li>
-            <button class="link-button" onclick="verificarAcceso('mapa.html')">
-              Mapa
+          <div id="login-btn">
+            <button class="btn-fantasma" onclick="window.location.href = 'login.html'">
+              Iniciar Sesión
             </button>
-          </li>
+          </div>
 
-          <li>
-            <button
-              class="link-button"
-              onclick="verificarAcceso('estadisticas.html')"
-            >
-              Estadísticas
-            </button>
-          </li>
+          <div id="usuario" class="usuario"></div>
 
-          <li>
-            <button
-              class="link-button"
-              onclick="verificarAcceso('documentacion.html')"
-            >
+          <button
+            id="btnCrearIncidencia"
+            class="btn-crear-incidencia"
+            type="button"
+            title="Reportar incidencia"
+            aria-label="Reportar incidencia"
+            onclick="
+              document
+                .getElementById('overlayCrearIncidencias')
+                .classList.add('activo');
+              cargarListaContenedores();
+            "
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3Z"/><path d="M12 10v4"/><path d="M12 17h.01"/></svg>
+            <span>Reportar incidencia</span>
+          </button>
+
+          <div class="overlay" id="overlayCrearIncidencias">
+            <div class="crear-centro-acopio">
+              <h3>Crear Incidencia</h3>
+              <form id="formCrearIncidencia">
+                <input type="hidden" id="estadoCrear" value="Pendiente" />
+
+                <label>Mail</label>
+                <input id="mailCrear" type="email" required />
+
+                <label>Tipo</label>
+                <select id="tipoCrear" required>
+                  <option value="" disabled selected>Seleccione un tipo</option>
+                  <option value="rotura">Contenedor dañado</option>
+                  <option value="lleno">Contenedor lleno</option>
+                  <option value="desbordado">Contenedor desbordado</option>
+                  <option value="incendiado">Contenedor incendiado</option>
+                </select>
+
+                <label>Imagen (URL)</label>
+                <input
+                  id="imagenCrear"
+                  type="url"
+                  placeholder="https://ejemplo.com/foto.jpg"
+                />
+
+                <div id="previewImagenCrear" class="preview-imagen">
+                  <img
+                    id="imgPreviewCrear"
+                    src=""
+                    alt="Vista previa de la imagen"
+                  />
+                </div>
+
+                <label>Contenedor:</label>
+                <div id="listaContenedores" class="lista-contenedores"></div>
+
+                <input
+                  type="hidden"
+                  id="idContenedorSeleccionado"
+                  name="idContenedor"
+                  value=""
+                />
+                <input
+                  type="hidden"
+                  id="calleSeleccionada"
+                  name="calleSeleccionada"
+                  value=""
+                />
+                <input
+                  type="hidden"
+                  id="numeroSeleccionada"
+                  name="numeroSeleccionada"
+                  value=""
+                />
+                <input
+                  type="hidden"
+                  id="barrioSeleccionada"
+                  name="barrioSeleccionada"
+                  value=""
+                />
+                <input
+                  type="hidden"
+                  id="tipoSeleccionado"
+                  name="tipoSeleccionado"
+                  value=""
+                />
+
+                <button type="button" id="btnDireccionNueva" class="btn-link">
+                  ¿No está en la lista? Ingresar dirección nueva
+                </button>
+
+                <div id="camposDireccionNueva" style="display: none">
+                  <input type="text" id="calleCrear" placeholder="Calle" />
+                  <input type="text" id="numeroCrear" placeholder="Número" />
+                  <input type="text" id="barrioCrear" placeholder="Barrio" />
+
+                  <label
+                    >Tipo de contenedor:
+                    <select id="tipoContenedorCrear">
+                      <option value="Naranja">Reciclables</option>
+                      <option value="Metalico">
+                        Metalico - Residuos mezclados
+                      </option>
+                      <option value="Plastico">
+                        Plástico - Residuos mezclados
+                      </option>
+                    </select>
+                  </label>
+                </div>
+
+                <button class="btn-crear-centro-acopio" type="submit">
+                  Crear Incidencia
+                </button>
+                <button
+                  class="btn-cancelar-centro-acopio"
+                  type="button"
+                  onclick="
+                    document
+                      .getElementById('overlayCrearIncidencias')
+                      .classList.remove('activo')
+                  "
+                >
+                  Cancelar
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+        </div>
+
+        <nav id="menu">
+          <ul>
+            <li>
+              <button
+                data-rol="Administrador"
+                class="link-button"
+                onclick="verificarAcceso('gestion.html')"
+              >
+                Gestión
+              </button>
+            </li>
+
+            <li>
+              <button class="link-button" onclick="verificarAcceso('mapa.html')">
+                Mapa
+              </button>
+            </li>
+
+            <li>
+              <button
+                class="link-button"
+                onclick="verificarAcceso('estadisticas.html')"
+              >
+                Estadísticas
+              </button>
+            </li>
+
+            <li>
+              <button
+                class="link-button"
+                onclick="verificarAcceso('documentacion.html')"
+              >
+                Documentación
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </header>
+
+      <section class="contenido">
+        <div class="texto">
+          <div class="hero-overline">Plataforma de gestión ambiental urbana</div>
+
+          <h2>
+            Transformando la <span class="acento">gestión urbana</span> de
+            residuos en algo más simple y sostenible
+          </h2>
+
+          <p>
+            Monitoreo, recolección y optimización de rutas en tiempo real,
+            para una ciudad más limpia y eficiente.
+          </p>
+
+          <div class="botones">
+            <button class="btn-pill btn-pill-solido" onclick="verificarAcceso('mapa.html')">Explorar Mapa</button>
+
+            <button class="btn-pill btn-pill-fantasma" onclick="verificarAcceso('documentacion.html')">
               Documentación
             </button>
-          </li>
-        </ul>
-      </nav>
-    </header>
-
-    <section class="contenido">
-      <div class="texto">
-        <h4>EPSILON</h4>
-
-        <h2>
-          Transformando <br />
-          la Gestión <br />
-          Urbana
-        </h2>
-
-        <p>
-          Plataforma integral para el monitoreo, recolección y optimización de
-          residuos en tiempo real.
-        </p>
-
-        <div class="botones">
-          <button onclick="verificarAcceso('mapa.html')">Explorar Mapa</button>
-
-          <button onclick="verificarAcceso('documentacion.html')">
-            Documentación
-          </button>
+          </div>
         </div>
-      </div>
+      </section>
+    </div>
 
-      <div class="imagen">
-        <img src="fotocamion.png" alt="Camión" />
+    <section class="franja-datos">
+      <div class="dato-item">
+        <span class="dato-numero">+1.200</span>
+        <span class="dato-label">Contenedores monitoreados</span>
+      </div>
+      <div class="dato-item">
+        <span class="dato-numero">7</span>
+        <span class="dato-label">Tipos de residuo clasificados</span>
+      </div>
+      <div class="dato-item">
+        <span class="dato-numero">24/7</span>
+        <span class="dato-label">Seguimiento en tiempo real</span>
+      </div>
+      <div class="dato-item">
+        <span class="dato-numero">Min.</span>
+        <span class="dato-label">Rutas optimizadas por incidencia</span>
       </div>
     </section>
+
+    <section class="como-funciona">
+      <div class="seccion-encabezado">
+        <h2>Cómo funciona Epsilon</h2>
+        <p>
+          Un ciclo simple que conecta a la ciudadanía con la recolección y
+          la optimización de rutas.
+        </p>
+      </div>
+
+      <div class="pasos">
+        <div class="paso">
+          <span class="paso-numero">01</span>
+          <h3>Reportar</h3>
+          <p>
+            Cualquier vecino notifica el estado de un contenedor: lleno,
+            dañado o desbordado, con foto y ubicación exacta.
+          </p>
+        </div>
+
+        <div class="paso">
+          <span class="paso-numero">02</span>
+          <h3>Recolectar</h3>
+          <p>
+            Los camiones reciben rutas ajustadas según las incidencias
+            activas y el estado real de cada zona.
+          </p>
+        </div>
+
+        <div class="paso">
+          <span class="paso-numero">03</span>
+          <h3>Optimizar</h3>
+          <p>
+            El sistema analiza los datos acumulados para mejorar frecuencias,
+            recorridos y ubicación de contenedores.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="servicios">
+      <div class="seccion-encabezado">
+        <h2>Explorá la plataforma</h2>
+        <p>Todo lo que necesitás para seguir la gestión de residuos de la ciudad.</p>
+      </div>
+
+      <div class="servicios-grid">
+        <button class="servicio-card" onclick="verificarAcceso('mapa.html')">
+          <span class="servicio-icono servicio-icono-acero">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.4"/></svg>
+          </span>
+          <h3>Mapa</h3>
+          <p>Ubicación en vivo de contenedores, camiones e incidencias.</p>
+        </button>
+
+        <button class="servicio-card" onclick="verificarAcceso('estadisticas.html')">
+          <span class="servicio-icono servicio-icono-brote">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10"/><path d="M12 20V4"/><path d="M20 20v-7"/><path d="M2 20h20"/></svg>
+          </span>
+          <h3>Estadísticas</h3>
+          <p>Indicadores de recolección, incidencias y desempeño por zona.</p>
+        </button>
+
+        <button class="servicio-card" onclick="verificarAcceso('documentacion.html')">
+          <span class="servicio-icono servicio-icono-ambar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l3 3v15H6Z"/><path d="M15 3v3h3"/><path d="M9 12h6"/><path d="M9 16h6"/></svg>
+          </span>
+          <h3>Documentación</h3>
+          <p>Guías del sistema, tipos de residuo y buenas prácticas de uso.</p>
+        </button>
+      </div>
+    </section>
+
+    <footer class="pie-epsilon">
+      <div class="pie-marca">
+        <img src="logo.png" alt="Epsilon" />
+        <p>Gestión integral de residuos urbanos, en tiempo real.</p>
+      </div>
+
+      <div class="pie-columna">
+        <h4>Plataforma</h4>
+        <a href="javascript:void(0)" onclick="verificarAcceso('mapa.html')">Mapa</a>
+        <a href="javascript:void(0)" onclick="verificarAcceso('estadisticas.html')">Estadísticas</a>
+        <a href="javascript:void(0)" onclick="verificarAcceso('documentacion.html')">Documentación</a>
+      </div>
+
+      <div class="pie-columna">
+        <h4>Cuenta</h4>
+        <a href="registro.html">Registrarse</a>
+        <a href="login.html">Iniciar sesión</a>
+      </div>
+
+      <div class="pie-copy">© 2026 Epsilon. Todos los derechos reservados.</div>
+    </footer>
 
     <script>
       const API_URL =
