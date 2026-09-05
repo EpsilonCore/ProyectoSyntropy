@@ -10,6 +10,12 @@
 
 <body>
 
+<script>
+if(localStorage.getItem("logueado") !== "si"){
+    window.location.href = "login.html";
+}
+</script>
+
 <header>
 
     <div class="logo">
@@ -18,14 +24,20 @@
         </a>
     </div>
 
-    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+    <div class="header-actions">
+
+        <div id="usuario" class="usuario"></div>
+
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+    </div>
 
     <nav id="menu">
 
         <ul>
 
-            <li><button class="link-button" onclick="window.location.href='gestion.html'">Gestión</button></li>
-            <li><button class="link-button" onclick="window.location.href='rutas.html'">Rutas</button></li>
+            <li><button class="link-button" data-rol="Administrador" onclick="window.location.href='gestion.html'">Gestión</button></li>
+            <li><button class="link-button" data-rol="Administrador, Operario" onclick="window.location.href='rutas.html'">Rutas</button></li>
             <li><button class="link-button" onclick="window.location.href='mapa.html'">Mapa</button></li>
             <li><button class="link-button" onclick="window.location.href='estadisticas.html'">Estadísticas</button></li>
             <li><button class="link-button" onclick="window.location.href='documentacion.html'">Documentación</button></li>
@@ -77,9 +89,58 @@
 
 <script>
 
+document.addEventListener("DOMContentLoaded", () => {
+    const rolUsuario = (localStorage.getItem("rol") || "").trim();
+    document.querySelectorAll("[data-rol]").forEach((boton) => {
+        const rolesPermitidos = boton.dataset.rol
+            .split(",")
+            .map((rol) => rol.trim());
+        if (!rolesPermitidos.includes(rolUsuario)) {
+            boton.style.display = "none";
+        }
+    });
+});
+
 function toggleMenu(){
     document.getElementById("menu").classList.toggle("activo");
 }
+
+function cerrarSesion(){
+    localStorage.removeItem("logueado");
+    localStorage.removeItem("nombreUsuario");
+    window.location.href = "index.html";
+}
+
+function cargarUsuario(){
+
+    const nombre = localStorage.getItem("nombreUsuario") || "Usuario";
+    const inicial = nombre.charAt(0).toUpperCase();
+
+    document.getElementById("usuario").innerHTML = `
+
+    <span class="nombre-usuario">${nombre}</span>
+
+    <button class="usuario-btn" onclick="abrirUsuario()">
+        ${inicial}
+    </button>
+
+    <div id="menuUsuario" class="menu-usuario">
+
+        <button onclick="cerrarSesion()">
+            Cerrar Sesión
+        </button>
+
+    </div>
+
+    `;
+
+}
+
+function abrirUsuario(){
+    document.getElementById("menuUsuario").classList.toggle("activo");
+}
+
+cargarUsuario();
 
 </script>
 

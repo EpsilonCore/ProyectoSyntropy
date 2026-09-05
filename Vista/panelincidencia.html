@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Panel Contenedores - Epsilon</title>
+    <title>Panel de Incidencias - Epsilon</title>
 
     <link rel="stylesheet" href="style.css" />
   </head>
@@ -88,55 +88,61 @@
     </header>
 
     <div class="pagina">
-      <h2>Panel Contenedores</h2>
+      <h2>Panel de Incidencias</h2>
 
-      <p>Gestión de contenedores registrados en el sistema.</p>
+      <p>Administración de Incidencias del sistema.</p>
 
-      <div class="panel" id="OverlayCrearContenedor">
-        <button onclick="abrirCrearContenedor()">Crear Contenedor</button>
+      <div class="panel" id="OverlayCrearUsuario">
+        <button onclick="abrirCrearIncidencia()">Crear Incidencia</button>
       </div>
-      <div class="overlay" id="overlayCrearContenedores">
-        <div class="crear-contenedor">
-          <h3>Crear Contenedor</h3>
-          <form id="formCrearContenedor">
+
+      <div class="overlay" id="overlayCrearIncidencias">
+        <div class="crear-centro-acopio">
+          <h3>Crear Incidencia</h3>
+          <form id="formCrearIncidencia">
+            <input type="hidden" id="estadoCrear" value="Pendiente" />
+
+            <label>Mail</label>
+            <input id="mailCrear" type="email" required />
+
             <label>Tipo</label>
             <select id="tipoCrear" required>
-              <option value="" disabled>Seleccione un tipo</option>
+              <option value="" disabled selected>Seleccione un tipo</option>
+              <option value="rotura">Contenedor dañado</option>
+              <option value="lleno">Contenedor lleno</option>
+              <option value="desbordado">Contenedor desbordado</option>
+              <option value="incendiado">Contenedor incendiado</option>
+            </select>
+
+            <label>Tipo de contenedor</label>
+            <select id="tipoContenedorCrear" required>
+              <option value="" disabled selected>Seleccione un tipo</option>
               <option value="Naranja">Naranja - Reciclables</option>
               <option value="Metalico">Metalico - Residuos mezclados</option>
               <option value="Plastico">Plastico - Residuos mezclados</option>
             </select>
 
-            <label>Capacidad de carga</label>
-            <input id="capCargaCrear" type="number" required />
-
-            <label>Estado</label>
-            <select id="estadoCrear" required>
-              <option value="" disabled>Seleccione un estado</option>
-              <option value="Lleno">Lleno</option>
-              <option value="Vacio">Vacio</option>
-              <option value="Desbordado">Desbordado</option>
-              <option value="Media capacidad">Media capacidad</option>
-            </select>
+            <label>Imagen (URL)</label>
+            <input id="imagenCrear" />
 
             <label>Calle</label>
             <input id="calleCrear" required />
 
-            <label>Número</label>
-            <input id="numeroCrear" required />
-
             <label>Barrio</label>
             <input id="barrioCrear" required />
 
-            <button class="btn-crear-contenedor" type="submit">
-              Crear Contenedor
+            <label>Numero</label>
+            <input id="numeroCrear" required />
+
+            <button class="btn-crear-centro-acopio" type="submit">
+              Crear Incidencia
             </button>
             <button
-              class="btn-cancelar-usuario"
+              class="btn-cancelar-centro-acopio"
               type="button"
               onclick="
                 document
-                  .getElementById('overlayCrearContenedores')
+                  .getElementById('overlayCrearIncidencias')
                   .classList.remove('activo')
               "
             >
@@ -147,62 +153,36 @@
       </div>
 
       <div class="lista-panel">
-        <h3>Lista de Contenedores</h3>
-        <ul id="listaContenedores">
-          <p>Cargando contenedores...</p>
+        <h3>Lista de Incidencias</h3>
+        <ul id="listaIncidencias">
+          <p>Cargando incidencias...</p>
         </ul>
       </div>
     </div>
 
     <div
       class="overlay"
-      id="overlayContenedores"
-      onclick="cerrarModalContenedores(event)"
+      id="overlayAsignarOperario"
+      onclick="cerrarModalAsignarOperario(event)"
     >
-      <div class="modal-contenedores">
-        <h3>Modificar contenedor</h3>
+      <div class="modal-usuarios">
+        <h3>Asignar operario</h3>
 
-        <form id="formModificarContenedor">
-          <input type="hidden" id="idOriginalContenedor" />
+        <form id="formAsignarOperario">
+          <input type="hidden" id="idOriginal" />
 
-          <label>Tipo</label>
-          <select id="tipoEditar" required>
-            <option value="" disabled selected>Seleccione un tipo</option>
-            <option value="Naranja">Naranja - Reciclables</option>
-            <option value="Metalico">Metalico - Residuos mezclados</option>
-            <option value="Plastico">Plastico - Residuos mezclados</option>
-          </select>
+          <label>ID Operario</label>
+          <input id="idOperarioAsignar" required />
 
-          <label>Capacidad de carga</label>
-          <input id="capCargaEditar" type="number" required />
-
-          <label>Estado</label>
-          <select id="estadoEditar" required>
-            <option value="" disabled>Seleccione un estado</option>
-            <option value="Lleno">Lleno</option>
-            <option value="Vacio">Vacio</option>
-            <option value="Desbordado">Desbordado</option>
-            <option value="Media capacidad">Media capacidad</option>
-          </select>
-
-          <label>Calle</label>
-          <input id="calleEditar" required />
-
-          <label>Número</label>
-          <input id="numeroEditar" required />
-
-          <label>Barrio</label>
-          <input id="barrioEditar" required />
-
-          <button class="btn-guardar-usuario" type="submit">
+          <button class="btn-guardar-centro-acopio" type="submit">
             Guardar cambios
           </button>
           <button
-            class="btn-cancelar-usuario"
+            class="btn-cancelar-centro-acopio"
             type="button"
             onclick="
               document
-                .getElementById('overlayContenedores')
+                .getElementById('overlayAsignarOperario')
                 .classList.remove('activo')
             "
           >
@@ -214,25 +194,20 @@
 
     <script>
       const API_URL =
-        "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/";
-      let contenedores = [];
+        "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/";
+      let incidencias = [];
 
       document
-        .getElementById("formModificarContenedor")
+        .getElementById("formAsignarOperario")
         .addEventListener("submit", async (event) => {
           event.preventDefault();
 
           const datos = {
-            idContenedor: document.getElementById("idOriginalContenedor").value,
-            capCarga: document.getElementById("capCargaEditar").value,
-            tipo: document.getElementById("tipoEditar").value,
-            estado: document.getElementById("estadoEditar").value,
-            calle: document.getElementById("calleEditar").value,
-            numero: document.getElementById("numeroEditar").value,
-            barrio: document.getElementById("barrioEditar").value,
+            idIncidencia: document.getElementById("idOriginal").value,
+            idOperario: document.getElementById("idOperarioAsignar").value,
           };
 
-          const resp = await fetch(`${API_URL}ActualizarContenedor`, {
+          const resp = await fetch(`${API_URL}AsignarOperario`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(datos),
@@ -242,29 +217,31 @@
 
           if (resultado.status === "ok") {
             document
-              .getElementById("overlayContenedores")
+              .getElementById("overlayAsignarOperario")
               .classList.remove("activo");
-            obtenerContenedores(); // refresca la lista
+            obtenerIncidencias(); // refresca la lista
           } else {
             alert(resultado.mensaje);
           }
         });
 
       document
-        .getElementById("formCrearContenedor")
+        .getElementById("formCrearIncidencia")
         .addEventListener("submit", async (event) => {
           event.preventDefault();
 
           const datos = {
-            capCarga: document.getElementById("capCargaCrear").value,
+            mail: document.getElementById("mailCrear").value,
             tipo: document.getElementById("tipoCrear").value,
             estado: document.getElementById("estadoCrear").value,
+            tipoContenedor: document.getElementById("tipoContenedorCrear").value,
+            imagen: document.getElementById("imagenCrear").value,
             calle: document.getElementById("calleCrear").value,
-            numero: document.getElementById("numeroCrear").value,
             barrio: document.getElementById("barrioCrear").value,
+            numero: document.getElementById("numeroCrear").value,
           };
 
-          const resp = await fetch(`${API_URL}RegistrarContenedor`, {
+          const resp = await fetch(`${API_URL}Registrar`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(datos),
@@ -274,9 +251,9 @@
 
           if (resultado.status === "creado") {
             document
-              .getElementById("overlayCrearContenedores")
+              .getElementById("overlayCrearIncidencias")
               .classList.remove("activo");
-            obtenerContenedores();
+            obtenerIncidencias();
           } else {
             alert(resultado.mensaje);
           }
@@ -334,94 +311,95 @@
 
       cargarUsuario();
 
-      function abrirCrearContenedor() {
+      function abrirCrearIncidencia() {
         document
-          .getElementById("overlayCrearContenedores")
+          .getElementById("overlayCrearIncidencias")
           .classList.add("activo");
       }
 
-      function cerrarModalContenedores(evento) {
-        if (evento.target.id === "overlayContenedores") {
+      function cerrarModalAsignarOperario(evento) {
+        if (evento.target.id === "overlayAsignarOperario") {
           document
-            .getElementById("overlayContenedores")
+            .getElementById("overlayAsignarOperario")
             .classList.remove("activo");
         }
       }
 
-      function seleccionarContenedor(id) {
-        const contenedor = contenedores.find((c) => c.ID_contenedor == id);
-        if (!contenedor) return;
+      function seleccionarIncidencia(ID_incidencia) {
+        const incidencia = incidencias.find(
+          (i) => i.ID_incidencia === ID_incidencia,
+        );
+        if (!incidencia) return;
 
-        document.getElementById("idOriginalContenedor").value =
-          contenedor.ID_contenedor;
-        document.getElementById("tipoEditar").value = contenedor.tipo ?? "";
-        document.getElementById("capCargaEditar").value =
-          contenedor.capacidadCarga ?? "";
-        document.getElementById("estadoEditar").value = contenedor.estado ?? "";
-        document.getElementById("calleEditar").value = contenedor.calle ?? "";
-        document.getElementById("numeroEditar").value = contenedor.numero ?? "";
-        document.getElementById("barrioEditar").value = contenedor.barrio ?? "";
+        document.getElementById("idOriginal").value = incidencia.ID_incidencia;
+        document.getElementById("idOperarioAsignar").value =
+          incidencia.ID_operario || "";
 
-        document.getElementById("overlayContenedores").classList.add("activo");
+        document
+          .getElementById("overlayAsignarOperario")
+          .classList.add("activo");
       }
 
-      async function obtenerContenedores() {
+      async function obtenerIncidencias() {
         try {
-          const resp = await fetch(`${API_URL}Contenedores`);
+          const resp = await fetch(`${API_URL}Incidencias`);
           if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
           const data = await resp.json();
-          contenedores = Array.isArray(data) ? data : data?.data || [];
+          const todas = Array.isArray(data) ? data : data?.data || [];
+          incidencias = todas;
           renderizarLista();
         } catch (error) {
-          console.error("Error al obtener contenedores:", error);
+          console.error("Error al obtener incidencias:", error);
         }
       }
 
-      async function eliminarContenedor(id) {
-        if (confirm("¿Está seguro de que desea eliminar este contenedor?")) {
-          const resp = await fetch(`${API_URL}EliminarContenedor`, {
+      async function eliminarIncidencia(id) {
+        if (confirm("¿Está seguro de que desea eliminar esta incidencia?")) {
+          const resp = await fetch(`${API_URL}Borrar`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ idContenedor: id }),
+            body: JSON.stringify({ idIncidencia: id }),
           });
           try {
             const resultado = await resp.json();
             if (resultado.status === "ok") {
-              obtenerContenedores();
+              obtenerIncidencias();
             } else {
-              alert("No se pudo eliminar el contenedor.");
+              alert("No se pudo eliminar la incidencia.");
             }
           } catch (error) {
             console.error(error);
-            alert("Error de conexión al eliminar contenedor.");
+            alert("Error de conexión al eliminar incidencia.");
           }
         }
       }
 
       function renderizarLista() {
-        const listaContainer = document.getElementById("listaContenedores");
+        const listaContainer = document.getElementById("listaIncidencias");
 
-        if (contenedores.length === 0) {
-          listaContainer.innerHTML = "<p>No hay contenedores disponibles.</p>";
+        if (incidencias.length === 0) {
+          listaContainer.innerHTML = "<p>No hay incidencias disponibles.</p>";
           return;
         }
 
         let html = '<ul style="list-style: none; padding: 0; margin: 0;">';
 
-        contenedores.forEach((contenedor) => {
+        incidencias.forEach((incidencia) => {
           html += `
-<li class="contenedor-item">
-  <span>
-    <strong>Contenedor #${contenedor.ID_contenedor} - ${contenedor.tipo ?? "Sin tipo"}</strong>
-    - ${contenedor.calle ?? ""} ${contenedor.numero ?? ""}, ${contenedor.barrio ?? "Sin barrio"}
-    - Carga: ${contenedor.capacidadCarga ?? "Sin capacidad"}
-    - ${contenedor.estado ?? "Sin estado"}
-  </span>
-  <span class="contenedor-acciones">
-    <button class="btn-modificar" onclick="seleccionarContenedor('${contenedor.ID_contenedor}')">
-      Modificar
+<li class="incidencia-item">
+  <div class="incidencia-info">
+    <strong>#${incidencia.ID_incidencia} — ${incidencia.tipo}</strong>
+    <span class="incidencia-estado">${incidencia.estado}</span>
+    <p>${incidencia.mail} · ${incidencia.calle} ${incidencia.numero}, ${incidencia.barrio}</p>
+    <p>Operario asignado: ${incidencia.ID_operario ? incidencia.ID_operario : "Sin asignar"}</p>
+  </div>
+  <span class="incidencia-acciones">
+    <button class="btn-modificar" onclick="seleccionarIncidencia(${incidencia.ID_incidencia})">
+      Asignar Operario
     </button>
-    <button class="btn-eliminar"style="background-color: #e74c3c; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-size: 14px; cursor: pointer;" onclick="eliminarContenedor('${contenedor.ID_contenedor}')">
+    <button
+      class="btn-eliminar"
+      onclick="eliminarIncidencia(${incidencia.ID_incidencia})">
       Eliminar
     </button>
   </span>
@@ -432,7 +410,7 @@
         listaContainer.innerHTML = html;
       }
 
-      obtenerContenedores();
+      obtenerIncidencias();
     </script>
   </body>
 </html>

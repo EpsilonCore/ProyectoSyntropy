@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Usuarios pendientes</title>
+  </head>
+  <body>
+    <script>
+      if (localStorage.getItem("logueado") !== "si") {
+        window.location.href = "login.html";
+      }
+      if ((localStorage.getItem("rol") || "").trim() !== "Administrador") {
+        window.location.href = "index.html";
+      }
+    </script>
+
+    <div id="app">
+      <h1>Usuarios pendientes</h1>
+      <div id="listaUsuarios"></div>
+    </div>
+
+    <script>
+      const API_URL =
+        "http://localhost/Proyecto/ProyectoSyntropy/Usuarios/miApi/";
+      let usuarios = [];
+
+      const listaContainer = document.getElementById("listaUsuarios");
+
+      async function obtenerUsuarios() {
+        try {
+          const resp = await fetch(`${API_URL}ListarPendientes`);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+
+          usuarios = Array.isArray(data) ? data : data?.usuarios || [];
+          renderizarLista();
+        } catch (error) {
+          console.error("Error al obtener usuarios:", error);
+          listaContainer.innerHTML = `<p>Error al cargar usuarios.</p>`;
+        }
+      }
+
+      async function enviarAccion(mail, decision) {
+        try {
+          const resp = await fetch(`${API_URL}Actualizar`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mail, decision }),
+          });
+
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const resultado = await resp.json();
+
+          if (resultado?.status === "ok") {
+            const usuario = usuarios.find((u) => u.mail === mail);
+            if (usuario) {
+              usuario.estado =
+                decision === "Aceptado" ? "Aceptado" : "Rechazado";
+            }
+            renderizarLista();
+          } else {
+            alert(`No se pudo ${decision} el usuario.`);
+          }
+        } catch (error) {
+          console.error(error);
+          alert(`Error de conexión al ${decision} usuario.`);
+        }
+      }
+
+      function renderizarLista() {
+        const pendientes = usuarios.filter((u) => u.estado === "Pendiente");
+
+        if (pendientes.length === 0) {
+          listaContainer.innerHTML = `
+            <p>No hay usuarios pendientes.</p>
+            <p>Todos han sido procesados.</p>`;
+          return;
+        }
+
+        let html = '<ul style="list-style: none; padding: 0;">';
+        pendientes.forEach((usuario) => {
+          html += `
+            <li>
+              <span><strong>${usuario.nombre}</strong></span>
+              <span>
+                <button onclick="aceptarUsuario('${usuario.mail}')">Aceptar</button>
+                <button onclick="rechazarUsuario('${usuario.mail}')">Rechazar</button>
+              </span>
+            </li>`;
+        });
+        html += "</ul>";
+        listaContainer.innerHTML = html;
+      }
+
+      window.aceptarUsuario = (mail) => enviarAccion(mail, "Aceptado");
+      window.rechazarUsuario = (mail) => enviarAccion(mail, "Rechazado");
+
+      obtenerUsuarios();
+    </script>
+  </body>
+</html>

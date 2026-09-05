@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mapa - Epsilon</title>
     <link rel="stylesheet" href="style.css" />
-    <!-- Usamos CDNJS para mayor estabilidad y evitar errores 403 de unpkg -->
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -28,12 +27,17 @@
         </a>
       </div>
 
-      <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+      <div class="header-actions">
+        <div id="usuario" class="usuario"></div>
+
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+      </div>
 
       <nav id="menu">
         <ul>
           <li>
             <button
+              data-rol="Administrador"
               class="link-button"
               onclick="window.location.href = 'gestion.html'"
             >
@@ -43,6 +47,7 @@
 
           <li>
             <button
+              data-rol="Administrador, Operario"
               class="link-button"
               onclick="window.location.href = 'rutas.html'"
             >
@@ -76,8 +81,6 @@
               Documentación
             </button>
           </li>
-
-          <li id="sesion"></li>
         </ul>
       </nav>
     </header>
@@ -88,8 +91,11 @@
       <p>Visualización geográfica de la ciudad.</p>
 
       <div class="panel">
-        <button>Ver Contenedores</button>
+        <button onclick="vertodo()">Ver todo</button>
+        <button onclick="soloContenedores()">Ver Contenedores</button>
+        <button onclick="soloIncidencias()">Ver Incidencias</button>
         <button>Ver Camiones</button>
+        <button>Ver Rutas</button>
         <button>Actualizar Mapa</button>
       </div>
 
@@ -97,41 +103,217 @@
     </div>
 
     <script>
+      async function CargarIncidenciasMapa() {
+        try {
+          const respuesta = await fetch(
+            "/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/Incidencias",
+          );
+          const respuestaJson = await respuesta.json();
+          const incidencias = Array.isArray(respuestaJson)
+            ? respuestaJson
+            : respuestaJson?.data || [];
+          console.log("Incidencias cargadas:", incidencias);
+
+          incidencias.forEach((inc) => {
+            if (!inc.lat || !inc.lon) return;
+            if (inc.tipo === "desbordado") {
+              L.circleMarker([inc.lat, inc.lon], {
+                radius: 3,
+                color: "#936c01",
+                fillColor: "#936c01",
+                fillOpacity: 1,
+              })
+                .addTo(map)
+                .bindPopup(
+                  `<strong>${inc.tipo}</strong><br>${inc.calle} ${inc.numero}, ${inc.barrio}<br>Estado: ${inc.estado}`,
+                );
+            }
+            if (inc.tipo === "rotura") {
+              L.circleMarker([inc.lat, inc.lon], {
+                radius: 3,
+                color: "#000000",
+                fillColor: "#000000",
+                fillOpacity: 1,
+              })
+                .addTo(map)
+                .bindPopup(
+                  `<strong>${inc.tipo}</strong><br>${inc.calle} ${inc.numero}, ${inc.barrio}<br>Estado: ${inc.estado}`,
+                );
+            }
+            if (inc.tipo === "incendiado") {
+              L.circleMarker([inc.lat, inc.lon], {
+                radius: 3,
+                color: "#ffa200",
+                fillColor: "#ffa200",
+                fillOpacity: 1,
+              })
+                .addTo(map)
+                .bindPopup(
+                  `<strong>${inc.tipo}</strong><br>${inc.calle} ${inc.numero}, ${inc.barrio}<br>Estado: ${inc.estado}`,
+                );
+            }
+            if (inc.tipo === "lleno") {
+              L.circleMarker([inc.lat, inc.lon], {
+                radius: 3,
+                color: "#861313",
+                fillColor: "#861313",
+                fillOpacity: 1,
+              })
+                .addTo(map)
+                .bindPopup(
+                  `<strong>${inc.tipo}</strong><br>${inc.calle} ${inc.numero}, ${inc.barrio}<br>Estado: ${inc.estado}`,
+                );
+            }
+          });
+        } catch (err) {
+          console.error("Error al cargar las incidencias:", err);
+        }
+      }
+      async function CargarContenedoresMapa() {
+        try {
+          const respuesta = await fetch(
+            "/Proyecto/ProyectoSyntropy/Gestion/miApi/Contenedores",
+          );
+          const respuestaJson = await respuesta.json();
+          const contenedores = Array.isArray(respuestaJson)
+            ? respuestaJson
+            : respuestaJson?.data || [];
+          console.log("Contenedores cargados:", contenedores);
+
+          contenedores.forEach((cont) => {
+            if (!cont.lat || !cont.lon) return;
+            if (cont.estado === "Vacio") {
+              L.circleMarker([cont.lat, cont.lon], {
+                radius: 3,
+                color: "#23c40e",
+                fillColor: "#23c40e",
+                fillOpacity: 1,
+              })
+                .addTo(map)
+                .bindPopup(
+                  `<strong>Contenedor</strong><br>${cont.calle} ${cont.numero}, ${cont.barrio}<br>Capacidad: ${cont.capacidadCarga}<br>Tipo: ${cont.tipo}<br>Estado: ${cont.estado}`,
+                );
+            } else if (cont.estado === "Lleno") {
+              L.circleMarker([cont.lat, cont.lon], {
+                radius: 3,
+                color: "#ff0000",
+                fillColor: "#ff0000",
+                fillOpacity: 1,
+              })
+                .addTo(map)
+                .bindPopup(
+                  `<strong>Contenedor</strong><br>${cont.calle} ${cont.numero}, ${cont.barrio}<br>Capacidad: ${cont.capacidadCarga}<br>Tipo: ${cont.tipo}<br>Estado: ${cont.estado}`,
+                );
+            } else if (cont.estado === "Desbordado") {
+              L.circleMarker([cont.lat, cont.lon], {
+                radius: 3,
+                color: "#000000",
+                fillColor: "#000000",
+                fillOpacity: 1,
+              })
+                .addTo(map)
+                .bindPopup(
+                  `<strong>Contenedor</strong><br>${cont.calle} ${cont.numero}, ${cont.barrio}<br>Capacidad: ${cont.capacidadCarga}<br>Tipo: ${cont.tipo}<br>Estado: ${cont.estado}`,
+                );
+            } else if (cont.estado === "Media capacidad") {
+              L.circleMarker([cont.lat, cont.lon], {
+                radius: 3,
+                color: "#fdd408",
+                fillColor: "#fdd408",
+                fillOpacity: 1,
+              })
+                .addTo(map)
+                .bindPopup(
+                  `<strong>Contenedor</strong><br>${cont.calle} ${cont.numero}, ${cont.barrio}<br>Capacidad: ${cont.capacidadCarga}<br>Tipo: ${cont.tipo}<br>Estado: ${cont.estado}`,
+                );
+            }
+          });
+        } catch (err) {
+          console.error("Error al cargar los contenedores:", err);
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const rolUsuario = (localStorage.getItem("rol") || "").trim();
+        document.querySelectorAll("[data-rol]").forEach((boton) => {
+          const rolesPermitidos = boton.dataset.rol
+            .split(",")
+            .map((rol) => rol.trim());
+          if (!rolesPermitidos.includes(rolUsuario)) {
+            boton.style.display = "none";
+          }
+        });
+      });
+
       function toggleMenu() {
         document.getElementById("menu").classList.toggle("activo");
       }
 
       function cerrarSesion() {
         localStorage.removeItem("logueado");
+        localStorage.removeItem("nombreUsuario");
         window.location.href = "index.html";
       }
 
-      const sesion = document.getElementById("sesion");
-      sesion.innerHTML = `<button onclick="cerrarSesion()">Cerrar Sesión</button>`;
+      function cargarUsuario() {
+        const nombre = localStorage.getItem("nombreUsuario") || "Usuario";
+        const inicial = nombre.charAt(0).toUpperCase();
+
+        document.getElementById("usuario").innerHTML = `
+
+          <span class="nombre-usuario">${nombre}</span>
+
+          <button class="usuario-btn" onclick="abrirUsuario()">
+              ${inicial}
+          </button>
+
+          <div id="menuUsuario" class="menu-usuario">
+
+              <button onclick="cerrarSesion()">
+                  Cerrar Sesión
+              </button>
+
+          </div>
+
+          `;
+      }
+
+      function abrirUsuario() {
+        document.getElementById("menuUsuario").classList.toggle("activo");
+      }
+
+      cargarUsuario();
 
       var map = L.map("map").setView([-34.9011, -56.1645], 13);
 
-      L.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-        {
-          attribution: "&copy; OpenStreetMap &copy; CARTO",
-        },
-      ).addTo(map);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors",
+        maxZoom: 19,
+      }).addTo(map);
 
-      var marcadorCentro = L.marker([-34.894555, -56.124376]).addTo(map);
-      marcadorCentro.bindPopup(
-        "<b>Buceo</b><br>Contenedor de la casa de emilia.",
-      );
+      function limpiarMapa() {
+        map.eachLayer(function (layer) {
+          if (layer instanceof L.CircleMarker) {
+            map.removeLayer(layer);
+          }
+        });
+      }
+      function soloContenedores() {
+        limpiarMapa();
+        CargarContenedoresMapa();
+      }
+      function soloIncidencias() {
+        limpiarMapa();
+        CargarIncidenciasMapa();
+      }
+      function vertodo() {
+        limpiarMapa();
+        CargarContenedoresMapa();
+        CargarIncidenciasMapa();
+      }
 
-      var estadio = L.marker([-34.8944, -56.1528]).addTo(map);
-      estadio.bindPopup(
-        "<b>Estadio Centenario</b><br>Punto de reciclaje de envases plásticos.",
-      );
-
-      var letrasMvd = L.marker([-34.9066, -56.1469]).addTo(map);
-      letrasMvd.bindPopup(
-        "<b>Letras de Montevideo</b><br>Contenedor inteligente de vidrio.",
-      );
+      CargarIncidenciasMapa();
+      CargarContenedoresMapa();
     </script>
   </body>
 </html>

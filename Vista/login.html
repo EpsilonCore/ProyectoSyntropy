@@ -58,18 +58,17 @@
             );
 
             const result = await response.json();
-            if (response.ok) {
-              alert(
-                "¡Solicitud de Login enviada con exito!" +
-                  (result.mensaje || ""),
-              );
+            if (response.ok && result.status === "ok") {
+              localStorage.setItem("logueado", "si");
+              localStorage.setItem("rol", result.usuario.rol);
               window.location.href = "index.html";
             } else {
-              alert(`Error: ${result.error || "No se pudo Loguear"}`);
+              localStorage.removeItem("logueado");
+              localStorage.removeItem("rol");
+              window.location.href = "login.html";
             }
           } catch (error) {
-            console.error("Error de conexion:", error);
-            alert("Error al conectar con el servidor");
+            console.error("Detalle exacto del error:", error);
           }
         });
     </script>

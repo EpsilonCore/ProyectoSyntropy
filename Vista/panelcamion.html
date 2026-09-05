@@ -1,275 +1,424 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-
-<head>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Panel Camiones - Epsilon</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-</head>
+  <body>
+    <script>
+      if (localStorage.getItem("logueado") !== "si") {
+        window.location.href = "login.html";
+      }
+      if ((localStorage.getItem("rol") || "").trim() !== "Administrador") {
+        window.location.href = "index.html";
+      }
+    </script>
 
-
-<body>
-
-
-<script>
-
-if(localStorage.getItem("logueado") !== "si"){
-
-    window.location.href = "login.html";
-
-}
-
-</script>
-
-
-
-<header>
-
-
-    <div class="logo">
-
+    <header>
+      <div class="logo">
         <a href="index.html">
-
-            <img src="logo.png" alt="Epsilon">
-
+          <img src="logo.png" alt="Epsilon" />
         </a>
+      </div>
 
-    </div>
+      <div class="header-actions">
+        <div id="usuario" class="usuario"></div>
 
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+      </div>
 
+      <nav id="menu">
+        <ul>
+          <li>
+            <button
+              data-rol="Administrador"
+              class="link-button"
+              onclick="window.location.href = 'gestion.html'"
+            >
+              Gestión
+            </button>
+          </li>
 
+          <li>
+            <button
+              data-rol="Administrador"
+              class="link-button"
+              onclick="window.location.href = 'panelregistro.html'"
+            >
+              Panel Registro
+            </button>
+          </li>
 
-    <div class="header-actions">
+          <li>
+            <button
+              data-rol="Administrador"
+              class="link-button"
+              onclick="window.location.href = 'panelcontenedor.html'"
+            >
+              Contenedores
+            </button>
+          </li>
 
+          <li>
+            <button
+              data-rol="Administrador"
+              class="link-button"
+              onclick="window.location.href = 'panelcamion.html'"
+            >
+              Camiones
+            </button>
+          </li>
 
-        <div class="menu-toggle" onclick="toggleMenu()">
+          <li>
+            <button
+              data-rol="Administrador"
+              class="link-button"
+              onclick="window.location.href = 'panelusuario.html'"
+            >
+              Panel de Usuario
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </header>
 
-            ☰
+    <div class="pagina">
+      <h2>Panel Camiones</h2>
 
+      <p>Administración de camiones registrados en el sistema.</p>
+
+      <div class="panel" id="OverlayCrearCamion" >
+        <button onclick="abrirCrearCamion()"">Crear Camión</button>
+      </div>
+      <div class="overlay" id="overlayCrearCamiones">
+        <div class="crear-camion">
+          <h3>Crear Camión</h3>
+          <form id="formCrearCamion">
+            <label>Matrícula</label>
+            <input id="matriculaCrear" required />
+
+            <label>Tipo</label>
+            <select id="tipoCrear" required>
+              <option value="" disabled selected>Seleccione un tipo</option>
+              <option value="Levante Lateral">Levante Lateral</option>
+              <option value="Levante Trasero">Levante Trasero</option>
+              <option value="Caja Abierta">Caja Abierta</option>
+              <option value="Caja Cerrada">Caja Cerrada</option>
+            </select>
+
+            <label>Capacidad de carga</label>
+            <input id="capacidadCargaCrear" type="number" />
+
+            <label>Estado</label>
+            <select id="estadoCrearCamion" required>
+              <option value="" disabled selected>Seleccione un estado</option>
+              <option value="Disponible">Disponible</option>
+              <option value="Mantenimiento">Mantenimiento</option>
+              <option value="En Servicio">En Servicio</option>
+              <option value="Averiado">Averiado</option>
+            </select>
+
+            <label>Ubicación</label>
+            <input id="ubicacionCrearCamion" />
+
+            <button class="btn-crear-camion" type="submit">Crear Camión</button>
+            <button
+              class="btn-cancelar-usuario"
+              type="button"
+              onclick="
+                document
+                  .getElementById('overlayCrearCamiones')
+                  .classList.remove('activo')
+              "
+            >
+              Cancelar
+            </button>
+          </form>
         </div>
+      </div>
 
-
-    </div>
-
-
-
-
-
-    <nav id="menu">
-
-
-        <ul>
-
-
-            <li>
-
-                <button class="link-button"
-                onclick="window.location.href='gestion.html'">
-
-                    Gestión
-
-                </button>
-
-            </li>
-
-
-
-            <li>
-
-                <button class="link-button"
-                onclick="window.location.href='panelregistro.html'">
-
-                    Panel Registro
-
-                </button>
-
-            </li>
-
-
-
-            <li>
-
-                <button class="link-button"
-                onclick="window.location.href='panelcontenedor.html'">
-
-                    Contenedores
-
-                </button>
-
-            </li>
-
-
-
-            <li>
-
-                <button class="link-button"
-                onclick="window.location.href='panelcamion.html'">
-
-                    Camiones
-
-                </button>
-
-            </li>
-
-
-
+      <div class="lista-panel">
+        <h3>Lista de Camiones</h3>
+        <ul id="listaCamiones">
+          <p>Cargando camiones...</p>
         </ul>
-
-
-    </nav>
-
-
-</header>
-
-
-
-
-
-
-
-<div class="pagina">
-
-
-
-    <h2>
-
-        Panel Camiones
-
-    </h2>
-
-
-
-
-    <p>
-
-        Administración de camiones registrados en el sistema.
-
-    </p>
-
-
-
-
-
-    <div class="panel">
-
-
-        <button>
-
-            Crear Camión
-
-        </button>
-
-
-
-
-        <button>
-
-            Modificar Camión
-
-        </button>
-
-
-
-
-        <button>
-
-            Eliminar Camión
-
-        </button>
-
-
-
+      </div>
     </div>
 
+    <div
+      class="overlay"
+      id="overlayCamiones"
+      onclick="cerrarModalCamiones(event)"
+    >
+      <div class="modal-camiones">
+        <h3>Modificar camión</h3>
 
+        <form id="formModificarCamion">
+          <input type="hidden" id="matriculaOriginal" />
 
+          <label>Tipo</label>
+          <select id="tipoEditarCamion" required>
+            <option value="" disabled selected>Seleccione un tipo</option>
+            <option value="Levante Lateral">Levante Lateral</option>
+            <option value="Levante Trasero">Levante Trasero</option>
+            <option value="Caja Abierta">Caja Abierta</option>
+            <option value="Caja Cerrada">Caja Cerrada</option>
+          </select>
 
+          <label>Capacidad de carga</label>
+          <input id="capacidadCargaEditar" type="number" />
 
+          <label>Estado</label>
+          <select id="estadoEditarCamion" required>
+            <option value="" disabled selected>Seleccione un estado</option>
+            <option value="Disponible">Disponible</option>
+            <option value="Mantenimiento">Mantenimiento</option>
+            <option value="En Servicio">En Servicio</option>
+            <option value="Averiado">Averiado</option>
+          </select>
 
+          <label>Ubicación</label>
+          <input id="ubicacionEditarCamion" />
 
-    <div class="lista-panel">
-
-
-
-        <h3>
-
-            Lista de Camiones
-
-        </h3>
-
-
-
-
-        <ul>
-
-
-
-            <li>
-
-                Camión ABC-123 - En servicio
-
-            </li>
-
-
-
-            <li>
-
-                Camión DEF-456 - Disponible
-
-            </li>
-
-
-
-            <li>
-
-                Camión GHI-789 - Mantenimiento
-
-            </li>
-
-
-
-        </ul>
-
-
-
-
+          <button class="btn-guardar-usuario" type="submit">
+            Guardar cambios
+          </button>
+          <button
+            class="btn-cancelar-usuario"
+            type="button"
+            onclick="
+              document
+                .getElementById('overlayCamiones')
+                .classList.remove('activo')
+            "
+          >
+            Cancelar
+          </button>
+        </form>
+      </div>
     </div>
 
+    <script>
+      const API_URL =
+        "http://localhost/Proyecto/ProyectoSyntropy/Recoleccion/miApi/";
+      let camiones = [];
 
+      document
+        .getElementById("formModificarCamion")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
 
+          const datos = {
+            matricula: document.getElementById("matriculaOriginal").value,
+            tipo: document.getElementById("tipoEditarCamion").value,
+            capacidadCarga: document.getElementById("capacidadCargaEditar")
+              .value,
+            estado: document.getElementById("estadoEditarCamion").value,
+            ubicacion: document.getElementById("ubicacionEditarCamion").value,
+          };
 
-</div>
+          const resp = await fetch(`${API_URL}ActualizarCamion`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
 
+          const resultado = await resp.json();
 
+          if (resultado.status === "ok") {
+            document
+              .getElementById("overlayCamiones")
+              .classList.remove("activo");
+            obtenerCamiones();
+          } else {
+            alert("No se pudo modificar el camión.");
+          }
+        });
 
+      document
+        .getElementById("formCrearCamion")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
 
+          const datos = {
+            matricula: document.getElementById("matriculaCrear").value,
+            tipo: document.getElementById("tipoCrear").value,
+            capacidadCarga: document.getElementById("capacidadCargaCrear")
+              .value,
+            estado: document.getElementById("estadoCrearCamion").value,
+            ubicacion: document.getElementById("ubicacionCrearCamion").value,
+          };
 
+          const resp = await fetch(`${API_URL}RegistrarCamion`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
 
+          const resultado = await resp.json();
 
-<script>
+          if (resultado.status === "creado") {
+            document
+              .getElementById("overlayCrearCamiones")
+              .classList.remove("activo");
+            obtenerCamiones();
+          } else {
+            alert("No se pudo crear el camión.");
+          }
+        });
 
+      document.addEventListener("DOMContentLoaded", () => {
+        const rolUsuario = (localStorage.getItem("rol") || "").trim();
+        document.querySelectorAll("[data-rol]").forEach((boton) => {
+          const rolesPermitidos = boton.dataset.rol
+            .split(",")
+            .map((rol) => rol.trim());
+          if (!rolesPermitidos.includes(rolUsuario)) {
+            boton.style.display = "none";
+          }
+        });
+      });
 
-function toggleMenu(){
+      function toggleMenu() {
+        document.getElementById("menu").classList.toggle("activo");
+      }
 
-    document
-    .getElementById("menu")
-    .classList.toggle("activo");
+      function cerrarSesion() {
+        localStorage.removeItem("logueado");
+        localStorage.removeItem("nombreUsuario");
 
-}
+        window.location.href = "index.html";
+      }
 
+      function cargarUsuario() {
+        const nombre = localStorage.getItem("nombreUsuario") || "Usuario";
+        const inicial = nombre.charAt(0).toUpperCase();
 
+        document.getElementById("usuario").innerHTML = `
 
-</script>
+      <span class="nombre-usuario">${nombre}</span>
 
+      <button class="usuario-btn" onclick="abrirUsuario()">
+          ${inicial}
+      </button>
 
+      <div id="menuUsuario" class="menu-usuario">
 
+          <button onclick="cerrarSesion()">
+              Cerrar Sesión
+          </button>
 
+      </div>
 
-</body>
+      `;
+      }
 
+      function abrirUsuario() {
+        document.getElementById("menuUsuario").classList.toggle("activo");
+      }
+
+      cargarUsuario();
+
+      function abrirCrearCamion() {
+        document.getElementById("overlayCrearCamiones").classList.add("activo");
+      }
+
+      function cerrarModalCamiones(evento) {
+        if (evento.target.id === "overlayCamiones") {
+          document.getElementById("overlayCamiones").classList.remove("activo");
+        }
+      }
+
+      function seleccionarCamion(matricula) {
+        const camion = camiones.find((c) => c.matricula === matricula);
+        if (!camion) return;
+
+        document.getElementById("matriculaOriginal").value = camion.matricula;
+        document.getElementById("tipoEditarCamion").value = camion.tipo ?? "";
+        document.getElementById("capacidadCargaEditar").value =
+          camion.capacidadCarga ?? "";
+        document.getElementById("estadoEditarCamion").value =
+          camion.estado ?? "";
+        document.getElementById("ubicacionEditarCamion").value =
+          camion.ubicacion ?? "";
+
+        document.getElementById("overlayCamiones").classList.add("activo");
+      }
+
+      async function obtenerCamiones() {
+        try {
+          const resp = await fetch(`${API_URL}Camiones`);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          camiones = Array.isArray(data) ? data : data?.data || [];
+          renderizarLista();
+        } catch (error) {
+          console.error("Error al obtener camiones:", error);
+        }
+      }
+
+      async function eliminarCamion(matricula) {
+        if (confirm("¿Está seguro de que desea eliminar este camión?")) {
+          const resp = await fetch(`${API_URL}EliminarCamion`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ matricula }),
+          });
+          try {
+            const resultado = await resp.json();
+            
+            if (resultado.status === "ok") {
+              obtenerCamiones();
+            } else {
+              alert("No se pudo eliminar el camión.");
+            }
+          } catch (error) {
+            console.error(error);
+            alert("Error de conexión al eliminar camión.");
+          }
+        }
+      }
+
+      function renderizarLista() {
+        const listaContainer = document.getElementById("listaCamiones");
+
+        if (camiones.length === 0) {
+          listaContainer.innerHTML = "<p>No hay camiones disponibles.</p>";
+          return;
+        }
+
+        let html = '<ul style="list-style: none; padding: 0; margin: 0;">';
+
+        camiones.forEach((camion) => {
+          html += `
+<li class="camion-item">
+  <span>
+    <strong>Camión ${camion.matricula} - ${camion.tipo ?? "Sin tipo"}</strong>
+    - ${camion.ubicacion ?? "Sin ubicación"}
+    - Carga: ${camion.capacidadCarga ?? "Sin capacidad"}
+    - ${camion.estado ?? "Sin estado"}
+  </span>
+  <span class="camion-acciones">
+    <button class="btn-modificar" onclick="seleccionarCamion('${camion.matricula}')">
+      Modificar
+    </button>
+    <button class="btn-eliminar"style="background-color: #e74c3c; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-size: 14px; cursor: pointer;" onclick="eliminarCamion('${camion.matricula}')">
+      Eliminar
+    </button>
+  </span>
+</li>`;
+        });
+
+        html += "</ul>";
+        listaContainer.innerHTML = html;
+      }
+
+      obtenerCamiones();
+    </script>
+  </body>
 </html>

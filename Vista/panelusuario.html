@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Panel de Usuario - Epsilon</title>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <script>
+      if (localStorage.getItem("logueado") !== "si") {
+        window.location.href = "login.html";
+      }
+      if ((localStorage.getItem("rol") || "").trim() !== "Administrador") {
+        window.location.href = "index.html";
+      }
+    </script>
+
+    <header>
+      <div class="logo">
+        <a href="index.html">
+          <img src="logo.png" alt="Epsilon" />
+        </a>
+      </div>
+
+      <div class="header-actions">
+        <div id="usuario" class="usuario"></div>
+
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+      </div>
+
+      <nav id="menu">
+        <ul>
+          <li>
+            <button
+              data-rol="Administrador"
+              class="link-button"
+              onclick="window.location.href = 'gestion.html'"
+            >
+              Gestión
+            </button>
+          </li>
+
+          <li>
+            <button
+              data-rol="Administrador"
+              class="link-button"
+              onclick="window.location.href = 'panelregistro.html'"
+            >
+              Panel Registro
+            </button>
+          </li>
+
+          <li>
+            <button
+              data-rol="Administrador"
+              class="link-button"
+              onclick="window.location.href = 'panelcontenedor.html'"
+            >
+              Contenedores
+            </button>
+          </li>
+
+          <li>
+            <button
+              data-rol="Administrador"
+              class="link-button"
+              onclick="window.location.href = 'panelcamion.html'"
+            >
+              Camiones
+            </button>
+          </li>
+
+          <li>
+            <button
+              data-rol="Administrador"
+              class="link-button"
+              onclick="window.location.href = 'panelusuario.html'"
+            >
+              Panel de Usuario
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="pagina">
+      <h2>Panel de Usuario</h2>
+
+      <p>Administración de usuarios del sistema.</p>
+
+      <div class="panel" id="OverlayCrearUsuario">
+        <button onclick="abrirCrearUsuario()">Crear Usuario</button>
+      </div>
+      <div class="overlay" id="overlayCrearUsuarios">
+        <div class="crear-usuario">
+          <h3>Crear Usuario</h3>
+          <form id="formCrearUsuario">
+            <label>Nombre</label>
+            <input id="nombreCrear" required />
+
+            <label>Apellido</label>
+            <input id="apellidoCrear" required />
+
+            <label>Mail</label>
+            <input id="mailCrear" type="email" required />
+
+            <label>Contraseña</label>
+            <input id="passwordCrear" type="password" required />
+
+            <label>Usuario</label>
+            <input id="nicknameCrear" />
+
+            <label>Rol</label>
+            <select id="rolCrear" required>
+              <option value="" disabled>Seleccione un rol</option>
+              <option value="Vecino">Vecino</option>
+              <option value="Operario">Operario</option>
+              <option value="Administrador">Administrador</option>
+            </select>
+
+            <button class="btn-crear-usuario" type="submit">
+              Crear Usuario
+            </button>
+            <button
+              class="btn-cancelar-usuario"
+              onclick="
+                document
+                  .getElementById('overlayCrearUsuarios')
+                  .classList.remove('activo')
+              "
+            >
+              Cancelar
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="lista-panel">
+        <h3>Lista de Usuarios</h3>
+        <ul id="listaUsuarios">
+          <p>Cargando usuarios...</p>
+        </ul>
+      </div>
+    </div>
+
+    <div
+      class="overlay"
+      id="overlayUsuarios"
+      onclick="cerrarModalUsuarios(event)"
+    >
+      <div class="modal-usuarios">
+        <h3>Modificar usuario</h3>
+
+        <form id="formModificarUsuario">
+          <input type="hidden" id="mailOriginal" />
+
+          <label>Nombre</label>
+          <input
+            id="nombreEditar"
+            placeholder="Dejar vacío para no modificar"
+          />
+
+          <label>Apellido</label>
+          <input
+            id="apellidoEditar"
+            placeholder="Dejar vacío para no modificar"
+          />
+
+          <label>Usuario</label>
+          <input
+            id="nicknameEditar"
+            placeholder="Dejar vacío para no modificar"
+          />
+          <label>Rol</label>
+          <select id="rolEditar" required>
+            <option value="" disabled>Seleccione un rol</option>
+            <option value="Vecino">Vecino</option>
+            <option value="Operario">Operario</option>
+            <option value="Administrador">Administrador</option>
+          </select>
+          <button class="btn-guardar-usuario" type="submit">
+            Guardar cambios
+          </button>
+          <button
+            class="btn-cancelar-usuario"
+            type="button"
+            onclick="
+              document
+                .getElementById('overlayUsuarios')
+                .classList.remove('activo')
+            "
+          >
+            Cancelar
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const API_URL =
+        "http://localhost/Proyecto/ProyectoSyntropy/Usuarios/miApi/";
+      let usuarios = [];
+
+      document
+        .getElementById("formModificarUsuario")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const datos = {
+            mail: document.getElementById("mailOriginal").value,
+            nombre: document.getElementById("nombreEditar").value,
+            apellido: document.getElementById("apellidoEditar").value,
+            nickname: document.getElementById("nicknameEditar").value,
+            rol: document.getElementById("rolEditar").value,
+          };
+
+          const resp = await fetch(`${API_URL}Modificar`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
+
+          const resultado = await resp.json();
+
+          if (resultado.status === "ok") {
+            document
+              .getElementById("overlayUsuarios")
+              .classList.remove("activo");
+            obtenerUsuarios(); // refresca la lista
+          } else {
+            alert(resultado.mensaje);
+          }
+        });
+      document
+        .getElementById("formCrearUsuario")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const datos = {
+            nombre: document.getElementById("nombreCrear").value,
+            apellido: document.getElementById("apellidoCrear").value,
+            mail: document.getElementById("mailCrear").value,
+            contrasenia: document.getElementById("passwordCrear").value,
+            usuario: document.getElementById("nicknameCrear").value,
+            rol: document.getElementById("rolCrear").value,
+          };
+
+          const resp = await fetch(`${API_URL}Registrar`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
+
+          const resultado = await resp.json();
+
+          if (resultado.status === "ok") {
+            document
+              .getElementById("overlayCrearUsuarios")
+              .classList.remove("activo");
+            obtenerUsuarios();
+          } else {
+            alert(resultado.mensaje);
+          }
+        });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const rolUsuario = (localStorage.getItem("rol") || "").trim();
+        document.querySelectorAll("[data-rol]").forEach((boton) => {
+          const rolesPermitidos = boton.dataset.rol
+            .split(",")
+            .map((rol) => rol.trim());
+          if (!rolesPermitidos.includes(rolUsuario)) {
+            boton.style.display = "none";
+          }
+        });
+      });
+
+      function toggleMenu() {
+        document.getElementById("menu").classList.toggle("activo");
+      }
+
+      function cerrarSesion() {
+        localStorage.removeItem("logueado");
+        localStorage.removeItem("nombreUsuario");
+
+        window.location.href = "index.html";
+      }
+
+      function cargarUsuario() {
+        const nombre = localStorage.getItem("nombreUsuario") || "Usuario";
+        const inicial = nombre.charAt(0).toUpperCase();
+
+        document.getElementById("usuario").innerHTML = `
+
+      <span class="nombre-usuario">${nombre}</span>
+
+      <button class="usuario-btn" onclick="abrirUsuario()">
+          ${inicial}
+      </button>
+
+      <div id="menuUsuario" class="menu-usuario">
+
+          <button onclick="cerrarSesion()">
+              Cerrar Sesión
+          </button>
+
+      </div>
+
+      `;
+      }
+
+      function abrirUsuario() {
+        document.getElementById("menuUsuario").classList.toggle("activo");
+      }
+
+      cargarUsuario();
+
+      function abrirModalUsuarios() {
+        document.getElementById("overlayUsuarios").classList.add("activo");
+      }
+      function abrirCrearUsuario() {
+        document.getElementById("overlayCrearUsuarios").classList.add("activo");
+      }
+
+      function cerrarModalUsuarios(evento) {
+        if (evento.target.id === "overlayUsuarios") {
+          document.getElementById("overlayUsuarios").classList.remove("activo");
+        }
+      }
+
+      function seleccionarUsuario(mail) {
+        const usuario = usuarios.find((u) => u.mail === mail);
+        if (!usuario) return;
+
+        document.getElementById("mailOriginal").value = usuario.mail;
+        document.getElementById("nombreEditar").value = usuario.nombre;
+        document.getElementById("apellidoEditar").value = usuario.apellido;
+        document.getElementById("nicknameEditar").value =
+          usuario.nickname ?? "";
+        document.getElementById("rolEditar").value = usuario.rol ?? "";
+
+        document.getElementById("overlayUsuarios").classList.add("activo");
+      }
+      async function obtenerUsuarios() {
+        try {
+          const resp = await fetch(`${API_URL}Usuarios`);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          const todos = Array.isArray(data) ? data : data?.usuarios || [];
+          usuarios = todos.filter((u) => u.estado_usuario === "Activo");
+          renderizarLista();
+        } catch (error) {
+          console.error("Error al obtener usuarios:", error);
+        }
+      }
+      async function eliminarUsuario(mail) {
+        const usuario = usuarios.find((u) => u.mail === mail);
+        if (confirm("¿Está seguro de que desea eliminar este usuario?")) {
+          const resp = await fetch(`${API_URL}Borrar`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mail }),
+          });
+          try {
+            const resultado = await resp.json();
+            if (resultado?.status === "ok") {
+              obtenerUsuarios();
+            } else {
+              alert("No se pudo eliminar el usuario.");
+            }
+          } catch (error) {
+            console.error(error);
+            alert("Error de conexión al eliminar usuario.");
+          }
+        }
+      }
+      function renderizarLista() {
+        const listaContainer = document.getElementById("listaUsuarios");
+
+        if (usuarios.length === 0) {
+          listaContainer.innerHTML = "<p>No hay usuarios disponibles.</p>";
+          return;
+        }
+
+        let html = '<ul style="list-style: none; padding: 0; margin: 0;">';
+
+        usuarios.forEach((usuario) => {
+          html += `
+<li class="usuario-item">
+  <span>
+    <strong>${usuario.nombre} ${usuario.apellido} ${usuario.nickname ?? "Sin nickname"} ${usuario.mail}</strong>
+    - ${usuario.rol ?? "Sin rol"}
+    - ${usuario.estado_registro ?? "Sin estado"}
+  </span>
+  <span class="usuario-acciones">
+    <button class="btn-modificar" onclick="seleccionarUsuario('${usuario.mail}')">
+      Modificar
+    </button>
+    <button
+      class="btn-eliminar"
+      style="background-color: #e74c3c; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-size: 14px; cursor: pointer;"
+      onclick="eliminarUsuario('${usuario.mail}')">
+      Eliminar
+    </button>
+  </span>
+</li>`;
+        });
+
+        html += "</ul>";
+        listaContainer.innerHTML = html;
+      }
+
+      obtenerUsuarios();
+    </script>
+  </body>
+</html>
