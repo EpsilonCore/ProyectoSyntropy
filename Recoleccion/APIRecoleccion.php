@@ -34,8 +34,9 @@ $method = $_SERVER['REQUEST_METHOD'];
 $uri    = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $resultado = ["status" => "no_encontrado", "mensaje" => "Ruta no encontrada.", "data" => null];
 
+// Gestionar camiones (crear/editar/borrar) sigue siendo exclusivo de Administrador.
 $rolesCamiones = ['Administrador'];
-                
+// Pero listar camiones y todo lo de Rutas lo usan ambos roles por igual.
 $rolesRutas = ['Administrador', 'Operario'];
 
 switch ($method) {
@@ -54,6 +55,12 @@ switch ($method) {
         if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas') {
             $resultado = verificarRol($rolesRutas) ?? $controladorRuta->getAllRutas();
         }
+        if (strpos($uri, '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas/') === 0) {
+            $idRuta = trim(str_replace('/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas/', '', $uri));
+            if (!empty($idRuta)) {
+                $resultado = verificarRol($rolesRutas) ?? $controladorRuta->getRutaPorId($idRuta);
+            }
+        }
         break;
 
     case 'POST':
@@ -62,6 +69,9 @@ switch ($method) {
         }
         if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas/Registrar') {
             $resultado = verificarRol($rolesRutas) ?? $controladorRuta->crearRuta();
+        }
+        if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas/CalcularCamino') {
+            $resultado = verificarRol($rolesRutas) ?? $controladorRuta->calcularCamino();
         }
         break;
 
@@ -74,6 +84,9 @@ switch ($method) {
     case 'DELETE':
         if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/EliminarCamion') {
             $resultado = verificarRol($rolesCamiones) ?? $controladorCamion->eliminarCamion();
+        }
+        if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas/Eliminar') {
+            $resultado = verificarRol($rolesRutas) ?? $controladorRuta->eliminarRuta();
         }
         break;
 

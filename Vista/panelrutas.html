@@ -49,6 +49,19 @@
         font-weight: bold;
         box-shadow: 0 0 0 2px #fff;
       }
+      .marcador-contenedor {
+        border: 2px solid #fff;
+        border-radius: 50%;
+        width: 14px;
+        height: 14px;
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+        cursor: pointer;
+      }
+      #resumenRuta {
+        font-size: 0.9rem;
+        color: #2a6df4;
+        font-weight: bold;
+      }
       #listaParadasRuta {
         margin: 10px 0;
       }
@@ -66,7 +79,11 @@
       if (localStorage.getItem("logueado") !== "si") {
         window.location.href = "login.html";
       }
-      if (!["Administrador", "Operario"].includes((localStorage.getItem("rol") || "").trim())) {
+      if (
+        !["Administrador", "Operario"].includes(
+          (localStorage.getItem("rol") || "").trim(),
+        )
+      ) {
         window.location.href = "index.html";
       }
     </script>
@@ -146,19 +163,14 @@
       <form id="formNuevaRuta" class="form-nueva-ruta">
         <input id="nombreRuta" placeholder="Nombre de la ruta" required />
 
-        <select id="camionRuta" required>
-          <option value="" disabled selected>Cargando camiones...</option>
-        </select>
-
         <button type="submit">Guardar Ruta</button>
-        <button type="button" onclick="cancelarCreacionRuta()">
-          Cancelar
-        </button>
+        <button type="button" onclick="cancelarCreacionRuta()">Cancelar</button>
       </form>
 
       <p id="instruccionMapa" class="instruccion-mapa" style="display: none">
-        Hacé click en el mapa para agregar paradas, en el orden en que el
-        camión debe recorrerlas.
+        Hacé click sobre los contenedores (color según su estado) para
+        agregarlos como paradas, en el orden en que el camión debe recorrerlos.
+        <span id="resumenRuta"></span>
       </p>
 
       <div id="map"></div>
@@ -176,12 +188,19 @@
     <script>
       const API_URL =
         "http://localhost/Proyecto/ProyectoSyntropy/Recoleccion/miApi/";
+      const API_URL_GESTION =
+        "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/";
 
       let modoCreacion = false;
       let paradas = [];
-      let marcadores = [];
+      let contenedoresDisponibles = [];
+      let marcadoresContenedores = [];
       let lineaRuta = null;
+      let lineaRutaContador = 0;
       let rutas = [];
+      let rutaSeleccionada = null;
+      let capaRutaSeleccionada = null;
+      let capaRutaSeleccionadaContador = 0;
 
       const map = L.map("map").setView([-34.9011, -56.1645], 13);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -189,25 +208,95 @@
         maxZoom: 19,
       }).addTo(map);
 
-      map.on("click", (e) => {
-        if (!modoCreacion) return;
-        agregarParada({
-          lat: e.latlng.lat,
-          lon: e.latlng.lng,
-          etiqueta: `Punto (${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)})`,
+      async function cargarContenedores() {
+        try {
+          const resp = await fetch(`${API_URL_GESTION}Contenedores`);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          contenedoresDisponibles = (data?.data || []).filter(
+            (c) => c.lat && c.lon,
+          );
+          dibujarContenedores();
+        } catch (error) {
+          console.error("Error al obtener contenedores:", error);
+        }
+      }
+
+      function colorPorEstadoContenedor(estado) {
+        switch (estado) {
+          case "Vacio":
+            return "#23c40e";
+          case "Lleno":
+            return "#ff0000";
+          case "Desbordado":
+            return "#000000";
+          case "Media capacidad":
+            return "#fdd408";
+          default:
+            return "#999999";
+        }
+      }
+
+      function dibujarContenedores() {
+        marcadoresContenedores.forEach((m) => map.removeLayer(m));
+
+        marcadoresContenedores = contenedoresDisponibles.map((cont) => {
+          const indice = paradas.findIndex(
+            (p) => p.idContenedor === cont.ID_contenedor,
+          );
+          const seleccionado = indice !== -1;
+
+          const marker = L.marker([cont.lat, cont.lon], {
+            icon: L.divIcon({
+              className: "",
+              html: seleccionado
+                ? `<div class="numero-parada">${indice + 1}</div>`
+                : `<div class="marcador-contenedor" style="background:${colorPorEstadoContenedor(cont.estado)}"></div>`,
+              iconSize: seleccionado ? [24, 24] : [14, 14],
+              iconAnchor: seleccionado ? [12, 12] : [7, 7],
+            }),
+          }).addTo(map);
+
+          marker.bindTooltip(
+            `Contenedor #${cont.ID_contenedor} — ${cont.calle ?? ""} ${cont.numero ?? ""}, ${cont.barrio ?? ""} — ${cont.estado ?? ""}`,
+          );
+
+          marker.on("click", () => {
+            if (!modoCreacion) return;
+            toggleParadaContenedor(cont);
+          });
+
+          return marker;
         });
-      });
+      }
+
+      function toggleParadaContenedor(cont) {
+        const indice = paradas.findIndex(
+          (p) => p.idContenedor === cont.ID_contenedor,
+        );
+        if (indice !== -1) {
+          paradas.splice(indice, 1);
+        } else {
+          paradas.push({
+            lat: cont.lat,
+            lon: cont.lon,
+            idContenedor: cont.ID_contenedor,
+            etiqueta: `Contenedor #${cont.ID_contenedor} — ${cont.calle ?? ""} ${cont.numero ?? ""}`,
+          });
+        }
+        redibujarParadas();
+      }
 
       function iniciarCreacionRuta() {
         modoCreacion = true;
         paradas = [];
+        rutaSeleccionada = null;
+        limpiarRutaSeleccionada();
         redibujarParadas();
 
         document.getElementById("btnCrearRuta").style.display = "none";
         document.getElementById("formNuevaRuta").classList.add("activo");
         document.getElementById("instruccionMapa").style.display = "block";
-
-        cargarCamionesDisponibles();
       }
 
       function cancelarCreacionRuta() {
@@ -221,37 +310,14 @@
         document.getElementById("instruccionMapa").style.display = "none";
       }
 
-      function agregarParada(parada) {
-        paradas.push(parada);
-        redibujarParadas();
-      }
-
       function quitarParada(indice) {
         paradas.splice(indice, 1);
         redibujarParadas();
       }
 
       function redibujarParadas() {
-        marcadores.forEach((m) => map.removeLayer(m));
-        marcadores = paradas.map((p, i) =>
-          L.marker([p.lat, p.lon], {
-            icon: L.divIcon({
-              className: "",
-              html: `<div class="numero-parada">${i + 1}</div>`,
-            }),
-          }).addTo(map),
-        );
-
-        if (lineaRuta) {
-          map.removeLayer(lineaRuta);
-          lineaRuta = null;
-        }
-        if (paradas.length >= 2) {
-          lineaRuta = L.polyline(
-            paradas.map((p) => [p.lat, p.lon]),
-            { color: "#2a6df4" },
-          ).addTo(map);
-        }
+        dibujarContenedores();
+        actualizarLineaRuta();
 
         const contenedor = document.getElementById("listaParadasRuta");
         if (paradas.length === 0) {
@@ -269,33 +335,59 @@
           .join("");
       }
 
-      async function cargarCamionesDisponibles() {
-        const select = document.getElementById("camionRuta");
-        try {
-          const resp = await fetch(`${API_URL}Camiones`);
-          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-          const data = await resp.json();
-          const disponibles = (data?.data || []).filter(
-            (c) => c.estado === "Disponible",
-          );
+      async function actualizarLineaRuta() {
+        const contador = ++lineaRutaContador;
 
-          if (disponibles.length === 0) {
-            select.innerHTML =
-              '<option value="" disabled selected>No hay camiones disponibles</option>';
+        if (lineaRuta) {
+          map.removeLayer(lineaRuta);
+          lineaRuta = null;
+        }
+        document.getElementById("resumenRuta").textContent = "";
+
+        if (paradas.length < 2) return;
+
+        const puntos = paradas.map(({ lat, lon }) => ({ lat, lon }));
+
+        try {
+          const resp = await fetch(`${API_URL}Rutas/CalcularCamino`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ paradas: puntos }),
+          });
+          const resultado = await resp.json();
+
+          // Si mientras esperábamos se guardó, canceló o cambió la ruta,
+          // esta respuesta ya está vieja: no la dibujamos.
+          if (contador !== lineaRutaContador) return;
+
+          if (resultado.status === "ok" && resultado.data) {
+            const coordenadas = resultado.data.geometria.map((p) => [
+              p.lat,
+              p.lon,
+            ]);
+            lineaRuta = L.polyline(coordenadas, { color: "#2a6df4" }).addTo(
+              map,
+            );
+
+            const km = (resultado.data.distanciaMetros / 1000).toFixed(1);
+            const min = Math.round(resultado.data.duracionSegundos / 60);
+            document.getElementById("resumenRuta").textContent =
+              `(${km} km · ${min} min por calle)`;
             return;
           }
-
-          select.innerHTML = disponibles
-            .map(
-              (c) =>
-                `<option value="${c.matricula}">${c.matricula} - ${c.tipo ?? "Sin tipo"}</option>`,
-            )
-            .join("");
         } catch (error) {
-          console.error("Error al obtener camiones:", error);
-          select.innerHTML =
-            '<option value="" disabled selected>Error al cargar camiones</option>';
+          console.error("Error al calcular el camino por calles:", error);
         }
+
+        if (contador !== lineaRutaContador) return;
+
+        // línea recta punteada si OSRM no respondió.
+        lineaRuta = L.polyline(
+          paradas.map((p) => [p.lat, p.lon]),
+          { color: "#2a6df4", dashArray: "6 6" },
+        ).addTo(map);
+        document.getElementById("resumenRuta").textContent =
+          "(no se pudo calcular el camino por calle, se muestra en línea recta)";
       }
 
       document
@@ -310,8 +402,11 @@
 
           const datos = {
             nombre: document.getElementById("nombreRuta").value,
-            matricula: document.getElementById("camionRuta").value,
-            paradas: paradas.map(({ lat, lon }) => ({ lat, lon })),
+            paradas: paradas.map(({ lat, lon, idContenedor }) => ({
+              lat,
+              lon,
+              idContenedor,
+            })),
           };
 
           const resp = await fetch(`${API_URL}Rutas/Registrar`, {
@@ -329,6 +424,130 @@
             alert(resultado.mensaje);
           }
         });
+
+      function limpiarRutaSeleccionada() {
+        capaRutaSeleccionadaContador++;
+        if (capaRutaSeleccionada) {
+          map.removeLayer(capaRutaSeleccionada);
+          capaRutaSeleccionada = null;
+        }
+      }
+
+      async function dibujarRutaSeleccionada(paradasRuta) {
+        limpiarRutaSeleccionada();
+        const contador = capaRutaSeleccionadaContador;
+
+        if (paradasRuta.length === 0) return;
+
+        const puntos = paradasRuta.map((p) => ({
+          lat: parseFloat(p.lat),
+          lon: parseFloat(p.lon),
+        }));
+
+        const capa = L.layerGroup().addTo(map);
+
+        puntos.forEach((p, i) => {
+          L.marker([p.lat, p.lon], {
+            icon: L.divIcon({
+              className: "",
+              html: `<div class="numero-parada">${i + 1}</div>`,
+              iconSize: [24, 24],
+              iconAnchor: [12, 12],
+            }),
+          }).addTo(capa);
+        });
+
+        let coordenadasLinea = puntos.map((p) => [p.lat, p.lon]);
+
+        if (puntos.length >= 2) {
+          try {
+            const resp = await fetch(`${API_URL}Rutas/CalcularCamino`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ paradas: puntos }),
+            });
+            const resultado = await resp.json();
+            if (resultado.status === "ok" && resultado.data) {
+              coordenadasLinea = resultado.data.geometria.map((p) => [
+                p.lat,
+                p.lon,
+              ]);
+            }
+          } catch (error) {
+            console.error("Error al calcular el camino por calles:", error);
+          }
+        }
+
+        // Si mientras esperábamos se seleccionó otra ruta o se canceló,
+        // esta respuesta ya está vieja: descartamos la capa sin mostrarla.
+        if (contador !== capaRutaSeleccionadaContador) {
+          map.removeLayer(capa);
+          return;
+        }
+
+        L.polyline(coordenadasLinea, { color: "#c97a1e", weight: 4 }).addTo(
+          capa,
+        );
+
+        capaRutaSeleccionada = capa;
+
+        map.fitBounds(
+          L.latLngBounds(puntos.map((p) => [p.lat, p.lon])),
+          { padding: [40, 40] },
+        );
+      }
+
+      async function verRutaEnMapa(idRuta, event) {
+        if (event) event.stopPropagation();
+        if (modoCreacion) return;
+
+        rutaSeleccionada = idRuta;
+        renderizarListaRutas();
+
+        try {
+          const resp = await fetch(`${API_URL}Rutas/${idRuta}`);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          await dibujarRutaSeleccionada(data?.data || []);
+        } catch (error) {
+          console.error("Error al obtener la ruta:", error);
+          alert("No se pudo cargar la ruta en el mapa.");
+        }
+      }
+
+      async function eliminarRuta(idRuta, event) {
+        if (event) event.stopPropagation();
+
+        if (
+          !confirm(
+            "¿Seguro que querés eliminar esta ruta? Esta acción no se puede deshacer.",
+          )
+        ) {
+          return;
+        }
+
+        try {
+          const resp = await fetch(`${API_URL}Rutas/Eliminar`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idRuta }),
+          });
+          const resultado = await resp.json();
+
+          if (resultado.status === "ok") {
+            if (rutaSeleccionada === idRuta) {
+              rutaSeleccionada = null;
+              limpiarRutaSeleccionada();
+            }
+            obtenerRutas();
+          } else {
+            alert(resultado.mensaje);
+          }
+        } catch (error) {
+          console.error("Error al eliminar la ruta:", error);
+          alert("No se pudo eliminar la ruta.");
+        }
+      }
 
       async function obtenerRutas() {
         try {
@@ -355,11 +574,24 @@
           rutas
             .map(
               (r) => `
-            <li class="ruta-item">
-              <strong>${r.nombre}</strong>
-              — Camión ${r.matricula ?? "Sin asignar"}
-              — ${r.cantidad_paradas} paradas
-              — ${r.estado}
+            <li class="ruta-item${r.ID_ruta === rutaSeleccionada ? " seleccionada" : ""}"
+                onclick="verRutaEnMapa(${r.ID_ruta}, event)">
+              <div class="ruta-info">
+                <strong>${r.nombre}</strong>
+                — ${r.matricula ? `Camión ${r.matricula}` : "Sin camión"}
+                — ${r.cantidad_paradas} paradas
+                — ${r.estado}
+              </div>
+              <div class="ruta-acciones">
+                <button
+                  type="button"
+                  class="btn-eliminar"
+                  style="border: none; border-radius: 8px; padding: 8px 16px; cursor: pointer;"
+                  onclick="eliminarRuta(${r.ID_ruta}, event)"
+                >
+                  Eliminar
+                </button>
+              </div>
             </li>`,
             )
             .join("") +
@@ -411,6 +643,7 @@
 
       cargarUsuario();
       obtenerRutas();
+      cargarContenedores();
     </script>
   </body>
 </html>

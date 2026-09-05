@@ -1229,11 +1229,32 @@ nav button:not(.link-button):hover {
 .contenedor-item,
 .camion-item,
 .centro-item,
-.incidencia-item {
+.incidencia-item,
+.ruta-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+}
+
+.ruta-item {
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.ruta-info {
+  color: var(--tinta-suave);
+}
+
+.ruta-acciones {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.ruta-item.seleccionada {
+  background: var(--verde-tinte) !important;
+  border-left: 4px solid var(--verde);
 }
 
 .usuario-acciones,
