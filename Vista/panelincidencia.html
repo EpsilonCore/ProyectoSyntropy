@@ -83,6 +83,16 @@
               Panel de Usuario
             </button>
           </li>
+
+          <li>
+            <button
+              data-rol="Administrador"
+              class="link-button"
+              onclick="window.location.href = 'panelcuadrilla.html'"
+            >
+              Cuadrillas
+            </button>
+          </li>
         </ul>
       </nav>
     </header>
@@ -162,17 +172,19 @@
 
     <div
       class="overlay"
-      id="overlayAsignarOperario"
-      onclick="cerrarModalAsignarOperario(event)"
+      id="overlayAsignarCuadrilla"
+      onclick="cerrarModalAsignarCuadrilla(event)"
     >
       <div class="modal-usuarios">
-        <h3>Asignar operario</h3>
+        <h3>Asignar cuadrilla</h3>
 
-        <form id="formAsignarOperario">
-          <input type="hidden" id="idOriginal" />
+        <form id="formAsignarCuadrilla">
+          <input type="hidden" id="idIncidenciaCuadrilla" />
 
-          <label>ID Operario</label>
-          <input id="idOperarioAsignar" required />
+          <label>Cuadrilla</label>
+          <select id="idCuadrillaAsignar" required>
+            <option value="" disabled selected>Seleccione una cuadrilla</option>
+          </select>
 
           <button class="btn-guardar-centro-acopio" type="submit">
             Guardar cambios
@@ -182,7 +194,7 @@
             type="button"
             onclick="
               document
-                .getElementById('overlayAsignarOperario')
+                .getElementById('overlayAsignarCuadrilla')
                 .classList.remove('activo')
             "
           >
@@ -195,19 +207,22 @@
     <script>
       const API_URL =
         "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/";
+      const API_URL_CUADRILLAS =
+        "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/Cuadrillas/";
       let incidencias = [];
+      let cuadrillas = [];
 
       document
-        .getElementById("formAsignarOperario")
+        .getElementById("formAsignarCuadrilla")
         .addEventListener("submit", async (event) => {
           event.preventDefault();
 
           const datos = {
-            idIncidencia: document.getElementById("idOriginal").value,
-            idOperario: document.getElementById("idOperarioAsignar").value,
+            idIncidencia: document.getElementById("idIncidenciaCuadrilla").value,
+            idCuadrilla: document.getElementById("idCuadrillaAsignar").value,
           };
 
-          const resp = await fetch(`${API_URL}AsignarOperario`, {
+          const resp = await fetch(`${API_URL}AsignarCuadrilla`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(datos),
@@ -217,7 +232,7 @@
 
           if (resultado.status === "ok") {
             document
-              .getElementById("overlayAsignarOperario")
+              .getElementById("overlayAsignarCuadrilla")
               .classList.remove("activo");
             obtenerIncidencias(); // refresca la lista
           } else {
@@ -317,26 +332,63 @@
           .classList.add("activo");
       }
 
-      function cerrarModalAsignarOperario(evento) {
-        if (evento.target.id === "overlayAsignarOperario") {
+      async function asignarmeIncidencia(id) {
+        try {
+          const resp = await fetch(`${API_URL}AsignarOperario`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idIncidencia: id }),
+          });
+          const resultado = await resp.json();
+          if (resultado.status === "ok") {
+            obtenerIncidencias(); // refresca la lista
+          } else {
+            alert(resultado.mensaje);
+          }
+        } catch (error) {
+          console.error("Error al asignar incidencia:", error);
+          alert("Error de conexión al asignar la incidencia.");
+        }
+      }
+
+      function cerrarModalAsignarCuadrilla(evento) {
+        if (evento.target.id === "overlayAsignarCuadrilla") {
           document
-            .getElementById("overlayAsignarOperario")
+            .getElementById("overlayAsignarCuadrilla")
             .classList.remove("activo");
         }
       }
 
-      function seleccionarIncidencia(ID_incidencia) {
-        const incidencia = incidencias.find(
-          (i) => i.ID_incidencia === ID_incidencia,
-        );
-        if (!incidencia) return;
+      async function obtenerCuadrillas() {
+        try {
+          const resp = await fetch(`${API_URL_CUADRILLAS}Cuadrillas`);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          cuadrillas = Array.isArray(data) ? data : data?.data || [];
 
-        document.getElementById("idOriginal").value = incidencia.ID_incidencia;
-        document.getElementById("idOperarioAsignar").value =
-          incidencia.ID_operario || "";
+          const select = document.getElementById("idCuadrillaAsignar");
+          const opcionesActuales = select.querySelectorAll(
+            "option:not([disabled])",
+          );
+          opcionesActuales.forEach((opcion) => opcion.remove());
 
+          cuadrillas.forEach((cuadrilla) => {
+            const opcion = document.createElement("option");
+            opcion.value = cuadrilla.ID_cuadrilla;
+            opcion.textContent = cuadrilla.nombre;
+            select.appendChild(opcion);
+          });
+        } catch (error) {
+          console.error("Error al obtener cuadrillas:", error);
+        }
+      }
+
+      function abrirModalAsignarCuadrilla(idIncidencia, idCuadrillaActual) {
+        document.getElementById("idIncidenciaCuadrilla").value = idIncidencia;
+        document.getElementById("idCuadrillaAsignar").value =
+          idCuadrillaActual || "";
         document
-          .getElementById("overlayAsignarOperario")
+          .getElementById("overlayAsignarCuadrilla")
           .classList.add("activo");
       }
 
@@ -392,10 +444,14 @@
     <span class="incidencia-estado">${incidencia.estado}</span>
     <p>${incidencia.mail} · ${incidencia.calle} ${incidencia.numero}, ${incidencia.barrio}</p>
     <p>Operario asignado: ${incidencia.ID_operario ? incidencia.ID_operario : "Sin asignar"}</p>
+    <p>Cuadrilla asignada: ${incidencia.nombre_cuadrilla ? incidencia.nombre_cuadrilla : "Sin asignar"}</p>
   </div>
   <span class="incidencia-acciones">
-    <button class="btn-modificar" onclick="seleccionarIncidencia(${incidencia.ID_incidencia})">
-      Asignar Operario
+    <button class="btn-modificar" onclick="asignarmeIncidencia(${incidencia.ID_incidencia})">
+      Asignarme
+    </button>
+    <button class="btn-modificar" onclick="abrirModalAsignarCuadrilla(${incidencia.ID_incidencia}, ${incidencia.ID_cuadrilla ?? "null"})">
+      Asignar Cuadrilla
     </button>
     <button
       class="btn-eliminar"
@@ -411,6 +467,7 @@
       }
 
       obtenerIncidencias();
+      obtenerCuadrillas();
     </script>
   </body>
 </html>

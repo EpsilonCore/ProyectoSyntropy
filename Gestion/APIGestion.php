@@ -28,16 +28,19 @@ function verificarRol(array $rolesPermitidos)
 require_once 'ContenedoresController.php';
 require_once 'CentrosAcopioController.php';
 require_once 'IncidenciaController.php';
+require_once 'CuadrillaController.php';
 
 $controladorContenedor   = new ContenedoresController();
 $controladorCentroAcopio = new CentrosAcopioController();
 $controladorIncidencia   = new IncidenciaController();
+$controladorCuadrilla    = new CuadrillaController();
 
 $method = $_SERVER['REQUEST_METHOD'];
 $uri    = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $resultado = ["status" => "no_encontrado", "mensaje" => "Ruta no encontrada.", "data" => null];
 
 $soloAdministrador = ['Administrador'];
+$administradorUOperario = ['Administrador', 'Operario'];
 
 switch ($method) {
     case 'GET':
@@ -53,6 +56,13 @@ switch ($method) {
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/Incidencias') {
             $resultado = $controladorIncidencia->getAllIncidencias();
         }
+        // Panel de Cuadrillas: exclusivo de Administrador.
+        if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Cuadrillas/Cuadrillas') {
+            $resultado = verificarRol($soloAdministrador) ?? $controladorCuadrilla->getAllCuadrillas();
+        }
+        if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Cuadrillas/Recolectores') {
+            $resultado = verificarRol($soloAdministrador) ?? $controladorCuadrilla->getRecolectoresDisponibles();
+        }
         break;
 
     case 'POST':
@@ -66,6 +76,9 @@ switch ($method) {
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/Registrar') {
             $resultado = $controladorIncidencia->crearIncidencia();
         }
+        if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Cuadrillas/Registrar') {
+            $resultado = verificarRol($soloAdministrador) ?? $controladorCuadrilla->crearCuadrilla();
+        }
         break;
 
     case 'DELETE':
@@ -78,6 +91,9 @@ switch ($method) {
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/Borrar') {
             $resultado = verificarRol($soloAdministrador) ?? $controladorIncidencia->eliminarIncidencia();
         }
+        if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Cuadrillas/Borrar') {
+            $resultado = verificarRol($soloAdministrador) ?? $controladorCuadrilla->eliminarCuadrilla();
+        }
         break;
 
     case 'PATCH':
@@ -88,7 +104,10 @@ switch ($method) {
             $resultado = verificarRol($soloAdministrador) ?? $controladorCentroAcopio->actualizarCentroAcopio();
         }
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/AsignarOperario') {
-            $resultado = verificarRol($soloAdministrador) ?? $controladorIncidencia->AsignarOperario();
+            $resultado = verificarRol($administradorUOperario) ?? $controladorIncidencia->AsignarOperario();
+        }
+        if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/AsignarCuadrilla') {
+            $resultado = verificarRol($soloAdministrador) ?? $controladorIncidencia->AsignarCuadrilla();
         }
         break;
 

@@ -1,0 +1,8 @@
+RewriteEngine On
+
+# Si el archivo o directorio existe, servirlo normalmente
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Enviar todo a api.php
+RewriteRule ^(.*)$ APIUsuario.php [QSA,L]

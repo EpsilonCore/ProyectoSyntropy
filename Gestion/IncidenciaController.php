@@ -60,14 +60,32 @@ class IncidenciaController
 	{
 		$json = file_get_contents('php://input');
 		$datos = json_decode($json);
-		if (!$datos || !isset($datos->idIncidencia) || !isset($datos->idOperario)) {
+		if (!$datos || !isset($datos->idIncidencia)) {
+			return ["status" => "datos_invalidos", "mensaje" => "Falta el ID de la incidencia.", "data" => null];
+		}
+		$nombreAsignador = $_SESSION['nombre_completo'] ?? null;
+		if (!$nombreAsignador) {
+			return ["status" => "no_autorizado", "mensaje" => "No se pudo identificar al usuario que asigna la incidencia. Volvé a iniciar sesión.", "data" => null];
+		}
+		$resultado = $this->modeloObj->AsignarOperario($datos->idIncidencia, $nombreAsignador);
+		if ($resultado) {
+			return ["status" => "ok", "mensaje" => "Incidencia asignada correctamente.", "data" => null];
+		}
+		return ["status" => "error", "mensaje" => "No se pudo asignar la incidencia.", "data" => null];
+	}
+
+	public function AsignarCuadrilla()
+	{
+		$json = file_get_contents('php://input');
+		$datos = json_decode($json);
+		if (!$datos || !isset($datos->idIncidencia) || !isset($datos->idCuadrilla)) {
 			return ["status" => "datos_invalidos", "mensaje" => "Faltan campos obligatorios.", "data" => null];
 		}
-		$resultado = $this->modeloObj->AsignarOperario($datos->idIncidencia, $datos->idOperario);
+		$resultado = $this->modeloObj->AsignarCuadrilla($datos->idIncidencia, $datos->idCuadrilla);
 		if ($resultado) {
-			return ["status" => "ok", "mensaje" => "Operario asignado correctamente.", "data" => null];
+			return ["status" => "ok", "mensaje" => "Cuadrilla asignada correctamente.", "data" => null];
 		}
-		return ["status" => "error", "mensaje" => "No se pudo asignar el operario.", "data" => null];
+		return ["status" => "error", "mensaje" => "No se pudo asignar la cuadrilla.", "data" => null];
 	}
 
 	public function eliminarIncidencia()

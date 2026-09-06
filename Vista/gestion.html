@@ -6,13 +6,6 @@
 
     <title>Gestión - Epsilon</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-
     <link rel="stylesheet" href="style.css" />
   </head>
 
@@ -22,12 +15,16 @@
         window.location.href = "login.html";
       }
 
-      if ((localStorage.getItem("rol") || "").trim() !== "Administrador") {
+      if (
+        !["Administrador", "Operario"].includes(
+          (localStorage.getItem("rol") || "").trim(),
+        )
+      ) {
         window.location.href = "index.html";
       }
     </script>
 
-    <header class="header-interno">
+    <header>
       <div class="logo">
         <a href="index.html">
           <img src="logo.png" alt="Epsilon" />
@@ -45,7 +42,7 @@
           <li>
             <button
               class="link-button"
-              data-rol="Administrador"
+              data-rol="Administrador, Operario"
               onclick="window.location.href = 'gestion.html'"
             >
               Gestión
@@ -92,102 +89,38 @@
       </nav>
     </header>
 
-    <div class="gestion-portada">
-      <div class="gestion-encabezado">
-        <span class="gestion-eyebrow">Administración</span>
-        <h2>Gestión de Residuos</h2>
-        <p id="gestionSaludo">Panel general del sistema Epsilon.</p>
+    <div class="pagina">
+      <h2>Gestión de Residuos</h2>
+
+      <p>Administración general del sistema Epsilon.</p>
+
+      <div class="panel">
+        <button onclick="window.location.href = 'panelregistro.html'">
+          Panel Registro
+        </button>
+
+        <button onclick="window.location.href = 'panelcontenedor.html'">
+          Panel Contenedores
+        </button>
+
+        <button onclick="window.location.href = 'panelcamion.html'">
+          Panel Camiones
+        </button>
+
+        <button onclick="window.location.href = 'panelusuario.html'">
+          Panel de Usuario
+        </button>
+
+        <button onclick="window.location.href = 'panelcentroacopio.html'">
+          Panel Centros de Acopio
+        </button>
+
+        <button onclick="window.location.href = 'rutas.html'">Rutas</button>
+
+        <button onclick="window.location.href = 'panelincidencia.html'">
+          Panel Incidencias
+        </button>
       </div>
-
-      <div class="gestion-resumen">
-        <div class="gestion-resumen-item">
-          <span class="gestion-resumen-numero">7</span>
-          <span class="gestion-resumen-label">Módulos activos</span>
-        </div>
-        <div class="gestion-resumen-item">
-          <span class="gestion-resumen-numero">24/7</span>
-          <span class="gestion-resumen-label">Monitoreo continuo</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="gestion-grid">
-      <button class="gestion-card" onclick="window.location.href = 'panelregistro.html'">
-        <span class="gestion-card-icono gestion-icono-verde">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M9 3V2h6v1"/><path d="M9 9h6"/><path d="M9 13h6"/><path d="M9 17h3"/></svg>
-        </span>
-        <span class="gestion-card-texto">
-          <span class="gestion-card-titulo">Registro</span>
-          <span class="gestion-card-desc">Alta general de operaciones y movimientos del sistema.</span>
-        </span>
-        <span class="gestion-card-flecha">→</span>
-      </button>
-
-      <button class="gestion-card" onclick="window.location.href = 'panelcontenedor.html'">
-        <span class="gestion-card-icono gestion-icono-brote">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14l-1.2 13.1a2 2 0 0 1-2 1.9H8.2a2 2 0 0 1-2-1.9L5 7Z"/><path d="M3 7h18"/><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
-        </span>
-        <span class="gestion-card-texto">
-          <span class="gestion-card-titulo">Contenedores</span>
-          <span class="gestion-card-desc">Ubicación, tipo y estado de cada contenedor de la ciudad.</span>
-        </span>
-        <span class="gestion-card-flecha">→</span>
-      </button>
-
-      <button class="gestion-card" onclick="window.location.href = 'panelcamion.html'">
-        <span class="gestion-card-icono gestion-icono-acero">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17V8a1 1 0 0 1 1-1h9v10"/><path d="M13 10h4.5l3.5 3.5V17h-2"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/><path d="M3 13h7"/></svg>
-        </span>
-        <span class="gestion-card-texto">
-          <span class="gestion-card-titulo">Camiones</span>
-          <span class="gestion-card-desc">Flota disponible y asignación de camiones recolectores.</span>
-        </span>
-        <span class="gestion-card-flecha">→</span>
-      </button>
-
-      <button class="gestion-card" onclick="window.location.href = 'panelusuario.html'">
-        <span class="gestion-card-icono gestion-icono-ambar">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20.5c1-3.6 4-5.5 6.5-5.5s5.5 1.9 6.5 5.5"/></svg>
-        </span>
-        <span class="gestion-card-texto">
-          <span class="gestion-card-titulo">Usuarios</span>
-          <span class="gestion-card-desc">Cuentas, roles y permisos del personal de Epsilon.</span>
-        </span>
-        <span class="gestion-card-flecha">→</span>
-      </button>
-
-      <button class="gestion-card" onclick="window.location.href = 'panelcentroacopio.html'">
-        <span class="gestion-card-icono gestion-icono-bosque">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V10l8-6 8 6v11"/><path d="M4 21h16"/><path d="M9 21v-6h6v6"/><path d="M9 13h.01"/><path d="M15 13h.01"/></svg>
-        </span>
-        <span class="gestion-card-texto">
-          <span class="gestion-card-titulo">Centros de Acopio</span>
-          <span class="gestion-card-desc">Puntos de acopio, capacidad y estado de cada centro.</span>
-        </span>
-        <span class="gestion-card-flecha">→</span>
-      </button>
-
-      <button class="gestion-card" onclick="window.location.href = 'panelrutas.html'">
-        <span class="gestion-card-icono gestion-icono-verde">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="18" r="2.2"/><path d="M6 8.2V13a3 3 0 0 0 3 3h6"/></svg>
-        </span>
-        <span class="gestion-card-texto">
-          <span class="gestion-card-titulo">Rutas</span>
-          <span class="gestion-card-desc">Trazado y ajuste de las rutas de recolección.</span>
-        </span>
-        <span class="gestion-card-flecha">→</span>
-      </button>
-
-      <button class="gestion-card" onclick="window.location.href = 'panelincidencia.html'">
-        <span class="gestion-card-icono gestion-icono-oxido">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3Z"/><path d="M12 10v4"/><path d="M12 17h.01"/></svg>
-        </span>
-        <span class="gestion-card-texto">
-          <span class="gestion-card-titulo">Incidencias</span>
-          <span class="gestion-card-desc">Reportes de la ciudadanía pendientes de resolución.</span>
-        </span>
-        <span class="gestion-card-flecha">→</span>
-      </button>
     </div>
 
     <script>
@@ -217,11 +150,6 @@
       function cargarUsuario() {
         const nombre = localStorage.getItem("nombreUsuario") || "Usuario";
         const inicial = nombre.charAt(0).toUpperCase();
-
-        const saludo = document.getElementById("gestionSaludo");
-        if (saludo) {
-          saludo.textContent = `Bienvenido/a, ${nombre}. Elegí un módulo para empezar.`;
-        }
 
         document.getElementById("usuario").innerHTML = `
 
