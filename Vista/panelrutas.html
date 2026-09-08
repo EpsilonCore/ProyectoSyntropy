@@ -119,7 +119,7 @@
               class="link-button"
               onclick="window.location.href = 'panelrutas.html'"
             >
-              Rutas
+              Panel Rutas
             </button>
           </li>
           <li>
@@ -491,10 +491,9 @@
 
         capaRutaSeleccionada = capa;
 
-        map.fitBounds(
-          L.latLngBounds(puntos.map((p) => [p.lat, p.lon])),
-          { padding: [40, 40] },
-        );
+        map.fitBounds(L.latLngBounds(puntos.map((p) => [p.lat, p.lon])), {
+          padding: [40, 40],
+        });
       }
 
       async function verRutaEnMapa(idRuta, event) {
