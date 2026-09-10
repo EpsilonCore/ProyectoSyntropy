@@ -1133,6 +1133,27 @@ nav button:not(.link-button):hover {
   margin-top: 16px;
 }
 
+/* Boton de texto tipo enlace, usado dentro del formulario
+   de Crear Incidencia para ingresar una direccion nueva */
+.btn-link {
+  background: none;
+  border: none;
+  padding: 4px 0;
+  margin-top: 4px;
+  color: var(--verde);
+  font-family: var(--fuente-texto);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.btn-link:hover {
+  color: var(--verde-hover);
+}
+
 /* Botones de accion dentro de paneles y modales */
 .btn-modificar,
 .btn-guardar-usuario,
@@ -1223,6 +1244,74 @@ nav button:not(.link-button):hover {
 
 .btn-eliminar:hover {
   background-color: var(--oxido-hover) !important;
+}
+
+/* Botones del formulario de nueva ruta (panelrutas.html) */
+.form-nueva-ruta button[type="submit"] {
+  background: var(--verde);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-family: var(--fuente-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition:
+    opacity 0.2s,
+    transform 0.2s,
+    background-color 0.2s;
+}
+
+.form-nueva-ruta button[type="submit"]:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  background: var(--verde-hover);
+}
+
+.form-nueva-ruta button[type="button"] {
+  background: var(--tinta-suave);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-family: var(--fuente-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+}
+
+.form-nueva-ruta button[type="button"]:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+/* Boton "Quitar" de cada parada listada (panelrutas.html) */
+#listaParadasRuta button {
+  background: none;
+  border: 1px solid var(--oxido);
+  color: var(--oxido);
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-family: var(--fuente-texto);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+#listaParadasRuta button:hover {
+  background: var(--oxido);
+  color: #fff;
 }
 
 .usuario-item,
