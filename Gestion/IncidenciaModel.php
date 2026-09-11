@@ -27,7 +27,9 @@ class IncidenciaModel{
 
     public function getAllIncidencias()
     {
-        $sql = "SELECT * FROM incidencia";
+        $sql = "SELECT i.*, c.nombre AS nombre_cuadrilla
+                FROM incidencia i
+                LEFT JOIN cuadrilla c ON c.ID_cuadrilla = i.ID_cuadrilla";
         $stmt = mysqli_prepare($this->conexion, $sql);
         mysqli_stmt_execute($stmt);
         $resultado = mysqli_stmt_get_result($stmt);
@@ -56,7 +58,7 @@ class IncidenciaModel{
     }
 
     public function crearIncidencia($m, $t, $e, $i, $c, $n,$b, $tipoContenedor){
-            $sql = "INSERT INTO incidencia (mail, ID_operario, tipo, estado, imagen, calle, numero, barrio, lat, lon, fecha_creacion, tipoContenedor) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+            $sql = "INSERT INTO incidencia (mail, tipo, estado, imagen, calle, numero, barrio, lat, lon, fecha_creacion, tipoContenedor) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
             $direccion = $this->geocodificador->GYSDireccion($c, $n, $b);
             if($direccion === null){
                 throw new Exception("No se pudo geocodificar la dirección");
@@ -69,7 +71,6 @@ class IncidenciaModel{
                 throw new Exception("Error al preparar la consulta: " . mysqli_error($this->conexion));
             }
             $this->mail = $m;
-            $this->ID_operario = "";
             $this->tipo = $t;
             $this->estado = $e;
             $this->imagen = $i;
@@ -80,7 +81,7 @@ class IncidenciaModel{
 
             $this->fecha = $fecha;
 
-            $stmt->bind_param('sissssisddss', $this->mail, $this->ID_operario, $this->tipo, $this->estado,  $this->imagen,  $this->calle,  $this->numero,  $this->barrio, $direccion['lat'], $direccion['lon'], $this->fecha, $this->tipoContenedor);
+            $stmt->bind_param('sssssisddss', $this->mail, $this->tipo, $this->estado,  $this->imagen,  $this->calle,  $this->numero,  $this->barrio, $direccion['lat'], $direccion['lon'], $this->fecha, $this->tipoContenedor);
             if($stmt->execute()){
                 $stmt->close();
                 return true;
@@ -91,10 +92,23 @@ class IncidenciaModel{
         }
 
 
-    public function AsignarOperario($idIncidencia, $idOperario){
+    public function AsignarOperario($idIncidencia, $nombreAsignador){
         $sql = "UPDATE incidencia SET ID_operario = ? WHERE ID_incidencia = ?";
         $stmt = mysqli_prepare($this->conexion, $sql);
-        $stmt->bind_param('ss', $idOperario, $idIncidencia);
+        $stmt->bind_param('si', $nombreAsignador, $idIncidencia);
+        if($stmt->execute()){
+            $stmt->close();
+            return true;
+        }else {
+            $stmt->close();
+            return false;
+        }
+    }
+
+    public function AsignarCuadrilla($idIncidencia, $idCuadrilla){
+        $sql = "UPDATE incidencia SET ID_cuadrilla = ? WHERE ID_incidencia = ?";
+        $stmt = mysqli_prepare($this->conexion, $sql);
+        $stmt->bind_param('ii', $idCuadrilla, $idIncidencia);
         if($stmt->execute()){
             $stmt->close();
             return true;

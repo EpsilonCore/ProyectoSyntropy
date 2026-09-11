@@ -4,6 +4,7 @@ class geocodificacion {
 
     private $nominatimUrl = "https://nominatim.openstreetmap.org/search";
     private $osrmUrl = "https://router.project-osrm.org/nearest/v1/driving";
+    private $osrmRouteUrl = "https://router.project-osrm.org/route/v1/driving";
     private $userAgent = "Epsilon-GestionResiduos/1.0";
 
     public function geocodificarDireccion($calle, $numero, $barrio) {
@@ -43,12 +44,6 @@ class geocodificacion {
             "etiqueta" => $datos[0]["display_name"]
         ];
     }
-
-    /**
-     * Ajusta una coordenada al punto más cercano sobre una calle transitable,
-     * usando el servicio público de OSRM. Sirve para corregir el caso en que
-     * Nominatim devuelve el centroide de un edificio en vez de un punto en la calle.
-     */
     public function snapearACalle($lat, $lon) {
         $url = "{$this->osrmUrl}/{$lon},{$lat}";
 
@@ -64,7 +59,6 @@ class geocodificacion {
         curl_close($ch);
 
         if ($error) {
-            // Si OSRM falla, devolvemos la coordenada original como respaldo
             return ["lat" => $lat, "lon" => $lon];
         }
 
@@ -100,6 +94,52 @@ class geocodificacion {
             "lat"      => $coordenadasCalle["lat"],
             "lon"      => $coordenadasCalle["lon"],
             "etiqueta" => $resultado["etiqueta"]
+        ];
+    }
+    
+    public function calcularRutaCalles(array $puntos) {
+        if (count($puntos) < 2) {
+            return null;
+        }
+
+        $coordenadas = implode(';', array_map(function ($p) {
+            return $p['lon'] . ',' . $p['lat'];
+        }, $puntos));
+
+        $url = "{$this->osrmRouteUrl}/{$coordenadas}?overview=full&geometries=geojson";
+
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "User-Agent: {$this->userAgent}"
+        ]);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+
+        $respuesta = curl_exec($ch);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        if ($error) {
+            throw new Exception("Error al conectar con OSRM: $error");
+        }
+
+        $datos = json_decode($respuesta, true);
+
+        if (empty($datos) || $datos["code"] !== "Ok" || empty($datos["routes"])) {
+            return null;
+        }
+
+        $ruta = $datos["routes"][0];
+
+        // GeoJSON devuelve cada punto como [lon, lat]; lo invertimos para Leaflet ([lat, lon]).
+        $geometria = array_map(function ($coord) {
+            return ["lat" => $coord[1], "lon" => $coord[0]];
+        }, $ruta["geometry"]["coordinates"]);
+
+        return [
+            "geometria"        => $geometria,
+            "distanciaMetros"  => $ruta["distance"],
+            "duracionSegundos" => $ruta["duration"],
         ];
     }
 }

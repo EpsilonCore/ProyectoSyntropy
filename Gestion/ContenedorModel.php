@@ -83,9 +83,13 @@ class ContenedorModel
         }
         public function actualizarContenedor($id, $cap, $t, $e, $c, $n, $b)
         {
-            $sql = "UPDATE contenedor SET capacidadCarga = ?, tipo = ?, estado = ?, calle = ?, numero = ?, barrio = ? WHERE ID_contenedor = ?";
+            $ubicacion = $this->geocodificador->GYSDireccion($c, $n, $b);
+            if($ubicacion === null){
+                throw new Exception("No se pudo geocodificar la dirección proporcionada.");
+            }
+            $sql = "UPDATE contenedor SET capacidadCarga = ?, tipo = ?, estado = ?, calle = ?, numero = ?, barrio = ?, lat = ?, lon = ? WHERE ID_contenedor = ?";
             $stmt = mysqli_prepare($this->conexion, $sql);
-            mysqli_stmt_bind_param($stmt, "isssisi", $cap, $t, $e, $c, $n, $b, $id);
+            mysqli_stmt_bind_param($stmt, "isssisddi", $cap, $t, $e, $c, $n, $b, $ubicacion['lat'], $ubicacion['lon'], $id);
             $resultado = mysqli_stmt_execute($stmt);
             mysqli_stmt_close($stmt);
             return $resultado;

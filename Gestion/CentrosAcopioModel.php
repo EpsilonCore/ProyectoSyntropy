@@ -7,10 +7,14 @@ class CentrosAcopioModel
     private $calle;
     private $numero;
     private $conexion;
+    private $latitud;
+    private $longitud;
+    private $geocodificador;
 
     public function __construct($bd)
     {
         $this->conexion = $bd;
+        $this->geocodificador = new geocodificacion();
     }
 
     public function getAllCentrosAcopio()
@@ -44,15 +48,21 @@ class CentrosAcopioModel
     
     public function crearCentroAcopio($tipoResiduo, $capacidad, $barrio, $calle, $numero)
     {
-        $sql = "INSERT INTO centro_acopio (tipoResiduo, capacidad, barrio, calle, numero) VALUES (?, ?, ?, ?, ?)";
+        $ubicacion = $this->geocodificador->GYSDireccion($calle, $numero, $barrio);
+        if($ubicacion === null){
+            throw new Exception("No se pudo geocodificar la dirección proporcionada.");
+        }
+        $sql = "INSERT INTO centro_acopio (tipoResiduo, capacidad, barrio, calle, numero, lat, lon) VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = mysqli_prepare($this->conexion, $sql);
         $this->tipoResiduo = $tipoResiduo;
         $this->capacidad = $capacidad;
         $this->barrio = $barrio;
         $this->calle = $calle;
         $this->numero = $numero;
+        $this->latitud = $ubicacion['lat'];
+        $this->longitud = $ubicacion['lon'];
 
-        mysqli_stmt_bind_param($stmt, 'sisss', $this->tipoResiduo, $this->capacidad, $this->barrio, $this->calle, $this->numero);
+        mysqli_stmt_bind_param($stmt, 'sisssdd', $this->tipoResiduo, $this->capacidad, $this->barrio, $this->calle, $this->numero, $this->latitud, $this->longitud);
         
         if ($stmt->execute()) {
             mysqli_stmt_close($stmt);
@@ -65,10 +75,14 @@ class CentrosAcopioModel
 
     public function actualizarCentroAcopio($id, $tipoResiduo, $capacidad, $barrio, $calle, $numero)
     {
-        $sql = "UPDATE centro_acopio SET tipoResiduo = ?, capacidad = ?, barrio = ?, calle = ?, numero = ? WHERE ID_acopio = ?";
+        $ubicacion = $this->geocodificador->GYSDireccion($calle, $numero, $barrio);
+        if($ubicacion === null){
+            throw new Exception("No se pudo geocodificar la dirección proporcionada.");
+        }
+        $sql = "UPDATE centro_acopio SET tipoResiduo = ?, capacidad = ?, barrio = ?, calle = ?, numero = ?, lat = ?, lon = ? WHERE ID_acopio = ?";
         $stmt = mysqli_prepare($this->conexion, $sql);
-        mysqli_stmt_bind_param($stmt, 'sisssi', $tipoResiduo, $capacidad, $barrio, $calle, $numero, $id);
-        
+        mysqli_stmt_bind_param($stmt, 'sisssddi', $tipoResiduo, $capacidad, $barrio, $calle, $numero, $ubicacion['lat'], $ubicacion['lon'], $id);
+
         if ($stmt->execute()) {
             mysqli_stmt_close($stmt);
             return true;

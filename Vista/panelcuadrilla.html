@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Cuadrillas - Epsilon</title>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <script>
+      if (localStorage.getItem("logueado") !== "si") {
+        window.location.href = "login.html";
+      }
+
+      if (
+        !["Administrador", "Operario"].includes(
+          (localStorage.getItem("rol") || "").trim(),
+        )
+      ) {
+        window.location.href = "index.html";
+      }
+    </script>
+
+    <header>
+      <div class="logo">
+        <a href="index.html">
+          <img src="logo.png" alt="Epsilon" />
+        </a>
+      </div>
+
+      <div class="header-actions">
+        <div id="usuario" class="usuario"></div>
+
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+      </div>
+
+      <nav id="menu">
+        <ul>
+          <li>
+            <button
+              class="link-button"
+              data-rol="Administrador, Operario"
+              onclick="window.location.href = 'gestion.html'"
+            >
+              Gestión
+            </button>
+          </li>
+
+          <li>
+            <button
+              class="link-button"
+              data-rol="Administrador, Operario"
+              onclick="window.location.href = 'panelrutas.html'"
+            >
+              Panel Rutas
+            </button>
+          </li>
+
+          <li>
+            <button
+              class="link-button"
+              onclick="window.location.href = 'mapa.html'"
+            >
+              Mapa
+            </button>
+          </li>
+
+          <li>
+            <button
+              class="link-button"
+              onclick="window.location.href = 'estadisticas.html'"
+            >
+              Estadísticas
+            </button>
+          </li>
+
+          <li>
+            <button
+              class="link-button"
+              onclick="window.location.href = 'documentacion.html'"
+            >
+              Documentación
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- Estructura visual alineada al Panel Usuario -->
+    <div class="pagina">
+      <h2>Cuadrillas</h2>
+      <p>Formá y administrá los equipos de recolectores.</p>
+
+      <div class="panel">
+        <button onclick="abrirModalCuadrilla()">Crear Cuadrilla</button>
+      </div>
+
+      <div id="cuadrillaMensaje" style="display: none; padding: 12px 16px; border-radius: 8px; margin-top: 16px; font-weight: 600;"></div>
+
+      <div class="lista-panel">
+        <h3>Lista de Cuadrillas</h3>
+        <ul id="cuadrillaGrid" style="list-style: none; padding: 0; margin: 0;">
+          <p>Cargando cuadrillas...</p>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Modal: nueva cuadrilla alineada al estilo overlayCrearUsuarios -->
+    <div class="overlay" id="cuadrillaModalFondo" onclick="cerrarModalCuadrillaFuera(event)">
+      <div class="crear-usuario">
+        <h3>Nueva Cuadrilla</h3>
+
+        <form id="formCrearCuadrilla" onsubmit="event.preventDefault(); crearCuadrilla();">
+          <label for="cuadrillaNombre">Nombre de la cuadrilla</label>
+          <input
+            type="text"
+            id="cuadrillaNombre"
+            placeholder="Ej: Cuadrilla Norte"
+            required
+          />
+
+          <label>Miembros (Recolectores activos)</label>
+          <div id="cuadrillaListaRecolectores" style="max-height: 180px; overflow-y: auto; border: 1px solid var(--borde); border-radius: 8px; padding: 10px; margin-top: 6px; background: white;">
+            <p style="color: var(--tinta-suave); font-size: 0.9rem;">Cargando recolectores...</p>
+          </div>
+
+          <button
+            type="submit"
+            id="cuadrillaBtnGuardar"
+            class="btn-crear-usuario"
+          >
+            Crear Cuadrilla
+          </button>
+          <button
+            type="button"
+            class="btn-cancelar-usuario"
+            onclick="cerrarModalCuadrilla()"
+          >
+            Cancelar
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // Rutas REST expuestas por APIGestion.php.
+      const CUADRILLA_API_BASE = "/Proyecto/ProyectoSyntropy/Gestion/miApi/Cuadrillas";
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const rolUsuario = (localStorage.getItem("rol") || "").trim();
+        document.querySelectorAll("[data-rol]").forEach((boton) => {
+          const rolesPermitidos = boton.dataset.rol
+            .split(",")
+            .map((rol) => rol.trim());
+          if (!rolesPermitidos.includes(rolUsuario)) {
+            boton.style.display = "none";
+          }
+        });
+
+        cargarCuadrillas();
+      });
+
+      function toggleMenu() {
+        document.getElementById("menu").classList.toggle("activo");
+      }
+
+      function cerrarSesion() {
+        localStorage.removeItem("logueado");
+        localStorage.removeItem("nickname");
+        window.location.href = "index.html";
+      }
+
+      function cargarUsuario() {
+        const nombre = localStorage.getItem("nickname") || "Usuario";
+        const inicial = nombre.charAt(0).toUpperCase();
+
+        document.getElementById("usuario").innerHTML = `
+          <span class="nombre-usuario">${nombre}</span>
+          <button class="usuario-btn" onclick="abrirUsuario()">
+              ${inicial}
+          </button>
+          <div id="menuUsuario" class="menu-usuario">
+              <button onclick="cerrarSesion()">Cerrar Sesión</button>
+          </div>
+        `;
+      }
+
+      function abrirUsuario() {
+        document.getElementById("menuUsuario").classList.toggle("activo");
+      }
+
+      cargarUsuario();
+
+      // ---------- Lógica de Cuadrillas ----------
+
+      function mostrarMensaje(texto, tipo) {
+        const contenedor = document.getElementById("cuadrillaMensaje");
+        contenedor.textContent = texto;
+        contenedor.style.display = "block";
+        contenedor.style.backgroundColor = tipo === "ok" ? "rgba(16, 185, 129, 0.12)" : "rgba(239, 68, 68, 0.12)";
+        contenedor.style.color = tipo === "ok" ? "#047857" : "#b91c1c";
+        
+        setTimeout(() => {
+          contenedor.style.display = "none";
+        }, 4000);
+      }
+
+      async function cargarCuadrillas() {
+        const grid = document.getElementById("cuadrillaGrid");
+        grid.innerHTML = `<p style="color: var(--tinta-suave);">Cargando cuadrillas...</p>`;
+
+        try {
+          const resp = await fetch(`${CUADRILLA_API_BASE}/Cuadrillas`);
+          const json = await resp.json();
+
+          if (!resp.ok || json.status !== "ok") {
+            grid.innerHTML = "";
+            mostrarMensaje(json.mensaje || "No se pudieron cargar las cuadrillas.", "error");
+            return;
+          }
+
+          renderizarCuadrillas(json.data || []);
+        } catch (error) {
+          grid.innerHTML = "";
+          mostrarMensaje("Error de conexión al cargar las cuadrillas.", "error");
+        }
+      }
+
+      function renderizarCuadrillas(cuadrillas) {
+        const grid = document.getElementById("cuadrillaGrid");
+
+        if (!cuadrillas.length) {
+          grid.innerHTML = `<p style="color: var(--tinta-suave);">Todavía no hay cuadrillas creadas.</p>`;
+          return;
+        }
+
+        grid.innerHTML = cuadrillas
+          .map((cuadrilla) => {
+            const miembrosHtml = (cuadrilla.miembros || []).length
+              ? cuadrilla.miembros
+                  .map((m) => `<li>• ${m.nombre} ${m.apellido} (${m.nickname})</li>`)
+                  .join("")
+              : `<li>Sin miembros asignados.</li>`;
+
+            return `
+              <li class="usuario-item" style="align-items: flex-start;">
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                  <strong style="font-size: 1.1rem; color: var(--tinta);">${cuadrilla.nombre}</strong>
+                  <span style="font-size: 0.85rem; color: var(--tinta-suave);">Creada: ${cuadrilla.fecha_creacion}</span>
+                  <ul style="list-style: none; padding-left: 0; margin-top: 4px; font-size: 0.95rem; color: var(--tinta);">
+                    ${miembrosHtml}
+                  </ul>
+                </div>
+                <span class="usuario-acciones">
+                  <button 
+                    class="btn-eliminar" 
+                    style="color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;"
+                    onclick="eliminarCuadrilla(${cuadrilla.ID_cuadrilla}, '${cuadrilla.nombre.replace(/'/g, "\\'")}')">
+                    Eliminar
+                  </button>
+                </span>
+              </li>
+            `;
+          })
+          .join("");
+      }
+
+      async function abrirModalCuadrilla() {
+        document.getElementById("cuadrillaNombre").value = "";
+        document.getElementById("cuadrillaModalFondo").classList.add("activo");
+
+        const lista = document.getElementById("cuadrillaListaRecolectores");
+        lista.innerHTML = `<p style="color: var(--tinta-suave); font-size: 0.9rem;">Cargando recolectores...</p>`;
+
+        try {
+          const resp = await fetch(`${CUADRILLA_API_BASE}/Recolectores`);
+          const json = await resp.json();
+
+          if (!resp.ok || json.status !== "ok" || !(json.data || []).length) {
+            lista.innerHTML = `<p style="color: var(--tinta-suave); font-size: 0.9rem;">No hay recolectores activos disponibles.</p>`;
+            return;
+          }
+
+          lista.innerHTML = json.data
+            .map(
+              (r) => `
+              <label style="display: flex; align-items: center; gap: 8px; padding: 6px 0; cursor: pointer; color: var(--tinta);">
+                <input type="checkbox" value="${r.mail}" style="width: auto; margin: 0;" />
+                <span>${r.nombre} ${r.apellido} (${r.nickname})</span>
+              </label>
+            `,
+            )
+            .join("");
+        } catch (error) {
+          lista.innerHTML = `<p style="color: var(--tinta-suave); font-size: 0.9rem;">Error de conexión al cargar recolectores.</p>`;
+        }
+      }
+
+      function cerrarModalCuadrilla() {
+        document.getElementById("cuadrillaModalFondo").classList.remove("activo");
+      }
+      
+      function cerrarModalCuadrillaFuera(evento) {
+        if (evento.target.id === "cuadrillaModalFondo") {
+          cerrarModalCuadrilla();
+        }
+      }
+
+      async function crearCuadrilla() {
+        const nombre = document.getElementById("cuadrillaNombre").value.trim();
+        const miembros = Array.from(
+          document.querySelectorAll(
+            "#cuadrillaListaRecolectores input[type=checkbox]:checked",
+          ),
+        ).map((chk) => chk.value);
+
+        if (!nombre || !miembros.length) {
+          mostrarMensaje(
+            "Ingresá un nombre y elegí al menos un miembro Recolector.",
+            "error",
+          );
+          return;
+        }
+
+        const boton = document.getElementById("cuadrillaBtnGuardar");
+        boton.disabled = true;
+        boton.textContent = "Creando...";
+
+        try {
+          const resp = await fetch(`${CUADRILLA_API_BASE}/Registrar`, {
+            method: "POST",
+            credentials: "same-origin",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ nombre, miembros }),
+          });
+          const json = await resp.json();
+
+          if (resp.ok && json.status === "creado") {
+            cerrarModalCuadrilla();
+            mostrarMensaje("Cuadrilla creada correctamente.", "ok");
+            cargarCuadrillas();
+          } else {
+            mostrarMensaje(json.mensaje || "No se pudo crear la cuadrilla.", "error");
+          }
+        } catch (error) {
+          mostrarMensaje("Error de conexión al crear la cuadrilla.", "error");
+        } finally {
+          boton.disabled = false;
+          boton.textContent = "Crear Cuadrilla";
+        }
+      }
+
+      async function eliminarCuadrilla(idCuadrilla, nombre) {
+        if (!confirm(`¿Eliminar la cuadrilla "${nombre}"?`)) {
+          return;
+        }
+
+        try {
+          const resp = await fetch(`${CUADRILLA_API_BASE}/Borrar`, {
+            method: "DELETE",
+            credentials: "same-origin",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idCuadrilla }),
+          });
+          const json = await resp.json();
+
+          if (resp.ok && json.status === "ok") {
+            mostrarMensaje("Cuadrilla eliminada correctamente.", "ok");
+            cargarCuadrillas();
+          } else {
+            mostrarMensaje(json.mensaje || "No se pudo eliminar la cuadrilla.", "error");
+          }
+        } catch (error) {
+          mostrarMensaje("Error de conexión al eliminar la cuadrilla.", "error");
+        }
+      }
+    </script>
+  </body>
+</html>

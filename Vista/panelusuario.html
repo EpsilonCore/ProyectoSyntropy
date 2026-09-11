@@ -83,6 +83,16 @@
               Panel de Usuario
             </button>
           </li>
+
+          <li>
+            <button
+              data-rol="Administrador"
+              class="link-button"
+              onclick="window.location.href = 'panelcuadrilla.html'"
+            >
+              Cuadrillas
+            </button>
+          </li>
         </ul>
       </nav>
     </header>
@@ -119,6 +129,7 @@
               <option value="" disabled>Seleccione un rol</option>
               <option value="Vecino">Vecino</option>
               <option value="Operario">Operario</option>
+              <option value="Recolector">Recolector</option>
               <option value="Administrador">Administrador</option>
             </select>
 
@@ -180,6 +191,7 @@
             <option value="" disabled>Seleccione un rol</option>
             <option value="Vecino">Vecino</option>
             <option value="Operario">Operario</option>
+            <option value="Recolector">Recolector</option>
             <option value="Administrador">Administrador</option>
           </select>
           <button class="btn-guardar-usuario" type="submit">
@@ -285,13 +297,13 @@
 
       function cerrarSesion() {
         localStorage.removeItem("logueado");
-        localStorage.removeItem("nombreUsuario");
+        localStorage.removeItem("nickname");
 
         window.location.href = "index.html";
       }
 
       function cargarUsuario() {
-        const nombre = localStorage.getItem("nombreUsuario") || "Usuario";
+        const nombre = localStorage.getItem("nickname") || "Usuario";
         const inicial = nombre.charAt(0).toUpperCase();
 
         document.getElementById("usuario").innerHTML = `

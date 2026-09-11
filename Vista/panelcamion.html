@@ -290,13 +290,13 @@
 
       function cerrarSesion() {
         localStorage.removeItem("logueado");
-        localStorage.removeItem("nombreUsuario");
+        localStorage.removeItem("nickname");
 
         window.location.href = "index.html";
       }
 
       function cargarUsuario() {
-        const nombre = localStorage.getItem("nombreUsuario") || "Usuario";
+        const nombre = localStorage.getItem("nickname") || "Usuario";
         const inicial = nombre.charAt(0).toUpperCase();
 
         document.getElementById("usuario").innerHTML = `

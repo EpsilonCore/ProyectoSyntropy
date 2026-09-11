@@ -5,7 +5,7 @@ class UsuarioController
 
 	public function __construct()
 	{
-		$conexionbd = mysqli_connect("localhost","root","","Syntropy");
+		$conexionbd = mysqli_connect("localhost","root","","syntropy");
 		if (!$conexionbd){
 			die(json_encode(["status" => "error", "mensaje" => "Error de conexion ". mysqli_connect_error()]));
 		}
@@ -39,6 +39,10 @@ class UsuarioController
         $contrasenia = $datos->contrasenia;
         $a2f = isset($datos->a2f) ? $datos->a2f : 0; 
         $rol = isset($datos->rol) ? $datos->rol : 'Vecino';
+        $rolesValidos = ['Vecino', 'Operario', 'Administrador', 'Recolector'];
+        if (!in_array($rol, $rolesValidos, true)) {
+            return ["status" => "datos_invalidos", "mensaje" => "Rol inválido."];
+        }
 		$UsuarioExistente = $this->modeloObj->buscarMail($datos->mail);
 		if($UsuarioExistente){
 			return ["status"=>"datos_invalidos", "mensaje" => "Este mail ya esta registrado, utilice otro mail"];
@@ -86,7 +90,9 @@ class UsuarioController
             } else {
                 $this->modeloObj->registrarAcceso($estadoEncontrado['mail'], 'Exitoso');
                 unset($usuarioEncontrado['contrasena']);
-                $_SESSION['rol']=$usuarioEncontrado['rol'];
+                $_SESSION['rol'] = $usuarioEncontrado['rol'];
+                $_SESSION['mail'] = $usuarioEncontrado['mail'];
+                $_SESSION['nombre_completo'] = trim($usuarioEncontrado['nombre'] . ' ' . $usuarioEncontrado['apellido']);
                 return ["status" => "ok","mensaje" => "Login exitoso.","rol" => $usuarioEncontrado['rol'],"usuario" => $usuarioEncontrado];
             }
             
@@ -157,7 +163,10 @@ public function modificarUsuario() {
         return ["status" => "datos_invalidos", "mensaje" => "Faltan datos obligatorios."];
     }
 
-    
+    $rolesValidos = ['Vecino', 'Operario', 'Administrador', 'Recolector'];
+    if (!in_array($datos->rol, $rolesValidos, true)) {
+        return ["status" => "datos_invalidos", "mensaje" => "Rol inválido."];
+    }
 
     if ($resultado = $this->modeloObj->modificarUsuario(
         $datos->mail,
