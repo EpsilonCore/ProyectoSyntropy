@@ -1,0 +1,21 @@
+$kind: http-request
+url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas/CalcularCamino"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "idRuta": "{{idRutaPrueba}}",
+      "origen": "Av. 18 de Julio 1234, Montevideo",
+      "destino": "Bvar. Artigas 567, Montevideo"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("El rol de la sesión activa SI tiene permiso (no devuelve 403)", function () {
+          pm.expect(pm.response.code).to.not.equal(403);
+      });
+    language: text/javascript
+order: 9000

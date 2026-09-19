@@ -1,0 +1,28 @@
+$kind: collection
+description: ""
+variables:
+  baseUrl: http://localhost
+  adminMail: admin@syntropy.uy
+  adminPass: CAMBIAR_CLAVE_ADMIN
+  operarioMail: operario@syntropy.uy
+  operarioPass: CAMBIAR_CLAVE_OPERARIO
+  mailUsuarioPrueba: postman.test@syntropy.uy
+  matriculaPrueba: ABC1234
+  idRutaPrueba: "1"
+  idContenedorPrueba: "1"
+  idCentroAcopioPrueba: "1"
+  idIncidenciaPrueba: "1"
+  idCuadrillaPrueba: "1"
+scripts:
+  - type: http:afterResponse
+    code: |-
+      
+      pm.test("Se recibió un código de estado HTTP", function () {
+          pm.expect(pm.response.code).to.be.a('number');
+      });
+
+      pm.test("Se recibió una respuesta", function () {
+          pm.response.to.not.be.null;
+          pm.expect(pm.response).to.have.property('code');
+      });
+    language: text/javascript

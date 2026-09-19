@@ -1,0 +1,23 @@
+$kind: http-request
+name: Operario NO puede asignar Cuadrilla a Incidencia (soloAdministrador)
+url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/AsignarCuadrilla"
+method: PATCH
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "idIncidencia": "{{idIncidenciaPrueba}}",
+      "idCuadrilla": "{{idCuadrillaPrueba}}"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("El rol de la sesión activa NO tiene permiso -> 403 'prohibido'", function () {
+          pm.response.to.have.status(403);
+          const jsonData = pm.response.json();
+          pm.expect(jsonData.status).to.eql('prohibido');
+      });
+    language: text/javascript
+order: 7000

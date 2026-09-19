@@ -17,7 +17,12 @@ class RutaController
 
     public function getAllRutas()
     {
-        return ["status" => "ok", "mensaje" => "Rutas obtenidas correctamente.", "data" => $this->modeloObj->getAllRutas()];
+        try {
+            $rutas = $this->modeloObj->getAllRutas();
+        } catch (Exception $e) {
+            return ["status" => "error", "mensaje" => "No se pudieron obtener las rutas: " . $e->getMessage(), "data" => null];
+        }
+        return ["status" => "ok", "mensaje" => "Rutas obtenidas correctamente.", "data" => $rutas];
     }
 
     public function calcularCamino()
@@ -102,11 +107,6 @@ class RutaController
             }
         }
 
-        $matricula = $datos->matricula ?? '';
-        if (trim($matricula) === '') {
-            $matricula = null;
-        }
-
         $paradas = array_map(function ($p) {
             return [
                 'lat' => $p->lat,
@@ -117,11 +117,34 @@ class RutaController
         }, $datos->paradas);
 
         try {
-            $idRuta = $this->modeloObj->crearRuta($datos->nombre, $matricula, $paradas);
+            $idRuta = $this->modeloObj->crearRuta($datos->nombre, $paradas);
         } catch (Exception $e) {
             return ["status" => "error", "mensaje" => "No se pudo guardar la ruta.", "data" => null];
         }
 
         return ["status" => "creado", "mensaje" => "Ruta guardada correctamente.", "data" => ["idRuta" => $idRuta]];
+    }
+
+    public function AsignarCuadrilla(){
+        $json = file_get_contents('php://input');
+        $datos = json_decode($json);
+        if(!$datos || empty($datos->idRuta) || empty($datos->idCuadrilla)){
+            return ["status" => "datos_invalidos", "mensaje" => "Faltan datos o los datos no son válidos.", "data" => null];
+        }
+
+        try {
+            $resultado = $this->modeloObj->AsignarCuadrilla((int)$datos->idRuta, (int)$datos->idCuadrilla);
+        } catch (Exception $e) {
+            return ["status" => "error", "mensaje" => "No se pudo asignar la cuadrilla a la ruta.", "data" => null];
+        }
+
+        if (!$resultado['ok']) {
+            if ($resultado['motivo'] === 'sin_camion') {
+                return ["status" => "sin_camion", "mensaje" => "Esa cuadrilla todavía no tiene un camión asignado. Asignale uno antes de asignarla a una ruta.", "data" => null];
+            }
+            return ["status" => "no_encontrado", "mensaje" => "No existe una ruta o cuadrilla con ese id.", "data" => null];
+        }
+
+        return ["status" => "ok", "mensaje" => "Cuadrilla asignada correctamente.", "data" => null];
     }
 }

@@ -79,6 +79,9 @@ switch ($method) {
         if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/ActualizarCamion') {
             $resultado = verificarRol($rolesCamiones) ?? $controladorCamion->actualizarCamion();
         }
+        if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas/AsignarCuadrilla') {
+            $resultado = verificarRol($rolesRutas) ?? $controladorRuta->AsignarCuadrilla();
+        }
         break;
 
     case 'DELETE':
@@ -103,6 +106,7 @@ $codigosHttp = [
     "cuenta_pendiente" => 403,
     "prohibido"        => 403,
     "no_encontrado"    => 404,
+    "sin_camion"       => 409,
     "no_permitido"     => 405,
     "error"            => 500,
 ];

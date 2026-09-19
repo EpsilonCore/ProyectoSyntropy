@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Usuarios/miApi/Usuarios"
+method: GET
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("El rol de la sesión activa NO tiene permiso -> 403 'prohibido'", function () {
+          pm.response.to.have.status(403);
+          const jsonData = pm.response.json();
+          pm.expect(jsonData.status).to.eql('prohibido');
+      });
+    language: text/javascript
+order: 4000

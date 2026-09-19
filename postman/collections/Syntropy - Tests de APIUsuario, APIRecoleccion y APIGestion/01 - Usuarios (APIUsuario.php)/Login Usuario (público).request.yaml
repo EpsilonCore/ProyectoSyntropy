@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Usuarios/miApi/Login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "mail": "{{adminMail}}",
+      "contrasena": "{{adminPass}}"
+    }
+order: 2000

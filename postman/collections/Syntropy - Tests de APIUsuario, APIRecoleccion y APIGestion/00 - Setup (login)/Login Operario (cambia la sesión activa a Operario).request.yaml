@@ -1,0 +1,21 @@
+$kind: http-request
+url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Usuarios/miApi/Login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "mail": "{{operarioMail}}",
+      "contrasena": "{{operarioPass}}"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Login responde 200 y status 'ok'", function () {
+          pm.response.to.have.status(200);
+          pm.expect(pm.response.json().status).to.eql('ok');
+      });
+    language: text/javascript
+order: 2000

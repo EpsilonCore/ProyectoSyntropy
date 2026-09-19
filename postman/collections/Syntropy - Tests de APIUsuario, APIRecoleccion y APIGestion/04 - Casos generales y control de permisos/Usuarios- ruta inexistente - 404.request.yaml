@@ -1,0 +1,13 @@
+$kind: http-request
+name: "Usuarios: ruta inexistente -> 404"
+url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Usuarios/miApi/EstoNoExiste"
+method: GET
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código 404 y status 'no_encontrado'", function () {
+          pm.response.to.have.status(404);
+          pm.expect(pm.response.json().status).to.eql('no_encontrado');
+      });
+    language: text/javascript
+order: 11000

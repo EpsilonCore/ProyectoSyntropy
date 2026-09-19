@@ -7,20 +7,16 @@ public function __construct($bd){
     $this->conexion = $bd;
 }
 
-public function crearRuta($nombre, $matricula, array $paradas){
+public function crearRuta($nombre, array $paradas){
     date_default_timezone_set('America/Montevideo');
     $fecha = date('Y-m-d H:i:s');
 
-    if (trim((string)$matricula) === '') {
-        $matricula = null;
-    }
-
-    $sql = "INSERT INTO ruta(nombre, matricula, estado, fecha_creacion) VALUES (?, ?, 'Planificada', ?)";
+    $sql = "INSERT INTO ruta(nombre, estado, fecha_creacion) VALUES (?, 'Planificada', ?)";
     $stmt = mysqli_prepare($this->conexion, $sql);
     if(!$stmt){
         throw new Exception("Error al preparar la conexion:" . mysqli_error($this->conexion));
     }
-    $stmt->bind_param("sss", $nombre, $matricula, $fecha);
+    $stmt->bind_param("ss", $nombre, $fecha);
     if(! $stmt->execute()){
         throw new Exception("Error al ejecutar la consulta: " . mysqli_error($this->conexion));
     }
@@ -53,10 +49,14 @@ public function crearRuta($nombre, $matricula, array $paradas){
 }
 
 public function getAllRutas(){
-    $sql = "SELECT r.ID_ruta, r.nombre, r.matricula, r.estado, r.fecha_creacion,
+    $sql = "SELECT r.ID_ruta, r.nombre, r.estado, r.fecha_creacion, r.ID_Cuadrilla,
+    c.nombre AS cuadrilla_nombre,
+    cc.matricula AS camion_matricula,
     COUNT(p.ID_parada) AS cantidad_paradas
     FROM ruta r
     LEFT JOIN rutaparada p ON p.ID_ruta = r.ID_ruta
+    LEFT JOIN cuadrilla c ON c.ID_cuadrilla = r.ID_Cuadrilla
+    LEFT JOIN camioncuadrilla cc ON cc.ID_cuadrilla = r.ID_Cuadrilla
     GROUP BY r.ID_ruta
     ORDER BY r.fecha_creacion DESC";
     $stmt = mysqli_prepare($this->conexion, $sql);
@@ -121,5 +121,38 @@ public function eliminarRuta($idRuta){
     $stmtRuta->close();
 
     return $filasAfectadas;
+}
+
+public function AsignarCuadrilla($idRuta, $idCuadrilla){
+    // Solo se puede asignar la ruta a una cuadrilla que ya tenga un camión asignado.
+    $sql = "SELECT 1 FROM camioncuadrilla WHERE ID_cuadrilla = ?";
+    $stmt = mysqli_prepare($this->conexion, $sql);
+    if(!$stmt){
+        throw new Exception("Error al preparar la consulta: " . mysqli_error($this->conexion));
+    }
+    $stmt->bind_param("i", $idCuadrilla);
+    if(! $stmt->execute()){
+        throw new Exception("Error al ejecutar la consulta: " . mysqli_error($this->conexion));
+    }
+    $tieneCamion = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    if (!$tieneCamion) {
+        return ["ok" => false, "motivo" => "sin_camion"];
+    }
+
+    $sql = "UPDATE ruta SET ID_Cuadrilla = ? WHERE ID_ruta = ?";
+    $stmt = mysqli_prepare($this->conexion, $sql);
+    if(!$stmt){
+        throw new Exception("Error al preparar la consulta: " . mysqli_error($this->conexion));
+    }
+    $stmt->bind_param("ii", $idCuadrilla, $idRuta);
+    if(! $stmt->execute()){
+        throw new Exception("Error al ejecutar la consulta: " . mysqli_error($this->conexion));
+    }
+    $filasAfectadas = $stmt->affected_rows;
+    $stmt->close();
+
+    return ["ok" => $filasAfectadas > 0, "motivo" => $filasAfectadas > 0 ? null : "no_encontrado"];
 }
 }

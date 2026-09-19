@@ -63,6 +63,9 @@ switch ($method) {
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Cuadrillas/Recolectores') {
             $resultado = verificarRol($soloAdministrador) ?? $controladorCuadrilla->getRecolectoresDisponibles();
         }
+        if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Cuadrillas/CamionesDisponibles') {
+            $resultado = verificarRol($soloAdministrador) ?? $controladorCuadrilla->getCamionesDisponibles();
+        }
         break;
 
     case 'POST':
@@ -109,6 +112,9 @@ switch ($method) {
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/AsignarCuadrilla') {
             $resultado = verificarRol($soloAdministrador) ?? $controladorIncidencia->AsignarCuadrilla();
         }
+        if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Cuadrillas/AsignarCamion') {
+            $resultado = verificarRol($soloAdministrador) ?? $controladorCuadrilla->asignarCamion();
+        }
         break;
 
     default:
@@ -124,6 +130,7 @@ $codigosHttp = [
     "cuenta_pendiente" => 403,
     "prohibido"        => 403,
     "no_encontrado"    => 404,
+    "no_disponible"    => 409,
     "no_permitido"     => 405,
     "error"            => 500,
 ];

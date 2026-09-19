@@ -1,0 +1,21 @@
+$kind: http-request
+name: "Sin sesión: Contenedores sigue siendo público"
+url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Gestion/miApi/Contenedores"
+method: GET
+scripts:
+  - type: beforeRequest
+    code: |-
+      try {
+          const jar = pm.cookies.jar();
+          jar.clear(pm.request.url.toString(), function () {});
+      } catch (e) {
+          console.log('Tu versión de Postman no soporta pm.cookies.jar(). Borrá las cookies manualmente antes de correr esta carpeta.');
+      }
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Responde 200 sin sesión", function () {
+          pm.response.to.have.status(200);
+      });
+    language: text/javascript
+order: 8000

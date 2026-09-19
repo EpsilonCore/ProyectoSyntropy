@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/Registrar"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "descripcion": "Contenedor desbordado",
+      "direccion": "Calle Falsa 123, Montevideo",
+      "latitud": -34.9011,
+      "longitud": -56.1645
+    }
+order: 8000

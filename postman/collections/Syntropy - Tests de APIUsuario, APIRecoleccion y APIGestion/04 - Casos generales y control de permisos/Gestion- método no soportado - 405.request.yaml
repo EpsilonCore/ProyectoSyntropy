@@ -1,0 +1,13 @@
+$kind: http-request
+name: "Gestion: método no soportado -> 405"
+url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Gestion/miApi/Contenedores"
+method: PUT
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código 405 y status 'no_permitido'", function () {
+          pm.response.to.have.status(405);
+          pm.expect(pm.response.json().status).to.eql('no_permitido');
+      });
+    language: text/javascript
+order: 18000

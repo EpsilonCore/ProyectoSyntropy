@@ -1,0 +1,21 @@
+$kind: http-request
+url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Usuarios/miApi/Registrar"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "Usuario de Prueba Postman",
+      "mail": "{{mailUsuarioPrueba}}",
+      "contrasena": "ClaveDePrueba123"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Devuelve 201 'creado' o 400 si el mail ya existe", function () {
+          pm.expect([201, 400]).to.include(pm.response.code);
+      });
+    language: text/javascript
+order: 1000

@@ -1,0 +1,925 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Panel Operario - Epsilon</title>
+
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+  </head>
+
+  <body>
+    <script>
+      if (localStorage.getItem("logueado") !== "si") {
+        window.location.href = "login.html";
+      }
+
+      if (
+        !["Administrador", "Operario"].includes(
+          (localStorage.getItem("rol") || "").trim(),
+        )
+      ) {
+        window.location.href = "index.html";
+      }
+    </script>
+
+    <header>
+      <div class="logo">
+        <a href="index.html">
+          <img src="logo.png" alt="Epsilon" />
+        </a>
+      </div>
+
+      <div class="header-actions">
+        <div id="usuario" class="usuario"></div>
+
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+      </div>
+
+      <nav id="menu">
+        <ul>
+          <li>
+            <button
+              class="link-button"
+              data-rol="Administrador, Operario"
+              onclick="window.location.href = 'gestion.html'"
+            >
+              Gestión
+            </button>
+          </li>
+
+          <li>
+            <button
+              class="link-button"
+              data-rol="Administrador, Operario"
+              onclick="window.location.href = 'panelrutas.html'"
+            >
+              Panel Rutas
+            </button>
+          </li>
+
+          <li>
+            <button
+              class="link-button"
+              data-rol="Operario"
+              onclick="window.location.href = 'paneloperario.html'"
+            >
+              Panel Operario
+            </button>
+          </li>
+
+          <li>
+            <button
+              class="link-button"
+              onclick="window.location.href = 'mapa.html'"
+            >
+              Mapa
+            </button>
+          </li>
+
+          <li>
+            <button
+              class="link-button"
+              onclick="window.location.href = 'estadisticas.html'"
+            >
+              Estadísticas
+            </button>
+          </li>
+
+          <li>
+            <button
+              class="link-button"
+              onclick="window.location.href = 'documentacion.html'"
+            >
+              Documentación
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="gestion-portada">
+      <div class="gestion-encabezado">
+        <span class="gestion-eyebrow">Operario</span>
+        <h2>Panel Operario</h2>
+        <p id="opSaludo">Toda la información operativa de Epsilon, en un solo lugar.</p>
+      </div>
+    </div>
+
+    <div class="pagina">
+      <div class="op-resumen-grid">
+        <div class="op-resumen-tile">
+          <span class="op-numero" id="opResContenedores">–</span>
+          <span class="op-label">Contenedores</span>
+        </div>
+        <div class="op-resumen-tile">
+          <span class="op-numero" id="opResCamiones">–</span>
+          <span class="op-label">Camiones disponibles</span>
+        </div>
+        <div class="op-resumen-tile">
+          <span class="op-numero" id="opResAcopio">–</span>
+          <span class="op-label">Centros de acopio</span>
+        </div>
+        <div class="op-resumen-tile">
+          <span class="op-numero" id="opResCuadrillas">–</span>
+          <span class="op-label">Cuadrillas</span>
+        </div>
+        <div class="op-resumen-tile">
+          <span class="op-numero" id="opResIncidencias">–</span>
+          <span class="op-label">Incidencias pendientes</span>
+        </div>
+        <div class="op-resumen-tile">
+          <span class="op-numero" id="opResRutas">–</span>
+          <span class="op-label">Rutas activas</span>
+        </div>
+      </div>
+
+      <div class="op-tabs">
+        <button class="op-tab activo" data-seccion="contenedores" onclick="cambiarSeccion('contenedores')">📦 Contenedores</button>
+        <button class="op-tab" data-seccion="camiones" onclick="cambiarSeccion('camiones')">🚛 Camiones</button>
+        <button class="op-tab" data-seccion="centros" onclick="cambiarSeccion('centros')">🏭 Centros de Acopio</button>
+        <button class="op-tab" data-seccion="cuadrillas" onclick="cambiarSeccion('cuadrillas')">👷 Cuadrillas</button>
+        <button class="op-tab" data-seccion="incidencias" onclick="cambiarSeccion('incidencias')">⚠️ Incidencias</button>
+        <button class="op-tab" data-seccion="rutas" onclick="cambiarSeccion('rutas')">🗺️ Rutas</button>
+      </div>
+
+      <!-- CONTENEDORES -->
+      <div class="op-panel activo" id="opPanel-contenedores">
+        <div class="op-toolbar">
+          <input type="text" id="opBuscarContenedores" placeholder="Buscar por calle o barrio…" oninput="renderContenedores()" />
+          <select id="opFiltroEstadoContenedores" onchange="renderContenedores()">
+            <option value="">Todos los estados</option>
+            <option value="Vacio">Vacío</option>
+            <option value="Media capacidad">Media capacidad</option>
+            <option value="Lleno">Lleno</option>
+            <option value="Desbordado">Desbordado</option>
+          </select>
+          <select id="opFiltroTipoContenedores" onchange="renderContenedores()">
+            <option value="">Todos los tipos</option>
+            <option value="Naranja">Naranja</option>
+            <option value="Metalico">Metálico</option>
+            <option value="Plastico">Plástico</option>
+          </select>
+          <button class="op-btn-actualizar" onclick="cargarSeccion('contenedores', true)">↻ Actualizar</button>
+        </div>
+        <div class="op-contador" id="opContadorContenedores"></div>
+        <div id="opListaContenedores" class="op-cargando">Cargando contenedores…</div>
+      </div>
+
+      <!-- CAMIONES -->
+      <div class="op-panel" id="opPanel-camiones">
+        <div class="op-toolbar">
+          <input type="text" id="opBuscarCamiones" placeholder="Buscar por matrícula o ubicación…" oninput="renderCamiones()" />
+          <select id="opFiltroEstadoCamiones" onchange="renderCamiones()">
+            <option value="">Todos los estados</option>
+            <option value="Disponible">Disponible</option>
+            <option value="En Servicio">En Servicio</option>
+            <option value="Mantenimiento">Mantenimiento</option>
+            <option value="Averiado">Averiado</option>
+          </select>
+          <button class="op-btn-actualizar" onclick="cargarSeccion('camiones', true)">↻ Actualizar</button>
+        </div>
+        <div class="op-contador" id="opContadorCamiones"></div>
+        <div id="opListaCamiones" class="op-cargando">Cargando camiones…</div>
+      </div>
+
+      <!-- CENTROS DE ACOPIO -->
+      <div class="op-panel" id="opPanel-centros">
+        <div class="op-toolbar">
+          <input type="text" id="opBuscarCentros" placeholder="Buscar por tipo de residuo o barrio…" oninput="renderCentros()" />
+          <button class="op-btn-actualizar" onclick="cargarSeccion('centros', true)">↻ Actualizar</button>
+        </div>
+        <div class="op-contador" id="opContadorCentros"></div>
+        <div id="opListaCentros" class="op-cargando">Cargando centros de acopio…</div>
+      </div>
+
+      <!-- CUADRILLAS -->
+      <div class="op-panel" id="opPanel-cuadrillas">
+        <p class="op-nota">Para asignar una ruta, una incidencia o un camión a una cuadrilla, hacelo desde la pestaña correspondiente con el botón "Asignar Cuadrilla".</p>
+        <div class="op-toolbar">
+          <input type="text" id="opBuscarCuadrillas" placeholder="Buscar por nombre de cuadrilla o integrante…" oninput="renderCuadrillas()" />
+          <button class="op-btn-actualizar" onclick="cargarSeccion('cuadrillas', true)">↻ Actualizar</button>
+        </div>
+        <div class="op-contador" id="opContadorCuadrillas"></div>
+        <div id="opListaCuadrillas" class="op-cargando">Cargando cuadrillas…</div>
+      </div>
+
+      <!-- INCIDENCIAS -->
+      <div class="op-panel" id="opPanel-incidencias">
+        <div class="op-toolbar">
+          <input type="text" id="opBuscarIncidencias" placeholder="Buscar por mail, calle o barrio…" oninput="renderIncidencias()" />
+          <select id="opFiltroEstadoIncidencias" onchange="renderIncidencias()">
+            <option value="">Todos los estados</option>
+          </select>
+          <button class="op-btn-actualizar" onclick="cargarSeccion('incidencias', true)">↻ Actualizar</button>
+        </div>
+        <div class="op-contador" id="opContadorIncidencias"></div>
+        <div id="opListaIncidencias" class="op-cargando">Cargando incidencias…</div>
+      </div>
+
+      <!-- RUTAS -->
+      <div class="op-panel" id="opPanel-rutas">
+        <div class="op-toolbar">
+          <input type="text" id="opBuscarRutas" placeholder="Buscar por nombre o matrícula…" oninput="renderRutas()" />
+          <select id="opFiltroEstadoRutas" onchange="renderRutas()">
+            <option value="">Todos los estados</option>
+          </select>
+          <button class="op-btn-actualizar" onclick="cargarSeccion('rutas', true)">↻ Actualizar</button>
+        </div>
+        <p class="op-nota">Tocá una ruta de la lista (fuera de los botones) para verla dibujada en el mapa.</p>
+        <div id="opMap"></div>
+        <div class="op-contador" id="opContadorRutas"></div>
+        <div id="opListaRutas" class="op-cargando">Cargando rutas…</div>
+      </div>
+    </div>
+
+    <!-- Visor de imagen de incidencia (solo lectura) -->
+    <div class="overlay" id="opOverlayImagen" onclick="opCerrarImagen(event)">
+      <div class="crear-centro-acopio incidencia-visor">
+        <h3>Foto de la incidencia</h3>
+        <img id="opImagenGrande" src="" alt="Foto de la incidencia" style="max-width: 100%; border-radius: 8px;" />
+      </div>
+    </div>
+
+    <!-- Modal compartido: asignar cuadrilla a ruta / incidencia / camión -->
+    <div class="overlay" id="opOverlayAsignar" onclick="opCerrarModalAsignar(event)">
+      <div class="modal-usuarios">
+        <h3 id="opAsignarTitulo">Asignar cuadrilla</h3>
+
+        <form id="opFormAsignar">
+          <label>Cuadrilla</label>
+          <select id="opSelectCuadrilla" required>
+            <option value="" disabled selected>Seleccione una cuadrilla</option>
+          </select>
+
+          <button class="btn-guardar-usuario" type="submit">Guardar cambios</button>
+          <button
+            class="btn-cancelar-usuario"
+            type="button"
+            onclick="document.getElementById('opOverlayAsignar').classList.remove('activo')"
+          >
+            Cancelar
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+      // ---------- Endpoints ----------
+      const API_GESTION = "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/";
+      const API_RECOLECCION = "http://localhost/Proyecto/ProyectoSyntropy/Recoleccion/miApi/";
+
+      const ENDPOINTS = {
+        contenedores: `${API_GESTION}Contenedores`,
+        camiones: `${API_RECOLECCION}Camiones`,
+        centros: `${API_GESTION}CentrosAcopio/CentrosAcopio`,
+        cuadrillas: `${API_GESTION}Cuadrillas/Cuadrillas`,
+        incidencias: `${API_GESTION}Incidencias/Incidencias`,
+        rutas: `${API_RECOLECCION}Rutas`,
+      };
+
+      // Estado en memoria por sección: datos ya traídos + si ya se cargó.
+      const estadoSecciones = {
+        contenedores: { datos: [], cargado: false },
+        camiones: { datos: [], cargado: false },
+        centros: { datos: [], cargado: false },
+        cuadrillas: { datos: [], cargado: false },
+        incidencias: { datos: [], cargado: false },
+        rutas: { datos: [], cargado: false },
+      };
+
+      const RENDERERS = {
+        contenedores: renderContenedores,
+        camiones: renderCamiones,
+        centros: renderCentros,
+        cuadrillas: renderCuadrillas,
+        incidencias: renderIncidencias,
+        rutas: renderRutas,
+      };
+
+      // ---------- Navegación por pestañas (carga perezosa) ----------
+      function cambiarSeccion(seccion) {
+        document.querySelectorAll(".op-tab").forEach((btn) => {
+          btn.classList.toggle("activo", btn.dataset.seccion === seccion);
+        });
+        document.querySelectorAll(".op-panel").forEach((panel) => {
+          panel.classList.toggle("activo", panel.id === `opPanel-${seccion}`);
+        });
+
+        if (seccion === "rutas") {
+          inicializarMapa();
+        }
+
+        if (!estadoSecciones[seccion].cargado) {
+          cargarSeccion(seccion);
+        }
+      }
+
+      async function cargarSeccion(seccion, forzar = false) {
+        if (estadoSecciones[seccion].cargado && !forzar) return;
+
+        const contenedorId = `opLista${capitalizar(seccion)}`;
+        const contenedor = document.getElementById(contenedorId);
+        if (contenedor) contenedor.innerHTML = `<p class="op-cargando">Cargando…</p>`;
+
+        try {
+          const resp = await fetch(ENDPOINTS[seccion]);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const json = await resp.json();
+          const datos = Array.isArray(json) ? json : json?.data || [];
+
+          estadoSecciones[seccion].datos = datos;
+          estadoSecciones[seccion].cargado = true;
+
+          RENDERERS[seccion]();
+          actualizarResumen();
+        } catch (error) {
+          console.error(`Error al cargar ${seccion}:`, error);
+          if (contenedor) {
+            contenedor.innerHTML = `<p class="op-error">No se pudo cargar la información. Verificá tu conexión y probá "Actualizar".</p>`;
+          }
+        }
+      }
+
+      function capitalizar(texto) {
+        return texto.charAt(0).toUpperCase() + texto.slice(1);
+      }
+
+      function filtrarPorTexto(items, texto, campos) {
+        if (!texto) return items;
+        const t = texto.trim().toLowerCase();
+        return items.filter((item) =>
+          campos.some((campo) => String(item[campo] ?? "").toLowerCase().includes(t)),
+        );
+      }
+
+      // ---------- Resumen general ----------
+      function actualizarResumen() {
+        if (estadoSecciones.contenedores.cargado) {
+          document.getElementById("opResContenedores").textContent =
+            estadoSecciones.contenedores.datos.length;
+        }
+        if (estadoSecciones.camiones.cargado) {
+          const disponibles = estadoSecciones.camiones.datos.filter(
+            (c) => c.estado === "Disponible",
+          ).length;
+          document.getElementById("opResCamiones").textContent = disponibles;
+        }
+        if (estadoSecciones.centros.cargado) {
+          document.getElementById("opResAcopio").textContent =
+            estadoSecciones.centros.datos.length;
+        }
+        if (estadoSecciones.cuadrillas.cargado) {
+          document.getElementById("opResCuadrillas").textContent =
+            estadoSecciones.cuadrillas.datos.length;
+        }
+        if (estadoSecciones.incidencias.cargado) {
+          const pendientes = estadoSecciones.incidencias.datos.filter(
+            (i) => (i.estado || "").toLowerCase() === "pendiente",
+          ).length;
+          document.getElementById("opResIncidencias").textContent = pendientes;
+        }
+        if (estadoSecciones.rutas.cargado) {
+          document.getElementById("opResRutas").textContent =
+            estadoSecciones.rutas.datos.length;
+        }
+      }
+
+      // ---------- Badges de color por estado ----------
+      function badgeEstado(estado) {
+        const colores = {
+          Vacio: ["var(--verde-tinte)", "var(--verde-bosque)"],
+          Disponible: ["var(--verde-tinte)", "var(--verde-bosque)"],
+          Resuelta: ["var(--verde-tinte)", "var(--verde-bosque)"],
+          finalizada: ["var(--verde-tinte)", "var(--verde-bosque)"],
+          "Media capacidad": ["#fdf3e7", "var(--ambar)"],
+          Mantenimiento: ["#fdf3e7", "var(--ambar)"],
+          Pendiente: ["#fdf3e7", "var(--ambar)"],
+          "En proceso": ["#e9eef1", "var(--acero)"],
+          "En Servicio": ["#e9eef1", "var(--acero)"],
+          activa: ["#e9eef1", "var(--acero)"],
+          Lleno: ["#f7e9e5", "var(--oxido)"],
+          Averiado: ["#f7e9e5", "var(--oxido)"],
+          Desbordado: ["#f3f4f6", "#111827"],
+        };
+        const [fondo, texto] = colores[estado] || ["#f3f4f6", "var(--tinta-suave)"];
+        return `<span class="op-badge" style="background:${fondo};color:${texto};">${estado ?? "Sin estado"}</span>`;
+      }
+
+      // ---------- CONTENEDORES ----------
+      function renderContenedores() {
+        const lista = document.getElementById("opListaContenedores");
+        const contador = document.getElementById("opContadorContenedores");
+        let datos = estadoSecciones.contenedores.datos;
+
+        const texto = document.getElementById("opBuscarContenedores").value;
+        const estado = document.getElementById("opFiltroEstadoContenedores").value;
+        const tipo = document.getElementById("opFiltroTipoContenedores").value;
+
+        datos = filtrarPorTexto(datos, texto, ["calle", "barrio", "numero"]);
+        if (estado) datos = datos.filter((c) => c.estado === estado);
+        if (tipo) datos = datos.filter((c) => c.tipo === tipo);
+
+        contador.textContent = `${datos.length} contenedor(es)`;
+
+        if (datos.length === 0) {
+          lista.innerHTML = `<p class="op-vacio">No hay contenedores que coincidan con la búsqueda.</p>`;
+          return;
+        }
+
+        lista.innerHTML = datos
+          .map(
+            (c) => `
+          <div class="op-tarjeta">
+            <div class="op-tarjeta-info">
+              <span class="op-tarjeta-titulo">Contenedor #${c.ID_contenedor} — ${c.tipo ?? "Sin tipo"}</span>
+              <span class="op-tarjeta-sub">${c.calle ?? ""} ${c.numero ?? ""}, ${c.barrio ?? "Sin barrio"} · Capacidad: ${c.capacidadCarga ?? "s/d"}</span>
+            </div>
+            ${badgeEstado(c.estado)}
+          </div>`,
+          )
+          .join("");
+      }
+
+      // ---------- CAMIONES ----------
+      function renderCamiones() {
+        const lista = document.getElementById("opListaCamiones");
+        const contador = document.getElementById("opContadorCamiones");
+        let datos = estadoSecciones.camiones.datos;
+
+        const texto = document.getElementById("opBuscarCamiones").value;
+        const estado = document.getElementById("opFiltroEstadoCamiones").value;
+
+        datos = filtrarPorTexto(datos, texto, ["matricula", "ubicacion"]);
+        if (estado) datos = datos.filter((c) => c.estado === estado);
+
+        contador.textContent = `${datos.length} camión(es)`;
+
+        if (datos.length === 0) {
+          lista.innerHTML = `<p class="op-vacio">No hay camiones que coincidan con la búsqueda.</p>`;
+          return;
+        }
+
+        lista.innerHTML = datos
+          .map((c) => {
+            const cuadrillaActual = c.nombre_cuadrilla || c.cuadrilla || null;
+            return `
+          <div class="op-tarjeta">
+            <div class="op-tarjeta-info">
+              <span class="op-tarjeta-titulo">Camión ${c.matricula} — ${c.tipo ?? "Sin tipo"}</span>
+              <span class="op-tarjeta-sub">${c.ubicacion ?? "Sin ubicación"} · Carga: ${c.capacidadCarga ?? "s/d"}</span>
+              <span class="op-tarjeta-sub">Cuadrilla: ${cuadrillaActual ?? "Sin asignar"}</span>
+            </div>
+            <div class="op-tarjeta-acciones">
+              ${badgeEstado(c.estado)}
+              <button class="op-btn-asignar" onclick="abrirModalAsignar('camion', '${c.matricula}', '${c.matricula}')">Asignar Cuadrilla</button>
+            </div>
+          </div>`;
+          })
+          .join("");
+      }
+
+      // ---------- CENTROS DE ACOPIO ----------
+      function renderCentros() {
+        const lista = document.getElementById("opListaCentros");
+        const contador = document.getElementById("opContadorCentros");
+        let datos = estadoSecciones.centros.datos;
+
+        const texto = document.getElementById("opBuscarCentros").value;
+        datos = filtrarPorTexto(datos, texto, ["tipoResiduo", "barrio", "calle"]);
+
+        contador.textContent = `${datos.length} centro(s) de acopio`;
+
+        if (datos.length === 0) {
+          lista.innerHTML = `<p class="op-vacio">No hay centros de acopio que coincidan con la búsqueda.</p>`;
+          return;
+        }
+
+        lista.innerHTML = datos
+          .map(
+            (c) => `
+          <div class="op-tarjeta">
+            <div class="op-tarjeta-info">
+              <span class="op-tarjeta-titulo">Centro #${c.ID_acopio} — ${c.tipoResiduo ?? "Sin tipo"}</span>
+              <span class="op-tarjeta-sub">${c.calle ?? ""} ${c.numero ?? ""}, ${c.barrio ?? "Sin barrio"} · Capacidad: ${c.capacidad ?? "s/d"}</span>
+            </div>
+          </div>`,
+          )
+          .join("");
+      }
+
+      // ---------- CUADRILLAS ----------
+      function renderCuadrillas() {
+        const lista = document.getElementById("opListaCuadrillas");
+        const contador = document.getElementById("opContadorCuadrillas");
+        let datos = estadoSecciones.cuadrillas.datos;
+
+        const texto = document.getElementById("opBuscarCuadrillas").value.trim().toLowerCase();
+        if (texto) {
+          datos = datos.filter((c) => {
+            const enNombre = (c.nombre || "").toLowerCase().includes(texto);
+            const enMiembros = (c.miembros || []).some((m) =>
+              `${m.nombre} ${m.apellido} ${m.nickname}`.toLowerCase().includes(texto),
+            );
+            return enNombre || enMiembros;
+          });
+        }
+
+        contador.textContent = `${datos.length} cuadrilla(s)`;
+
+        if (datos.length === 0) {
+          lista.innerHTML = `<p class="op-vacio">No hay cuadrillas que coincidan con la búsqueda.</p>`;
+          return;
+        }
+
+        lista.innerHTML = datos
+          .map((c) => {
+            const miembrosHtml = (c.miembros || []).length
+              ? c.miembros
+                  .map((m) => `<li>• ${m.nombre} ${m.apellido} (${m.nickname})</li>`)
+                  .join("")
+              : `<li>Sin miembros asignados.</li>`;
+
+            return `
+          <div class="op-tarjeta" style="align-items: flex-start;">
+            <div class="op-tarjeta-info">
+              <span class="op-tarjeta-titulo">${c.nombre}</span>
+              <span class="op-tarjeta-sub">Creada: ${c.fecha_creacion ?? "s/d"}</span>
+              <ul class="op-cuadrilla-miembros">${miembrosHtml}</ul>
+            </div>
+          </div>`;
+          })
+          .join("");
+      }
+
+      // ---------- INCIDENCIAS ----------
+      function poblarFiltroEstados(selectId, datos) {
+        const select = document.getElementById(selectId);
+        const actual = select.value;
+        const estadosUnicos = [...new Set(datos.map((d) => d.estado).filter(Boolean))];
+
+        select.innerHTML =
+          `<option value="">Todos los estados</option>` +
+          estadosUnicos.map((e) => `<option value="${e}">${e}</option>`).join("");
+
+        if (estadosUnicos.includes(actual)) select.value = actual;
+      }
+
+      function renderIncidencias() {
+        const lista = document.getElementById("opListaIncidencias");
+        const contador = document.getElementById("opContadorIncidencias");
+        let datos = estadoSecciones.incidencias.datos;
+
+        poblarFiltroEstados("opFiltroEstadoIncidencias", estadoSecciones.incidencias.datos);
+
+        const texto = document.getElementById("opBuscarIncidencias").value;
+        const estado = document.getElementById("opFiltroEstadoIncidencias").value;
+
+        datos = filtrarPorTexto(datos, texto, ["mail", "calle", "barrio"]);
+        if (estado) datos = datos.filter((i) => i.estado === estado);
+
+        contador.textContent = `${datos.length} incidencia(s)`;
+
+        if (datos.length === 0) {
+          lista.innerHTML = `<p class="op-vacio">No hay incidencias que coincidan con la búsqueda.</p>`;
+          return;
+        }
+
+        lista.innerHTML = datos
+          .map(
+            (i) => `
+          <div class="op-tarjeta" style="align-items: flex-start;">
+            <div class="op-incidencia-cuerpo">
+              ${
+                i.imagen
+                  ? `<img src="${i.imagen}" alt="Foto de la incidencia" class="op-incidencia-thumb" onclick="opVerImagen('${i.imagen}')" />`
+                  : ""
+              }
+              <div class="op-tarjeta-info">
+                <span class="op-tarjeta-titulo">#${i.ID_incidencia} — ${i.tipo ?? "Sin tipo"}</span>
+                <span class="op-tarjeta-sub">${i.mail ?? ""} · ${i.calle ?? ""} ${i.numero ?? ""}, ${i.barrio ?? ""}</span>
+                <span class="op-tarjeta-sub">Operario asignado: ${i.ID_operario ? i.ID_operario : "Sin asignar"}</span>
+                <span class="op-tarjeta-sub">Cuadrilla asignada: ${i.nombre_cuadrilla ? i.nombre_cuadrilla : "Sin asignar"}</span>
+              </div>
+            </div>
+            <div class="op-tarjeta-acciones">
+              ${badgeEstado(i.estado)}
+              <button class="op-btn-asignarme" onclick="asignarmeIncidencia(${i.ID_incidencia})">Asignarme</button>
+              <button class="op-btn-asignar" onclick="abrirModalAsignar('incidencia', ${i.ID_incidencia}, '#${i.ID_incidencia}')">Asignar Cuadrilla</button>
+            </div>
+          </div>`,
+          )
+          .join("");
+      }
+
+      async function asignarmeIncidencia(id) {
+        try {
+          const resp = await fetch(`${API_GESTION}Incidencias/AsignarOperario`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idIncidencia: id }),
+          });
+          const resultado = await resp.json();
+          if (resultado.status === "ok") {
+            cargarSeccion("incidencias", true);
+          } else {
+            alert(resultado.mensaje || "No se pudo asignar la incidencia.");
+          }
+        } catch (error) {
+          console.error("Error al asignarme la incidencia:", error);
+          alert("Error de conexión al asignarme la incidencia.");
+        }
+      }
+
+      function opVerImagen(url) {
+        document.getElementById("opImagenGrande").src = url;
+        document.getElementById("opOverlayImagen").classList.add("activo");
+      }
+
+      function opCerrarImagen(evento) {
+        if (evento.target.id === "opOverlayImagen") {
+          document.getElementById("opOverlayImagen").classList.remove("activo");
+        }
+      }
+
+      // ---------- MODAL COMPARTIDO: ASIGNAR CUADRILLA ----------
+      let opAsignarContexto = { tipo: null, id: null };
+
+      async function abrirModalAsignar(tipo, id, etiqueta) {
+        opAsignarContexto = { tipo, id };
+
+        const nombresTipo = { ruta: "la ruta", incidencia: "la incidencia", camion: "el camión" };
+        document.getElementById("opAsignarTitulo").textContent =
+          `Asignar cuadrilla a ${nombresTipo[tipo] || ""} ${etiqueta ?? ""}`.trim();
+
+        const select = document.getElementById("opSelectCuadrilla");
+        select.innerHTML = `<option value="" disabled selected>Cargando cuadrillas…</option>`;
+        document.getElementById("opOverlayAsignar").classList.add("activo");
+
+        if (!estadoSecciones.cuadrillas.cargado) {
+          await cargarSeccion("cuadrillas");
+        }
+
+        const cuadrillas = estadoSecciones.cuadrillas.datos;
+        if (!cuadrillas.length) {
+          select.innerHTML = `<option value="" disabled selected>No hay cuadrillas creadas</option>`;
+          return;
+        }
+
+        select.innerHTML =
+          `<option value="" disabled selected>Seleccione una cuadrilla</option>` +
+          cuadrillas
+            .map((c) => `<option value="${c.ID_cuadrilla}">${c.nombre}</option>`)
+            .join("");
+      }
+
+      function opCerrarModalAsignar(evento) {
+        if (!evento || evento.target.id === "opOverlayAsignar") {
+          document.getElementById("opOverlayAsignar").classList.remove("activo");
+        }
+      }
+
+      document.getElementById("opFormAsignar").addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const idCuadrilla = document.getElementById("opSelectCuadrilla").value;
+        if (!idCuadrilla) return;
+
+        const { tipo, id } = opAsignarContexto;
+
+        // Los endpoints de Rutas e Incidencias ya existen en el sistema.
+        // El de Camiones es nuevo: falta exponerlo en el backend con esta
+        // misma forma (ver aviso al usuario).
+        const peticiones = {
+          ruta: {
+            url: `${API_RECOLECCION}Rutas/AsignarCuadrilla`,
+            method: "POST",
+            body: { idRuta: id, idCuadrilla },
+          },
+          incidencia: {
+            url: `${API_GESTION}Incidencias/AsignarCuadrilla`,
+            method: "PATCH",
+            body: { idIncidencia: id, idCuadrilla },
+          },
+          camion: {
+            url: `${API_RECOLECCION}Camiones/AsignarCuadrilla`,
+            method: "PATCH",
+            body: { matricula: id, idCuadrilla },
+          },
+        };
+
+        const peticion = peticiones[tipo];
+        if (!peticion) return;
+
+        try {
+          const resp = await fetch(peticion.url, {
+            method: peticion.method,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(peticion.body),
+          });
+          const resultado = await resp.json();
+
+          if (resultado.status === "ok") {
+            opCerrarModalAsignar();
+            const seccion = tipo === "ruta" ? "rutas" : tipo === "incidencia" ? "incidencias" : "camiones";
+            cargarSeccion(seccion, true);
+          } else {
+            alert(resultado.mensaje || "No se pudo asignar la cuadrilla.");
+          }
+        } catch (error) {
+          console.error("Error al asignar cuadrilla:", error);
+          alert("Error de conexión al asignar la cuadrilla.");
+        }
+      });
+
+      // ---------- RUTAS ----------
+      let opRutaSeleccionada = null;
+      let opMap = null;
+      let opCapaRuta = null;
+      let opCapaContador = 0;
+
+      function inicializarMapa() {
+        if (opMap) {
+          setTimeout(() => opMap.invalidateSize(), 50);
+          return;
+        }
+        opMap = L.map("opMap").setView([-34.9011, -56.1645], 12);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "&copy; OpenStreetMap contributors",
+          maxZoom: 19,
+        }).addTo(opMap);
+        setTimeout(() => opMap.invalidateSize(), 50);
+      }
+
+      function renderRutas() {
+        const lista = document.getElementById("opListaRutas");
+        const contador = document.getElementById("opContadorRutas");
+        let datos = estadoSecciones.rutas.datos;
+
+        poblarFiltroEstados("opFiltroEstadoRutas", estadoSecciones.rutas.datos);
+
+        const texto = document.getElementById("opBuscarRutas").value;
+        const estado = document.getElementById("opFiltroEstadoRutas").value;
+
+        datos = filtrarPorTexto(datos, texto, ["nombre", "matricula"]);
+        if (estado) datos = datos.filter((r) => r.estado === estado);
+
+        contador.textContent = `${datos.length} ruta(s)`;
+
+        if (datos.length === 0) {
+          lista.innerHTML = `<p class="op-vacio">No hay rutas que coincidan con la búsqueda.</p>`;
+          return;
+        }
+
+        lista.innerHTML = datos
+          .map((r) => {
+            const cuadrillaActual = r.nombre_cuadrilla || r.cuadrilla || null;
+            const nombreEscapado = (r.nombre || "").replace(/'/g, "\\'");
+            return `
+          <div class="op-tarjeta op-ruta-item${r.ID_ruta === opRutaSeleccionada ? " op-seleccionada" : ""}" onclick="opVerRutaEnMapa(${r.ID_ruta})">
+            <div class="op-tarjeta-info">
+              <span class="op-tarjeta-titulo">${r.nombre}</span>
+              <span class="op-tarjeta-sub">${r.matricula ? `Camión ${r.matricula}` : "Sin camión asignado"} · ${r.cantidad_paradas ?? 0} paradas</span>
+              <span class="op-tarjeta-sub">Cuadrilla: ${cuadrillaActual ?? "Sin asignar"}</span>
+            </div>
+            <div class="op-tarjeta-acciones" onclick="event.stopPropagation()">
+              ${badgeEstado(r.estado)}
+              <button class="op-btn-asignar" onclick="abrirModalAsignar('ruta', ${r.ID_ruta}, '${nombreEscapado}')">Asignar Cuadrilla</button>
+            </div>
+          </div>`;
+          })
+          .join("");
+      }
+
+      async function opVerRutaEnMapa(idRuta) {
+        opRutaSeleccionada = idRuta;
+        renderRutas();
+
+        try {
+          const resp = await fetch(`${API_RECOLECCION}Rutas/${idRuta}`);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          await opDibujarRuta(data?.data || []);
+        } catch (error) {
+          console.error("Error al obtener la ruta:", error);
+          alert("No se pudo cargar la ruta en el mapa.");
+        }
+      }
+
+      async function opDibujarRuta(paradasRuta) {
+        opCapaContador++;
+        const contador = opCapaContador;
+
+        if (opCapaRuta) {
+          opMap.removeLayer(opCapaRuta);
+          opCapaRuta = null;
+        }
+
+        if (!paradasRuta.length) return;
+
+        const puntos = paradasRuta.map((p) => ({
+          lat: parseFloat(p.lat),
+          lon: parseFloat(p.lon),
+        }));
+
+        const capa = L.layerGroup().addTo(opMap);
+
+        puntos.forEach((p, i) => {
+          L.marker([p.lat, p.lon], {
+            icon: L.divIcon({
+              className: "",
+              html: `<div class="op-numero-parada">${i + 1}</div>`,
+              iconSize: [22, 22],
+              iconAnchor: [11, 11],
+            }),
+          }).addTo(capa);
+        });
+
+        let coordenadasLinea = puntos.map((p) => [p.lat, p.lon]);
+
+        if (puntos.length >= 2) {
+          try {
+            const resp = await fetch(`${API_RECOLECCION}Rutas/CalcularCamino`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ paradas: puntos }),
+            });
+            const resultado = await resp.json();
+            if (resultado.status === "ok" && resultado.data) {
+              coordenadasLinea = resultado.data.geometria.map((p) => [p.lat, p.lon]);
+            }
+          } catch (error) {
+            console.error("Error al calcular el camino por calles:", error);
+          }
+        }
+
+        if (contador !== opCapaContador) {
+          opMap.removeLayer(capa);
+          return;
+        }
+
+        L.polyline(coordenadasLinea, { color: "#2f8f3a", weight: 4 }).addTo(capa);
+        opCapaRuta = capa;
+
+        opMap.fitBounds(L.latLngBounds(puntos.map((p) => [p.lat, p.lon])), {
+          padding: [40, 40],
+        });
+      }
+
+      // ---------- Cabecera / sesión (igual al resto del sitio) ----------
+      document.addEventListener("DOMContentLoaded", () => {
+        const rolUsuario = (localStorage.getItem("rol") || "").trim();
+        document.querySelectorAll("[data-rol]").forEach((boton) => {
+          const rolesPermitidos = boton.dataset.rol.split(",").map((r) => r.trim());
+          if (!rolesPermitidos.includes(rolUsuario)) {
+            boton.style.display = "none";
+          }
+        });
+      });
+
+      function toggleMenu() {
+        document.getElementById("menu").classList.toggle("activo");
+      }
+
+      function cerrarSesion() {
+        localStorage.removeItem("logueado");
+        localStorage.removeItem("nickname");
+        window.location.href = "index.html";
+      }
+
+      function cargarUsuario() {
+        const nombre = localStorage.getItem("nickname") || "Usuario";
+        const inicial = nombre.charAt(0).toUpperCase();
+
+        const saludo = document.getElementById("opSaludo");
+        if (saludo) {
+          saludo.textContent = `Bienvenido/a, ${nombre}. Toda la operación de Epsilon a un click.`;
+        }
+
+        document.getElementById("usuario").innerHTML = `
+          <span class="nombre-usuario">${nombre}</span>
+          <button class="usuario-btn" onclick="abrirUsuario()">${inicial}</button>
+          <div id="menuUsuario" class="menu-usuario">
+            <button onclick="cerrarSesion()">Cerrar Sesión</button>
+          </div>
+        `;
+      }
+
+      function abrirUsuario() {
+        document.getElementById("menuUsuario").classList.toggle("activo");
+      }
+
+      cargarUsuario();
+
+      // Carga inicial: solo la primera pestaña, el resto se carga al abrirla.
+      cargarSeccion("contenedores");
+    </script>
+  </body>
+</html>

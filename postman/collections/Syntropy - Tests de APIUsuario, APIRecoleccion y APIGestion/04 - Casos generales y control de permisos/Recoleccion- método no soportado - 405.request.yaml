@@ -1,0 +1,13 @@
+$kind: http-request
+name: "Recoleccion: método no soportado -> 405"
+url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Camiones"
+method: PUT
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código 405 y status 'no_permitido'", function () {
+          pm.response.to.have.status(405);
+          pm.expect(pm.response.json().status).to.eql('no_permitido');
+      });
+    language: text/javascript
+order: 15000

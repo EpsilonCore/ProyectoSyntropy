@@ -73,6 +73,49 @@ class CuadrillaController
         return ["status" => "error", "mensaje" => "No se pudo crear la cuadrilla. Verificá que todos los miembros tengan rol Recolector y estén activos.", "data" => null];
     }
 
+    public function getCamionesDisponibles()
+    {
+        return ["status" => "ok", "mensaje" => "Camiones disponibles obtenidos correctamente.", "data" => $this->modeloObj->getCamionesDisponibles()];
+    }
+
+    public function asignarCamion()
+    {
+        $json = file_get_contents('php://input');
+        $datos = json_decode($json);
+
+        if (
+            !$datos ||
+            !isset($datos->idCuadrilla) ||
+            filter_var($datos->idCuadrilla, FILTER_VALIDATE_INT) === false ||
+            (int) $datos->idCuadrilla <= 0 ||
+            !isset($datos->matricula) ||
+            !is_string($datos->matricula) ||
+            trim($datos->matricula) === ""
+        ) {
+            return [
+                "status" => "datos_invalidos",
+                "mensaje" => "Faltan campos obligatorios: idCuadrilla y matricula.",
+                "data" => null
+            ];
+        }
+
+        $idCuadrilla = (int) $datos->idCuadrilla;
+        $matricula = trim($datos->matricula);
+
+        $resultado = $this->modeloObj->asignarCamion($idCuadrilla, $matricula);
+
+        if ($resultado['ok']) {
+            return ["status" => "ok", "mensaje" => "Camión asignado correctamente.", "data" => null];
+        }
+        if ($resultado['motivo'] === 'no_disponible') {
+            return ["status" => "no_disponible", "mensaje" => "El camión seleccionado ya no está disponible.", "data" => null];
+        }
+        if ($resultado['motivo'] === 'no_encontrado') {
+            return ["status" => "no_encontrado", "mensaje" => "No se encontró un camión con esa matrícula.", "data" => null];
+        }
+        return ["status" => "error", "mensaje" => "No se pudo asignar el camión.", "data" => null];
+    }
+
     public function eliminarCuadrilla()
     {
         $json = file_get_contents('php://input');

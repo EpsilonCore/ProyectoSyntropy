@@ -315,7 +315,7 @@
 
       // Convierte el archivo elegido en el input a un data URL en base64,
       // para mandarlo dentro del mismo body JSON que ya usa el resto del
-      // formulario (sin pasar a multipart/form-data ni tocar el backend).
+      // formulario.
       function leerImagenComoBase64(inputFile) {
         return new Promise((resolve, reject) => {
           const archivo = inputFile.files[0];
@@ -444,13 +444,10 @@
       }
 
       function verImagenIncidencia(id) {
-        const incidencia = incidencias.find(
-          (i) => i.ID_incidencia === id,
-        );
+        const incidencia = incidencias.find((i) => i.ID_incidencia === id);
         if (!incidencia || !incidencia.imagen) return;
 
-        document.getElementById("imgIncidenciaGrande").src =
-          incidencia.imagen;
+        document.getElementById("imgIncidenciaGrande").src = incidencia.imagen;
         document
           .getElementById("overlayImagenIncidencia")
           .classList.add("activo");

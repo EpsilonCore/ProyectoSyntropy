@@ -1,0 +1,32 @@
+$kind: http-request
+name: "Sin sesión: Registrar Incidencia sigue siendo público"
+url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/Registrar"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "descripcion": "Contenedor desbordado (sin sesión)",
+      "direccion": "Calle Falsa 123, Montevideo",
+      "latitud": -34.9011,
+      "longitud": -56.1645
+    }
+scripts:
+  - type: beforeRequest
+    code: |-
+      try {
+          const jar = pm.cookies.jar();
+          jar.clear(pm.request.url.toString(), function () {});
+      } catch (e) {
+          console.log('Tu versión de Postman no soporta pm.cookies.jar(). Borrá las cookies manualmente antes de correr esta carpeta.');
+      }
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("No responde 403", function () {
+          pm.expect(pm.response.code).to.not.equal(403);
+      });
+    language: text/javascript
+order: 9000

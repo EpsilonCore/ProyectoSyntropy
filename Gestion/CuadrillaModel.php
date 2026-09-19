@@ -28,10 +28,12 @@ class CuadrillaModel
 
     public function getAllCuadrillas()
     {
-        $sql = "SELECT ID_cuadrilla, nombre, fecha_creacion, estado
-                FROM cuadrilla
-                WHERE estado = 'Activa'
-                ORDER BY fecha_creacion DESC";
+        $sql = "SELECT c.ID_cuadrilla, c.nombre, c.fecha_creacion, c.estado,
+                       cc.matricula AS camion_matricula, cc.fecha AS camion_fecha
+                FROM cuadrilla c
+                LEFT JOIN camioncuadrilla cc ON cc.ID_cuadrilla = c.ID_cuadrilla
+                WHERE c.estado = 'Activa'
+                ORDER BY c.fecha_creacion DESC";
         $stmt = mysqli_prepare($this->conexion, $sql);
         mysqli_stmt_execute($stmt);
         $resultado = mysqli_stmt_get_result($stmt);
@@ -130,6 +132,93 @@ class CuadrillaModel
             mysqli_rollback($this->conexion);
             error_log("Error en crearCuadrilla: " . $e->getMessage());
             return false;
+        }
+    }
+
+    // Camiones que se pueden ofrecer para asignar (solo los libres).
+    public function getCamionesDisponibles()
+    {
+        $sql = "SELECT matricula, tipo, capacidadCarga, ubicacion
+                FROM camion
+                WHERE estado = 'Disponible'";
+        $stmt = mysqli_prepare($this->conexion, $sql);
+        mysqli_stmt_execute($stmt);
+        $resultado = mysqli_stmt_get_result($stmt);
+
+        $camiones = [];
+        while ($fila = mysqli_fetch_assoc($resultado)) {
+            $camiones[] = $fila;
+        }
+        mysqli_stmt_close($stmt);
+        return $camiones;
+    }
+
+    // Asigna un camión Disponible a una cuadrilla: lo pasa a "En Servicio",
+    // libera el camión que la cuadrilla tuviera asignado antes (si tenía uno
+    // distinto) y deja el registro en camioncuadrilla (una fila por cuadrilla,
+    // se pisa con ON DUPLICATE KEY UPDATE si ya existía).
+    public function asignarCamion($idCuadrilla, $matricula)
+    {
+        mysqli_begin_transaction($this->conexion);
+        try {
+            $sql = "SELECT estado FROM camion WHERE matricula = ? FOR UPDATE";
+            $stmt = mysqli_prepare($this->conexion, $sql);
+            mysqli_stmt_bind_param($stmt, "s", $matricula);
+            mysqli_stmt_execute($stmt);
+            $camion = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+            mysqli_stmt_close($stmt);
+
+            if (!$camion) {
+                mysqli_rollback($this->conexion);
+                return ["ok" => false, "motivo" => "no_encontrado"];
+            }
+            if ($camion['estado'] !== 'Disponible') {
+                mysqli_rollback($this->conexion);
+                return ["ok" => false, "motivo" => "no_disponible"];
+            }
+
+            // Si la cuadrilla ya tenía otro camión asignado, lo liberamos.
+            $sql = "SELECT matricula FROM camioncuadrilla WHERE ID_cuadrilla = ?";
+            $stmt = mysqli_prepare($this->conexion, $sql);
+            mysqli_stmt_bind_param($stmt, "i", $idCuadrilla);
+            mysqli_stmt_execute($stmt);
+            $anterior = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+            mysqli_stmt_close($stmt);
+
+            if ($anterior && $anterior['matricula'] !== $matricula) {
+                $sql = "UPDATE camion SET estado = 'Disponible' WHERE matricula = ?";
+                $stmt = mysqli_prepare($this->conexion, $sql);
+                mysqli_stmt_bind_param($stmt, "s", $anterior['matricula']);
+                mysqli_stmt_execute($stmt);
+                mysqli_stmt_close($stmt);
+            }
+
+            $sql = "UPDATE camion SET estado = 'En Servicio' WHERE matricula = ?";
+            $stmt = mysqli_prepare($this->conexion, $sql);
+            mysqli_stmt_bind_param($stmt, "s", $matricula);
+            if (!mysqli_stmt_execute($stmt)) {
+                throw new Exception("Error al actualizar el estado del camión: " . mysqli_stmt_error($stmt));
+            }
+            mysqli_stmt_close($stmt);
+
+            date_default_timezone_set('America/Montevideo');
+            $fecha = date('Y-m-d');
+            $sql = "INSERT INTO camioncuadrilla (ID_cuadrilla, matricula, fecha)
+                    VALUES (?, ?, ?)
+                    ON DUPLICATE KEY UPDATE matricula = VALUES(matricula), fecha = VALUES(fecha)";
+            $stmt = mysqli_prepare($this->conexion, $sql);
+            mysqli_stmt_bind_param($stmt, "iss", $idCuadrilla, $matricula, $fecha);
+            if (!mysqli_stmt_execute($stmt)) {
+                throw new Exception("Error al registrar la asignación: " . mysqli_stmt_error($stmt));
+            }
+            mysqli_stmt_close($stmt);
+
+            mysqli_commit($this->conexion);
+            return ["ok" => true];
+        } catch (Exception $e) {
+            mysqli_rollback($this->conexion);
+            error_log("Error en asignarCamion: " . $e->getMessage());
+            return ["ok" => false, "motivo" => "error"];
         }
     }
 

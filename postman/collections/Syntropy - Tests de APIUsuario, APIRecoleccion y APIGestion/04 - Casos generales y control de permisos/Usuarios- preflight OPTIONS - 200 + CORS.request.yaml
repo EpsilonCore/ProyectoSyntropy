@@ -1,0 +1,16 @@
+$kind: http-request
+name: "Usuarios: preflight OPTIONS -> 200 + CORS"
+url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Usuarios/miApi/Login"
+method: OPTIONS
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("OPTIONS responde 200", function () {
+          pm.response.to.have.status(200);
+      });
+      pm.test("Incluye headers CORS esperados", function () {
+          pm.expect(pm.response.headers.get('Access-Control-Allow-Origin')).to.eql('*');
+          pm.expect(pm.response.headers.get('Access-Control-Allow-Methods')).to.include('GET');
+      });
+    language: text/javascript
+order: 13000

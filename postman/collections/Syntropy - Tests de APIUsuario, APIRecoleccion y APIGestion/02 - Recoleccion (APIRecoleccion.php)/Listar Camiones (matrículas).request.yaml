@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Camiones"
+method: GET
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("El rol de la sesión activa SI tiene permiso (no devuelve 403)", function () {
+          pm.expect(pm.response.code).to.not.equal(403);
+      });
+      if (pm.response.code === 200) {
+          pm.test("Si la respuesta es 200, 'data' es un array", function () {
+              const jsonData = pm.response.json();
+              pm.expect(jsonData.data).to.be.an('array');
+          });
+      }
+    language: text/javascript
+order: 1000

@@ -7,6 +7,12 @@
     <title>Cuadrillas - Epsilon</title>
 
     <link rel="stylesheet" href="style.css" />
+
+    <style>
+      .btn-asignar-camion {
+        background: #2a6df4;
+      }
+    </style>
   </head>
 
   <body>
@@ -145,6 +151,36 @@
       </div>
     </div>
 
+    <!-- Modal: asignar camión a una cuadrilla -->
+    <div class="overlay" id="modalAsignarCamionFondo" onclick="cerrarModalAsignarCamionFuera(event)">
+      <div class="crear-usuario">
+        <h3>Asignar Camión</h3>
+        <p id="asignarCamionCuadrillaNombre" style="color: var(--tinta-suave); margin-top: -8px;"></p>
+
+        <form id="formAsignarCamion" onsubmit="event.preventDefault(); asignarCamion();">
+          <label for="selectCamionDisponible">Camión disponible</label>
+          <select id="selectCamionDisponible" required>
+            <option value="">Cargando camiones...</option>
+          </select>
+
+          <button
+            type="submit"
+            id="btnGuardarAsignarCamion"
+            class="btn-crear-usuario"
+          >
+            Asignar
+          </button>
+          <button
+            type="button"
+            class="btn-cancelar-usuario"
+            onclick="cerrarModalAsignarCamion()"
+          >
+            Cancelar
+          </button>
+        </form>
+      </div>
+    </div>
+
     <script>
       // Rutas REST expuestas por APIGestion.php.
       const CUADRILLA_API_BASE = "/Proyecto/ProyectoSyntropy/Gestion/miApi/Cuadrillas";
@@ -245,16 +281,27 @@
                   .join("")
               : `<li>Sin miembros asignados.</li>`;
 
+            const camionInfo = cuadrilla.camion_matricula
+              ? `Camión asignado: <strong>${cuadrilla.camion_matricula}</strong>`
+              : "Sin camión asignado";
+
             return `
               <li class="usuario-item" style="align-items: flex-start;">
                 <div style="display: flex; flex-direction: column; gap: 6px;">
                   <strong style="font-size: 1.1rem; color: var(--tinta);">${cuadrilla.nombre}</strong>
                   <span style="font-size: 0.85rem; color: var(--tinta-suave);">Creada: ${cuadrilla.fecha_creacion}</span>
+                  <span style="font-size: 0.9rem; color: var(--tinta);">${camionInfo}</span>
                   <ul style="list-style: none; padding-left: 0; margin-top: 4px; font-size: 0.95rem; color: var(--tinta);">
                     ${miembrosHtml}
                   </ul>
                 </div>
-                <span class="usuario-acciones">
+                <span class="usuario-acciones" style="display: flex; gap: 8px;">
+                  <button
+                    class="btn-asignar-camion"
+                    style="color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;"
+                    onclick="abrirModalAsignarCamion(${cuadrilla.ID_cuadrilla}, '${cuadrilla.nombre.replace(/'/g, "\\'")}', event)">
+                    Asignar Camión
+                  </button>
                   <button 
                     class="btn-eliminar" 
                     style="color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;"
@@ -306,6 +353,89 @@
       function cerrarModalCuadrillaFuera(evento) {
         if (evento.target.id === "cuadrillaModalFondo") {
           cerrarModalCuadrilla();
+        }
+      }
+
+      // ---------- Lógica de Asignar Camión ----------
+
+      let idCuadrillaParaAsignarCamion = null;
+
+      async function abrirModalAsignarCamion(idCuadrilla, nombreCuadrilla, event) {
+        if (event) event.stopPropagation();
+
+        idCuadrillaParaAsignarCamion = idCuadrilla;
+        document.getElementById("asignarCamionCuadrillaNombre").textContent = `Cuadrilla: ${nombreCuadrilla}`;
+        document.getElementById("modalAsignarCamionFondo").classList.add("activo");
+
+        const select = document.getElementById("selectCamionDisponible");
+        select.innerHTML = `<option value="">Cargando camiones...</option>`;
+
+        try {
+          const resp = await fetch(`${CUADRILLA_API_BASE}/CamionesDisponibles`);
+          const json = await resp.json();
+
+          if (!resp.ok || json.status !== "ok" || !(json.data || []).length) {
+            select.innerHTML = `<option value="">No hay camiones disponibles</option>`;
+            return;
+          }
+
+          select.innerHTML =
+            '<option value="">Seleccioná un camión</option>' +
+            json.data
+              .map((c) => `<option value="${c.matricula}">${c.matricula} — ${c.tipo}</option>`)
+              .join("");
+        } catch (error) {
+          select.innerHTML = `<option value="">Error al cargar camiones</option>`;
+        }
+      }
+
+      function cerrarModalAsignarCamion() {
+        idCuadrillaParaAsignarCamion = null;
+        document.getElementById("modalAsignarCamionFondo").classList.remove("activo");
+        document.getElementById("formAsignarCamion").reset();
+      }
+
+      function cerrarModalAsignarCamionFuera(evento) {
+        if (evento.target.id === "modalAsignarCamionFondo") {
+          cerrarModalAsignarCamion();
+        }
+      }
+
+      async function asignarCamion() {
+        const matricula = document.getElementById("selectCamionDisponible").value;
+        if (!matricula || !idCuadrillaParaAsignarCamion) {
+          mostrarMensaje("Seleccioná un camión disponible.", "error");
+          return;
+        }
+
+        const boton = document.getElementById("btnGuardarAsignarCamion");
+        boton.disabled = true;
+        boton.textContent = "Asignando...";
+
+        try {
+          const resp = await fetch(`${CUADRILLA_API_BASE}/AsignarCamion`, {
+            method: "PATCH",
+            credentials: "same-origin",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              idCuadrilla: idCuadrillaParaAsignarCamion,
+              matricula,
+            }),
+          });
+          const json = await resp.json();
+
+          if (resp.ok && json.status === "ok") {
+            cerrarModalAsignarCamion();
+            mostrarMensaje("Camión asignado correctamente.", "ok");
+            cargarCuadrillas();
+          } else {
+            mostrarMensaje(json.mensaje || "No se pudo asignar el camión.", "error");
+          }
+        } catch (error) {
+          mostrarMensaje("Error de conexión al asignar el camión.", "error");
+        } finally {
+          boton.disabled = false;
+          boton.textContent = "Asignar";
         }
       }
 

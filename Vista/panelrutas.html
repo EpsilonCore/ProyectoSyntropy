@@ -74,6 +74,52 @@
         align-items: center;
         padding: 4px 0;
       }
+      .ruta-acciones {
+        display: flex;
+        gap: 8px;
+      }
+      .btn-asignar-cuadrilla {
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        cursor: pointer;
+        background: #2a6df4;
+        color: #fff;
+      }
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+      .modal-overlay.activo {
+        display: flex;
+      }
+      .modal-caja {
+        background: #fff;
+        border-radius: 10px;
+        padding: 24px;
+        width: 320px;
+        max-width: 90vw;
+      }
+      .modal-caja h3 {
+        margin-top: 0;
+      }
+      .modal-caja select {
+        width: 100%;
+        padding: 8px 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        margin: 10px 0 16px;
+      }
+      .modal-acciones {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
     </style>
   </head>
 
@@ -196,6 +242,30 @@
       </div>
     </div>
 
+    <div id="modalAsignarCuadrilla" class="modal-overlay">
+      <div class="modal-caja">
+        <h3>Asignar cuadrilla</h3>
+        <p id="modalCuadrillaRutaNombre"></p>
+        <form id="formAsignarCuadrilla">
+          <select id="selectCuadrilla" required>
+            <option value="">Seleccioná una cuadrilla</option>
+          </select>
+          <div class="modal-acciones">
+            <button
+              type="button"
+              class="btn-cancelar-centro-acopio"
+              onclick="cerrarModalCuadrilla()"
+            >
+              Cancelar
+            </button>
+            <button type="submit" class="btn-crear-centro-acopio">
+              Asignar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <script>
       const API_URL =
         "http://localhost/Proyecto/ProyectoSyntropy/Recoleccion/miApi/";
@@ -212,6 +282,8 @@
       let rutaSeleccionada = null;
       let capaRutaSeleccionada = null;
       let capaRutaSeleccionadaContador = 0;
+      let cuadrillasDisponibles = [];
+      let idRutaParaAsignar = null;
 
       const map = L.map("map").setView([-34.9011, -56.1645], 13);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -559,6 +631,91 @@
         }
       }
 
+      async function cargarCuadrillas() {
+        try {
+          const resp = await fetch(`${API_URL_GESTION}Cuadrillas/Cuadrillas`);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          // Solo se puede asignar una ruta a cuadrillas que ya tienen un camión asignado.
+          cuadrillasDisponibles = (data?.data || []).filter(
+            (c) => c.camion_matricula,
+          );
+        } catch (error) {
+          console.error("Error al obtener cuadrillas:", error);
+        }
+      }
+
+      function abrirModalCuadrilla(idRuta, nombreRuta, event) {
+        if (event) event.stopPropagation();
+
+        idRutaParaAsignar = idRuta;
+        document.getElementById("modalCuadrillaRutaNombre").textContent =
+          `Ruta: ${nombreRuta}`;
+
+        const select = document.getElementById("selectCuadrilla");
+
+        if (cuadrillasDisponibles.length === 0) {
+          select.innerHTML =
+            '<option value="">No hay cuadrillas con camión asignado</option>';
+        } else {
+          select.innerHTML =
+            '<option value="">Seleccioná una cuadrilla</option>' +
+            cuadrillasDisponibles
+              .map(
+                (c) =>
+                  `<option value="${c.ID_cuadrilla}">${c.nombre || `Cuadrilla #${c.ID_cuadrilla}`} — Camión ${c.camion_matricula}</option>`,
+              )
+              .join("");
+        }
+
+        document
+          .getElementById("modalAsignarCuadrilla")
+          .classList.add("activo");
+      }
+
+      function cerrarModalCuadrilla() {
+        idRutaParaAsignar = null;
+        document
+          .getElementById("modalAsignarCuadrilla")
+          .classList.remove("activo");
+        document.getElementById("formAsignarCuadrilla").reset();
+      }
+
+      document
+        .getElementById("formAsignarCuadrilla")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const idCuadrilla = document.getElementById("selectCuadrilla").value;
+          if (!idCuadrilla || !idRutaParaAsignar) return;
+
+          try {
+            const resp = await fetch(`${API_URL}Rutas/AsignarCuadrilla`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                idRuta: idRutaParaAsignar,
+                idCuadrilla,
+              }),
+            });
+            const resultado = await resp.json();
+
+            if (resultado.status === "ok") {
+              cerrarModalCuadrilla();
+              obtenerRutas();
+            } else if (resultado.status === "sin_camion") {
+              alert(
+                "Esa cuadrilla todavía no tiene un camión asignado. Asignale uno primero desde el panel de Cuadrillas.",
+              );
+            } else {
+              alert(resultado.mensaje);
+            }
+          } catch (error) {
+            console.error("Error al asignar cuadrilla:", error);
+            alert("No se pudo asignar la cuadrilla.");
+          }
+        });
+
       async function obtenerRutas() {
         try {
           const resp = await fetch(`${API_URL}Rutas`);
@@ -588,11 +745,19 @@
                 onclick="verRutaEnMapa(${r.ID_ruta}, event)">
               <div class="ruta-info">
                 <strong>${r.nombre}</strong>
-                — ${r.matricula ? `Camión ${r.matricula}` : "Sin camión"}
+                — ${r.camion_matricula ? `Camión ${r.camion_matricula}` : "Sin camión"}
+                — ${r.cuadrilla_nombre ? `Cuadrilla ${r.cuadrilla_nombre}` : "Sin cuadrilla"}
                 — ${r.cantidad_paradas} paradas
                 — ${r.estado}
               </div>
               <div class="ruta-acciones">
+                <button
+                  type="button"
+                  class="btn-asignar-cuadrilla"
+                  onclick="abrirModalCuadrilla(${r.ID_ruta}, '${(r.nombre || "").replace(/'/g, "\\'")}', event)"
+                >
+                  Asignar Cuadrilla
+                </button>
                 <button
                   type="button"
                   class="btn-eliminar"
@@ -654,6 +819,7 @@
       cargarUsuario();
       obtenerRutas();
       cargarContenedores();
+      cargarCuadrillas();
     </script>
   </body>
 </html>

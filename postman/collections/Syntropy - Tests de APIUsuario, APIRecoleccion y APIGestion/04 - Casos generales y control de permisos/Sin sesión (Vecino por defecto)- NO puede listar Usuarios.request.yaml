@@ -1,0 +1,23 @@
+$kind: http-request
+name: "Sin sesión (Vecino por defecto): NO puede listar Usuarios"
+url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Usuarios/miApi/Usuarios"
+method: GET
+scripts:
+  - type: beforeRequest
+    code: |-
+      try {
+          const jar = pm.cookies.jar();
+          jar.clear(pm.request.url.toString(), function () {});
+      } catch (e) {
+          console.log('Tu versión de Postman no soporta pm.cookies.jar(). Borrá las cookies manualmente antes de correr esta carpeta.');
+      }
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("El rol de la sesión activa NO tiene permiso -> 403 'prohibido'", function () {
+          pm.response.to.have.status(403);
+          const jsonData = pm.response.json();
+          pm.expect(jsonData.status).to.eql('prohibido');
+      });
+    language: text/javascript
+order: 10000

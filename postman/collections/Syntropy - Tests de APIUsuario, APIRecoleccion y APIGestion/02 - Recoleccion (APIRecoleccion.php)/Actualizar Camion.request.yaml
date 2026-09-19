@@ -1,0 +1,21 @@
+$kind: http-request
+url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Recoleccion/miApi/ActualizarCamion"
+method: PATCH
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "matricula": "{{matriculaPrueba}}",
+      "modelo": "Volvo FH16",
+      "capacidadKg": 9000
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("El rol de la sesión activa SI tiene permiso (no devuelve 403)", function () {
+          pm.expect(pm.response.code).to.not.equal(403);
+      });
+    language: text/javascript
+order: 4000

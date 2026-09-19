@@ -1,0 +1,11 @@
+workspace:
+  id: 8f7d7297-0944-424c-81b3-49de91aef061
+
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+
+cloudResources:
+  collections: {}
+
+localResources:
+  specs:
+    - ../postman/specs/Test de APIs/Test de APIs.json
