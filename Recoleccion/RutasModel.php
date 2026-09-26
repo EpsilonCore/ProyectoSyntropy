@@ -140,6 +140,21 @@ public function AsignarCuadrilla($idRuta, $idCuadrilla){
     if (!$tieneCamion) {
         return ["ok" => false, "motivo" => "sin_camion"];
     }
+    $sqlExiste = "SELECT 1 FROM ruta WHERE ID_ruta = ?";
+    $stmtExiste = mysqli_prepare($this->conexion, $sqlExiste);
+    if(!$stmtExiste){
+        throw new Exception("Error al preparar la consulta: " . mysqli_error($this->conexion));
+    }
+    $stmtExiste->bind_param("i", $idRuta);
+    if(! $stmtExiste->execute()){
+        throw new Exception("Error al ejecutar la consulta: " . mysqli_error($this->conexion));
+    }
+    $rutaExiste = $stmtExiste->get_result()->fetch_assoc();
+    $stmtExiste->close();
+
+    if (!$rutaExiste) {
+        return ["ok" => false, "motivo" => "no_encontrado"];
+    }
 
     $sql = "UPDATE ruta SET ID_Cuadrilla = ? WHERE ID_ruta = ?";
     $stmt = mysqli_prepare($this->conexion, $sql);
@@ -150,9 +165,7 @@ public function AsignarCuadrilla($idRuta, $idCuadrilla){
     if(! $stmt->execute()){
         throw new Exception("Error al ejecutar la consulta: " . mysqli_error($this->conexion));
     }
-    $filasAfectadas = $stmt->affected_rows;
     $stmt->close();
-
-    return ["ok" => $filasAfectadas > 0, "motivo" => $filasAfectadas > 0 ? null : "no_encontrado"];
+    return ["ok" => true, "motivo" => null];
 }
 }

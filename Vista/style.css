@@ -467,6 +467,80 @@ nav button:not(.link-button):hover {
 }
 
 /* =========================
+   PANEL RUTAS (creación con mapa)
+========================= */
+.instruccion-mapa {
+  margin: 8px 0 16px;
+  font-size: 0.9rem;
+  color: var(--tinta-suave);
+}
+
+.form-nueva-ruta {
+  display: none;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.form-nueva-ruta.activo {
+  display: flex;
+}
+
+.form-nueva-ruta input,
+.form-nueva-ruta select {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--borde);
+  font-family: var(--fuente-texto);
+}
+
+.form-nueva-ruta button {
+  margin-top: 0;
+}
+
+.numero-parada {
+  background: var(--verde);
+  color: #fff;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: bold;
+  box-shadow: 0 0 0 2px #fff;
+}
+
+.marcador-contenedor {
+  border: 2px solid #fff;
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
+
+#resumenRuta {
+  font-size: 0.9rem;
+  color: var(--verde);
+  font-weight: bold;
+}
+
+#listaParadasRuta {
+  margin: 10px 0;
+}
+
+#listaParadasRuta li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  color: var(--tinta);
+}
+
+/* =========================
    DASHBOARD ESTADISTICAS
 ========================= */
 
@@ -1033,7 +1107,8 @@ nav button:not(.link-button):hover {
 .crear-usuario,
 .crear-contenedor,
 .crear-camion,
-.crear-centro-acopio {
+.crear-centro-acopio,
+.asignar-cuadrilla {
   background: var(--panel);
   width: min(460px, calc(100% - 32px));
   padding: 30px;
@@ -1048,7 +1123,8 @@ nav button:not(.link-button):hover {
 .crear-usuario h3,
 .crear-contenedor h3,
 .crear-camion h3,
-.crear-centro-acopio h3 {
+.crear-centro-acopio h3,
+.asignar-cuadrilla h3 {
   font-family: var(--fuente-display);
   font-size: 24px;
   font-weight: 700;
@@ -1062,7 +1138,8 @@ nav button:not(.link-button):hover {
 .crear-usuario form,
 .crear-contenedor form,
 .crear-camion form,
-.crear-centro-acopio form {
+.crear-centro-acopio form,
+.asignar-cuadrilla form {
   display: grid;
   gap: 10px;
 }
@@ -1073,7 +1150,8 @@ nav button:not(.link-button):hover {
 .crear-usuario label,
 .crear-contenedor label,
 .crear-camion label,
-.crear-centro-acopio label {
+.crear-centro-acopio label,
+.asignar-cuadrilla label {
   margin-top: 6px;
   color: var(--tinta);
   font-size: 0.9rem;
@@ -1093,7 +1171,9 @@ nav button:not(.link-button):hover {
 .crear-camion input:not([type="hidden"]),
 .crear-camion select,
 .crear-centro-acopio input:not([type="hidden"]),
-.crear-centro-acopio select {
+.crear-centro-acopio select,
+.asignar-cuadrilla input:not([type="hidden"]),
+.asignar-cuadrilla select {
   width: 100%;
   padding: 12px 14px;
   border: 1px solid var(--borde);
@@ -1122,7 +1202,9 @@ nav button:not(.link-button):hover {
 .crear-camion input:focus,
 .crear-camion select:focus,
 .crear-centro-acopio input:focus,
-.crear-centro-acopio select:focus {
+.crear-centro-acopio select:focus,
+.asignar-cuadrilla input:focus,
+.asignar-cuadrilla select:focus {
   border-color: var(--verde);
   box-shadow: 0 0 0 3px rgba(47, 143, 58, 0.16);
 }
@@ -1233,6 +1315,36 @@ nav button:not(.link-button):hover {
 }
 
 .btn-modificar:active {
+  transform: scale(0.97);
+}
+
+/* Botones "Asignar" (cuadrilla -> ruta, camión -> cuadrilla): misma
+   forma que btn-eliminar/btn-modificar pero en verde, para diferenciar
+   la acción de asignar de la de eliminar o modificar. */
+.btn-asignar-cuadrilla,
+.btn-asignar-camion {
+  background-color: var(--verde);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  color: #fff;
+  font-family: var(--fuente-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
+}
+
+.btn-asignar-cuadrilla:hover,
+.btn-asignar-camion:hover {
+  background-color: var(--verde-hover);
+}
+
+.btn-asignar-cuadrilla:active,
+.btn-asignar-camion:active {
   transform: scale(0.97);
 }
 
@@ -2237,7 +2349,9 @@ nav button:not(.link-button):hover {
    PANEL OPERARIO (paneloperario.html)
    Estilos propios del panel unificado de solo lectura +
    asignaciones para operarios. Todo bajo prefijo "op-" para
-   no chocar con clases existentes.
+   no chocar con clases existentes. Los botones y el modal de
+   asignar reutilizan .btn-asignar-cuadrilla / .btn-asignar-camion
+   y .asignar-cuadrilla ya definidos arriba.
 ========================================================= */
 
 .op-resumen-grid {
@@ -2369,14 +2483,15 @@ nav button:not(.link-button):hover {
 }
 
 .op-vacio,
-.op-cargando,
-.op-error {
+.op-cargando {
   color: var(--tinta-suave);
   padding: 20px 4px;
 }
 
 .op-error {
   color: var(--oxido);
+  padding: 20px 4px;
+  font-weight: 600;
 }
 
 .op-tarjeta {
@@ -2417,6 +2532,31 @@ nav button:not(.link-button):hover {
   justify-content: flex-end;
 }
 
+/* Botón "Asignarme" (operario se autoasigna una incidencia): mismo
+   look que btn-asignar-cuadrilla/btn-asignar-camion, en acero para
+   diferenciarlo de una asignación de cuadrilla. */
+.btn-asignarme {
+  background-color: var(--acero);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  color: #fff;
+  font-family: var(--fuente-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-asignarme:hover {
+  background-color: var(--acero-hover);
+}
+
+.btn-asignarme:active {
+  transform: scale(0.97);
+}
+
 .op-cuadrilla-miembros {
   list-style: none;
   padding: 0;
@@ -2444,42 +2584,6 @@ nav button:not(.link-button):hover {
   font-size: 0.88rem;
   color: var(--tinta-suave);
   margin: 0 0 14px;
-}
-
-/* Botones de asignación dentro de las tarjetas */
-.op-btn-asignar,
-.op-btn-asignarme {
-  border: none;
-  border-radius: 8px;
-  padding: 8px 14px;
-  color: #fff;
-  font-family: var(--fuente-texto);
-  font-size: 0.83rem;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color 0.2s ease, transform 0.1s ease;
-}
-
-.op-btn-asignar {
-  background-color: var(--acero);
-}
-
-.op-btn-asignar:hover {
-  background-color: var(--acero-hover);
-}
-
-.op-btn-asignarme {
-  background-color: var(--verde);
-}
-
-.op-btn-asignarme:hover {
-  background-color: var(--verde-hover);
-}
-
-.op-btn-asignar:active,
-.op-btn-asignarme:active {
-  transform: scale(0.97);
 }
 
 /* Mapa de rutas (solo lectura) */

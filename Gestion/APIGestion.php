@@ -48,9 +48,8 @@ switch ($method) {
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Contenedores') {
             $resultado = $controladorContenedor->getAllContenedores();
         }
-        // Panel de Centros de Acopio: exclusivo de Administrador.
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/CentrosAcopio/CentrosAcopio') {
-            $resultado = verificarRol($soloAdministrador) ?? $controladorCentroAcopio->getAllCentrosAcopio();
+            $resultado = $controladorCentroAcopio->getAllCentrosAcopio();
         }
         // Abierto a cualquier logueado: lo usa mapa.html, además del panel de Incidencias.
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/Incidencias') {
@@ -58,7 +57,7 @@ switch ($method) {
         }
         // Panel de Cuadrillas: exclusivo de Administrador.
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Cuadrillas/Cuadrillas') {
-            $resultado = verificarRol($soloAdministrador) ?? $controladorCuadrilla->getAllCuadrillas();
+            $resultado = verificarRol($administradorUOperario) ?? $controladorCuadrilla->getAllCuadrillas();
         }
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Cuadrillas/Recolectores') {
             $resultado = verificarRol($soloAdministrador) ?? $controladorCuadrilla->getRecolectoresDisponibles();

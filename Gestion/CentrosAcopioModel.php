@@ -19,7 +19,7 @@ class CentrosAcopioModel
 
     public function getAllCentrosAcopio()
     {
-        $sql = "SELECT ID_acopio, tipoResiduo, capacidad, barrio, calle, numero FROM centro_acopio";
+        $sql = "SELECT ID_acopio, tipoResiduo, capacidad, barrio, calle, numero, lat, lon FROM centro_acopio";
         $stmt = mysqli_prepare($this->conexion, $sql);
         mysqli_stmt_execute($stmt);
         $resultado = mysqli_stmt_get_result($stmt);
@@ -62,7 +62,7 @@ class CentrosAcopioModel
         $this->latitud = $ubicacion['lat'];
         $this->longitud = $ubicacion['lon'];
 
-        mysqli_stmt_bind_param($stmt, 'sisssdd', $this->tipoResiduo, $this->capacidad, $this->barrio, $this->calle, $this->numero, $this->latitud, $this->longitud);
+        mysqli_stmt_bind_param($stmt, 'sissidd', $this->tipoResiduo, $this->capacidad, $this->barrio, $this->calle, $this->numero, $this->latitud, $this->longitud);
         
         if ($stmt->execute()) {
             mysqli_stmt_close($stmt);
@@ -81,7 +81,7 @@ class CentrosAcopioModel
         }
         $sql = "UPDATE centro_acopio SET tipoResiduo = ?, capacidad = ?, barrio = ?, calle = ?, numero = ?, lat = ?, lon = ? WHERE ID_acopio = ?";
         $stmt = mysqli_prepare($this->conexion, $sql);
-        mysqli_stmt_bind_param($stmt, 'sisssddi', $tipoResiduo, $capacidad, $barrio, $calle, $numero, $ubicacion['lat'], $ubicacion['lon'], $id);
+        mysqli_stmt_bind_param($stmt, 'sissiddi', $tipoResiduo, $capacidad, $barrio, $calle, $numero, $ubicacion['lat'], $ubicacion['lon'], $id);
 
         if ($stmt->execute()) {
             mysqli_stmt_close($stmt);

@@ -39,7 +39,11 @@ class CentrosAcopioController
 		if (!$datos || !isset($datos->tipoResiduo) || !isset($datos->capacidad) || !isset($datos->barrio) || !isset($datos->calle) || !isset($datos->numero)) {
 			return ["status" => "datos_invalidos", "mensaje" => "Faltan campos obligatorios.", "data" => null];
 		}
-		$resultado = $this->modeloObj->crearCentroAcopio($datos->tipoResiduo, $datos->capacidad, $datos->barrio, $datos->calle, $datos->numero);
+		try {
+			$resultado = $this->modeloObj->crearCentroAcopio($datos->tipoResiduo, $datos->capacidad, $datos->barrio, $datos->calle, $datos->numero);
+		} catch (\Throwable $e) {
+			return ["status" => "error", "mensaje" => "No se pudo crear el centro de acopio: " . $e->getMessage(), "data" => null];
+		}
 		if ($resultado) {
 			return ["status" => "creado", "mensaje" => "Centro de acopio creado correctamente.", "data" => null];
 		}

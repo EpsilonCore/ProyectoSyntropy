@@ -107,7 +107,9 @@
       <div class="gestion-encabezado">
         <span class="gestion-eyebrow">Operario</span>
         <h2>Panel Operario</h2>
-        <p id="opSaludo">Toda la información operativa de Epsilon, en un solo lugar.</p>
+        <p id="opSaludo">
+          Toda la información operativa de Epsilon, en un solo lugar.
+        </p>
       </div>
     </div>
 
@@ -140,19 +142,63 @@
       </div>
 
       <div class="op-tabs">
-        <button class="op-tab activo" data-seccion="contenedores" onclick="cambiarSeccion('contenedores')">📦 Contenedores</button>
-        <button class="op-tab" data-seccion="camiones" onclick="cambiarSeccion('camiones')">🚛 Camiones</button>
-        <button class="op-tab" data-seccion="centros" onclick="cambiarSeccion('centros')">🏭 Centros de Acopio</button>
-        <button class="op-tab" data-seccion="cuadrillas" onclick="cambiarSeccion('cuadrillas')">👷 Cuadrillas</button>
-        <button class="op-tab" data-seccion="incidencias" onclick="cambiarSeccion('incidencias')">⚠️ Incidencias</button>
-        <button class="op-tab" data-seccion="rutas" onclick="cambiarSeccion('rutas')">🗺️ Rutas</button>
+        <button
+          class="op-tab activo"
+          data-seccion="contenedores"
+          onclick="cambiarSeccion('contenedores')"
+        >
+          📦 Contenedores
+        </button>
+        <button
+          class="op-tab"
+          data-seccion="camiones"
+          onclick="cambiarSeccion('camiones')"
+        >
+          🚛 Camiones
+        </button>
+        <button
+          class="op-tab"
+          data-seccion="centros"
+          onclick="cambiarSeccion('centros')"
+        >
+          🏭 Centros de Acopio
+        </button>
+        <button
+          class="op-tab"
+          data-seccion="cuadrillas"
+          onclick="cambiarSeccion('cuadrillas')"
+        >
+          👷 Cuadrillas
+        </button>
+        <button
+          class="op-tab"
+          data-seccion="incidencias"
+          onclick="cambiarSeccion('incidencias')"
+        >
+          ⚠️ Incidencias
+        </button>
+        <button
+          class="op-tab"
+          data-seccion="rutas"
+          onclick="cambiarSeccion('rutas')"
+        >
+          🗺️ Rutas
+        </button>
       </div>
 
       <!-- CONTENEDORES -->
       <div class="op-panel activo" id="opPanel-contenedores">
         <div class="op-toolbar">
-          <input type="text" id="opBuscarContenedores" placeholder="Buscar por calle o barrio…" oninput="renderContenedores()" />
-          <select id="opFiltroEstadoContenedores" onchange="renderContenedores()">
+          <input
+            type="text"
+            id="opBuscarContenedores"
+            placeholder="Buscar por calle o barrio…"
+            oninput="renderContenedores()"
+          />
+          <select
+            id="opFiltroEstadoContenedores"
+            onchange="renderContenedores()"
+          >
             <option value="">Todos los estados</option>
             <option value="Vacio">Vacío</option>
             <option value="Media capacidad">Media capacidad</option>
@@ -165,16 +211,32 @@
             <option value="Metalico">Metálico</option>
             <option value="Plastico">Plástico</option>
           </select>
-          <button class="op-btn-actualizar" onclick="cargarSeccion('contenedores', true)">↻ Actualizar</button>
+          <button
+            class="op-btn-actualizar"
+            onclick="cargarSeccion('contenedores', true)"
+          >
+            ↻ Actualizar
+          </button>
         </div>
         <div class="op-contador" id="opContadorContenedores"></div>
-        <div id="opListaContenedores" class="op-cargando">Cargando contenedores…</div>
+        <div id="opListaContenedores" class="op-cargando">
+          Cargando contenedores…
+        </div>
       </div>
 
       <!-- CAMIONES -->
       <div class="op-panel" id="opPanel-camiones">
+        <p class="op-nota">
+          Para asignar un camión a una cuadrilla, hacelo desde la pestaña
+          "Cuadrillas".
+        </p>
         <div class="op-toolbar">
-          <input type="text" id="opBuscarCamiones" placeholder="Buscar por matrícula o ubicación…" oninput="renderCamiones()" />
+          <input
+            type="text"
+            id="opBuscarCamiones"
+            placeholder="Buscar por matrícula o ubicación…"
+            oninput="renderCamiones()"
+          />
           <select id="opFiltroEstadoCamiones" onchange="renderCamiones()">
             <option value="">Todos los estados</option>
             <option value="Disponible">Disponible</option>
@@ -182,7 +244,12 @@
             <option value="Mantenimiento">Mantenimiento</option>
             <option value="Averiado">Averiado</option>
           </select>
-          <button class="op-btn-actualizar" onclick="cargarSeccion('camiones', true)">↻ Actualizar</button>
+          <button
+            class="op-btn-actualizar"
+            onclick="cargarSeccion('camiones', true)"
+          >
+            ↻ Actualizar
+          </button>
         </div>
         <div class="op-contador" id="opContadorCamiones"></div>
         <div id="opListaCamiones" class="op-cargando">Cargando camiones…</div>
@@ -191,47 +258,99 @@
       <!-- CENTROS DE ACOPIO -->
       <div class="op-panel" id="opPanel-centros">
         <div class="op-toolbar">
-          <input type="text" id="opBuscarCentros" placeholder="Buscar por tipo de residuo o barrio…" oninput="renderCentros()" />
-          <button class="op-btn-actualizar" onclick="cargarSeccion('centros', true)">↻ Actualizar</button>
+          <input
+            type="text"
+            id="opBuscarCentros"
+            placeholder="Buscar por tipo de residuo o barrio…"
+            oninput="renderCentros()"
+          />
+          <button
+            class="op-btn-actualizar"
+            onclick="cargarSeccion('centros', true)"
+          >
+            ↻ Actualizar
+          </button>
         </div>
         <div class="op-contador" id="opContadorCentros"></div>
-        <div id="opListaCentros" class="op-cargando">Cargando centros de acopio…</div>
+        <div id="opListaCentros" class="op-cargando">
+          Cargando centros de acopio…
+        </div>
       </div>
 
       <!-- CUADRILLAS -->
       <div class="op-panel" id="opPanel-cuadrillas">
-        <p class="op-nota">Para asignar una ruta, una incidencia o un camión a una cuadrilla, hacelo desde la pestaña correspondiente con el botón "Asignar Cuadrilla".</p>
+        <p class="op-nota">
+          Para asignar una ruta o una incidencia a una cuadrilla, hacelo desde
+          la pestaña correspondiente con el botón "Asignar Cuadrilla".
+        </p>
         <div class="op-toolbar">
-          <input type="text" id="opBuscarCuadrillas" placeholder="Buscar por nombre de cuadrilla o integrante…" oninput="renderCuadrillas()" />
-          <button class="op-btn-actualizar" onclick="cargarSeccion('cuadrillas', true)">↻ Actualizar</button>
+          <input
+            type="text"
+            id="opBuscarCuadrillas"
+            placeholder="Buscar por nombre de cuadrilla o integrante…"
+            oninput="renderCuadrillas()"
+          />
+          <button
+            class="op-btn-actualizar"
+            onclick="cargarSeccion('cuadrillas', true)"
+          >
+            ↻ Actualizar
+          </button>
         </div>
         <div class="op-contador" id="opContadorCuadrillas"></div>
-        <div id="opListaCuadrillas" class="op-cargando">Cargando cuadrillas…</div>
+        <div id="opListaCuadrillas" class="op-cargando">
+          Cargando cuadrillas…
+        </div>
       </div>
 
       <!-- INCIDENCIAS -->
       <div class="op-panel" id="opPanel-incidencias">
         <div class="op-toolbar">
-          <input type="text" id="opBuscarIncidencias" placeholder="Buscar por mail, calle o barrio…" oninput="renderIncidencias()" />
+          <input
+            type="text"
+            id="opBuscarIncidencias"
+            placeholder="Buscar por mail, calle o barrio…"
+            oninput="renderIncidencias()"
+          />
           <select id="opFiltroEstadoIncidencias" onchange="renderIncidencias()">
             <option value="">Todos los estados</option>
           </select>
-          <button class="op-btn-actualizar" onclick="cargarSeccion('incidencias', true)">↻ Actualizar</button>
+          <button
+            class="op-btn-actualizar"
+            onclick="cargarSeccion('incidencias', true)"
+          >
+            ↻ Actualizar
+          </button>
         </div>
         <div class="op-contador" id="opContadorIncidencias"></div>
-        <div id="opListaIncidencias" class="op-cargando">Cargando incidencias…</div>
+        <div id="opListaIncidencias" class="op-cargando">
+          Cargando incidencias…
+        </div>
       </div>
 
       <!-- RUTAS -->
       <div class="op-panel" id="opPanel-rutas">
         <div class="op-toolbar">
-          <input type="text" id="opBuscarRutas" placeholder="Buscar por nombre o matrícula…" oninput="renderRutas()" />
+          <input
+            type="text"
+            id="opBuscarRutas"
+            placeholder="Buscar por nombre o matrícula…"
+            oninput="renderRutas()"
+          />
           <select id="opFiltroEstadoRutas" onchange="renderRutas()">
             <option value="">Todos los estados</option>
           </select>
-          <button class="op-btn-actualizar" onclick="cargarSeccion('rutas', true)">↻ Actualizar</button>
+          <button
+            class="op-btn-actualizar"
+            onclick="cargarSeccion('rutas', true)"
+          >
+            ↻ Actualizar
+          </button>
         </div>
-        <p class="op-nota">Tocá una ruta de la lista (fuera de los botones) para verla dibujada en el mapa.</p>
+        <p class="op-nota">
+          Tocá una ruta de la lista (fuera de los botones) para verla dibujada
+          en el mapa.
+        </p>
         <div id="opMap"></div>
         <div class="op-contador" id="opContadorRutas"></div>
         <div id="opListaRutas" class="op-cargando">Cargando rutas…</div>
@@ -242,13 +361,22 @@
     <div class="overlay" id="opOverlayImagen" onclick="opCerrarImagen(event)">
       <div class="crear-centro-acopio incidencia-visor">
         <h3>Foto de la incidencia</h3>
-        <img id="opImagenGrande" src="" alt="Foto de la incidencia" style="max-width: 100%; border-radius: 8px;" />
+        <img
+          id="opImagenGrande"
+          src=""
+          alt="Foto de la incidencia"
+          style="max-width: 100%; border-radius: 8px"
+        />
       </div>
     </div>
 
-    <!-- Modal compartido: asignar cuadrilla a ruta / incidencia / camión -->
-    <div class="overlay" id="opOverlayAsignar" onclick="opCerrarModalAsignar(event)">
-      <div class="modal-usuarios">
+    <!-- Modal: asignar cuadrilla a ruta o incidencia (endpoints ya existentes) -->
+    <div
+      class="overlay"
+      id="opOverlayAsignar"
+      onclick="opCerrarModalAsignar(event)"
+    >
+      <div class="asignar-cuadrilla">
         <h3 id="opAsignarTitulo">Asignar cuadrilla</h3>
 
         <form id="opFormAsignar">
@@ -257,11 +385,50 @@
             <option value="" disabled selected>Seleccione una cuadrilla</option>
           </select>
 
-          <button class="btn-guardar-usuario" type="submit">Guardar cambios</button>
+          <button class="btn-asignar-cuadrilla" type="submit">
+            Guardar cambios
+          </button>
           <button
             class="btn-cancelar-usuario"
             type="button"
-            onclick="document.getElementById('opOverlayAsignar').classList.remove('activo')"
+            onclick="
+              document
+                .getElementById('opOverlayAsignar')
+                .classList.remove('activo')
+            "
+          >
+            Cancelar
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal: asignar camión a una cuadrilla (mismo flujo que Panel Cuadrillas) -->
+    <div
+      class="overlay"
+      id="opOverlayAsignarCamion"
+      onclick="opCerrarModalAsignarCamion(event)"
+    >
+      <div class="asignar-cuadrilla">
+        <h3 id="opAsignarCamionTitulo">Asignar camión</h3>
+
+        <form id="opFormAsignarCamion">
+          <label>Camión disponible</label>
+          <select id="opSelectCamionDisponible" required>
+            <option value="" disabled selected>Cargando camiones…</option>
+          </select>
+
+          <button class="btn-asignar-camion" type="submit">
+            Guardar cambios
+          </button>
+          <button
+            class="btn-cancelar-usuario"
+            type="button"
+            onclick="
+              document
+                .getElementById('opOverlayAsignarCamion')
+                .classList.remove('activo')
+            "
           >
             Cancelar
           </button>
@@ -273,14 +440,19 @@
 
     <script>
       // ---------- Endpoints ----------
-      const API_GESTION = "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/";
-      const API_RECOLECCION = "http://localhost/Proyecto/ProyectoSyntropy/Recoleccion/miApi/";
+      const API_GESTION =
+        "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/";
+      const API_RECOLECCION =
+        "http://localhost/Proyecto/ProyectoSyntropy/Recoleccion/miApi/";
+      // La API de Cuadrillas se sirve por ruta relativa (así la usa panelcuadrilla.html).
+      const CUADRILLA_API_BASE =
+        "/Proyecto/ProyectoSyntropy/Gestion/miApi/Cuadrillas";
 
       const ENDPOINTS = {
         contenedores: `${API_GESTION}Contenedores`,
         camiones: `${API_RECOLECCION}Camiones`,
         centros: `${API_GESTION}CentrosAcopio/CentrosAcopio`,
-        cuadrillas: `${API_GESTION}Cuadrillas/Cuadrillas`,
+        cuadrillas: `${CUADRILLA_API_BASE}/Cuadrillas`,
         incidencias: `${API_GESTION}Incidencias/Incidencias`,
         rutas: `${API_RECOLECCION}Rutas`,
       };
@@ -327,12 +499,28 @@
 
         const contenedorId = `opLista${capitalizar(seccion)}`;
         const contenedor = document.getElementById(contenedorId);
-        if (contenedor) contenedor.innerHTML = `<p class="op-cargando">Cargando…</p>`;
+        if (contenedor)
+          contenedor.innerHTML = `<p class="op-cargando">Cargando…</p>`;
 
         try {
-          const resp = await fetch(ENDPOINTS[seccion]);
-          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const resp = await fetch(ENDPOINTS[seccion], {
+            credentials: "same-origin",
+          });
           const json = await resp.json();
+
+          if (
+            !resp.ok ||
+            (json &&
+              !Array.isArray(json) &&
+              "status" in json &&
+              json.status !== "ok")
+          ) {
+            throw new Error(
+              (json && json.mensaje) ||
+                `La API respondió con estado ${resp.status}.`,
+            );
+          }
+
           const datos = Array.isArray(json) ? json : json?.data || [];
 
           estadoSecciones[seccion].datos = datos;
@@ -343,7 +531,7 @@
         } catch (error) {
           console.error(`Error al cargar ${seccion}:`, error);
           if (contenedor) {
-            contenedor.innerHTML = `<p class="op-error">No se pudo cargar la información. Verificá tu conexión y probá "Actualizar".</p>`;
+            contenedor.innerHTML = `<p class="op-error">No se pudo cargar la información: ${error.message}</p>`;
           }
         }
       }
@@ -356,7 +544,11 @@
         if (!texto) return items;
         const t = texto.trim().toLowerCase();
         return items.filter((item) =>
-          campos.some((campo) => String(item[campo] ?? "").toLowerCase().includes(t)),
+          campos.some((campo) =>
+            String(item[campo] ?? "")
+              .toLowerCase()
+              .includes(t),
+          ),
         );
       }
 
@@ -392,8 +584,8 @@
         }
       }
 
-      // ---------- Badges de color por estado ----------
-      function badgeEstado(estado) {
+      // ---------- color por estado ----------
+      function colores(estado) {
         const colores = {
           Vacio: ["var(--verde-tinte)", "var(--verde-bosque)"],
           Disponible: ["var(--verde-tinte)", "var(--verde-bosque)"],
@@ -409,7 +601,10 @@
           Averiado: ["#f7e9e5", "var(--oxido)"],
           Desbordado: ["#f3f4f6", "#111827"],
         };
-        const [fondo, texto] = colores[estado] || ["#f3f4f6", "var(--tinta-suave)"];
+        const [fondo, texto] = colores[estado] || [
+          "#f3f4f6",
+          "var(--tinta-suave)",
+        ];
         return `<span class="op-badge" style="background:${fondo};color:${texto};">${estado ?? "Sin estado"}</span>`;
       }
 
@@ -420,7 +615,9 @@
         let datos = estadoSecciones.contenedores.datos;
 
         const texto = document.getElementById("opBuscarContenedores").value;
-        const estado = document.getElementById("opFiltroEstadoContenedores").value;
+        const estado = document.getElementById(
+          "opFiltroEstadoContenedores",
+        ).value;
         const tipo = document.getElementById("opFiltroTipoContenedores").value;
 
         datos = filtrarPorTexto(datos, texto, ["calle", "barrio", "numero"]);
@@ -442,17 +639,32 @@
               <span class="op-tarjeta-titulo">Contenedor #${c.ID_contenedor} — ${c.tipo ?? "Sin tipo"}</span>
               <span class="op-tarjeta-sub">${c.calle ?? ""} ${c.numero ?? ""}, ${c.barrio ?? "Sin barrio"} · Capacidad: ${c.capacidadCarga ?? "s/d"}</span>
             </div>
-            ${badgeEstado(c.estado)}
+            ${colores(c.estado)}
           </div>`,
           )
           .join("");
       }
 
       // ---------- CAMIONES ----------
+      // La relación vive del lado de la cuadrilla (campo camion_matricula),
+      // así que para mostrar "Cuadrilla: X" en cada camión hace falta la
+      // lista de cuadrillas. Se pide en segundo plano si todavía no está.
+      function mapaCuadrillaPorCamion() {
+        const mapa = {};
+        (estadoSecciones.cuadrillas.datos || []).forEach((c) => {
+          if (c.camion_matricula) mapa[c.camion_matricula] = c.nombre;
+        });
+        return mapa;
+      }
+
       function renderCamiones() {
         const lista = document.getElementById("opListaCamiones");
         const contador = document.getElementById("opContadorCamiones");
         let datos = estadoSecciones.camiones.datos;
+
+        if (!estadoSecciones.cuadrillas.cargado) {
+          cargarSeccion("cuadrillas").then(renderCamiones);
+        }
 
         const texto = document.getElementById("opBuscarCamiones").value;
         const estado = document.getElementById("opFiltroEstadoCamiones").value;
@@ -467,9 +679,11 @@
           return;
         }
 
+        const cuadrillaPorCamion = mapaCuadrillaPorCamion();
+
         lista.innerHTML = datos
           .map((c) => {
-            const cuadrillaActual = c.nombre_cuadrilla || c.cuadrilla || null;
+            const cuadrillaActual = cuadrillaPorCamion[c.matricula] || null;
             return `
           <div class="op-tarjeta">
             <div class="op-tarjeta-info">
@@ -477,10 +691,7 @@
               <span class="op-tarjeta-sub">${c.ubicacion ?? "Sin ubicación"} · Carga: ${c.capacidadCarga ?? "s/d"}</span>
               <span class="op-tarjeta-sub">Cuadrilla: ${cuadrillaActual ?? "Sin asignar"}</span>
             </div>
-            <div class="op-tarjeta-acciones">
-              ${badgeEstado(c.estado)}
-              <button class="op-btn-asignar" onclick="abrirModalAsignar('camion', '${c.matricula}', '${c.matricula}')">Asignar Cuadrilla</button>
-            </div>
+            ${colores(c.estado)}
           </div>`;
           })
           .join("");
@@ -493,7 +704,11 @@
         let datos = estadoSecciones.centros.datos;
 
         const texto = document.getElementById("opBuscarCentros").value;
-        datos = filtrarPorTexto(datos, texto, ["tipoResiduo", "barrio", "calle"]);
+        datos = filtrarPorTexto(datos, texto, [
+          "tipoResiduo",
+          "barrio",
+          "calle",
+        ]);
 
         contador.textContent = `${datos.length} centro(s) de acopio`;
 
@@ -510,6 +725,7 @@
               <span class="op-tarjeta-titulo">Centro #${c.ID_acopio} — ${c.tipoResiduo ?? "Sin tipo"}</span>
               <span class="op-tarjeta-sub">${c.calle ?? ""} ${c.numero ?? ""}, ${c.barrio ?? "Sin barrio"} · Capacidad: ${c.capacidad ?? "s/d"}</span>
             </div>
+            ${colores(c.estado)}
           </div>`,
           )
           .join("");
@@ -521,12 +737,17 @@
         const contador = document.getElementById("opContadorCuadrillas");
         let datos = estadoSecciones.cuadrillas.datos;
 
-        const texto = document.getElementById("opBuscarCuadrillas").value.trim().toLowerCase();
+        const texto = document
+          .getElementById("opBuscarCuadrillas")
+          .value.trim()
+          .toLowerCase();
         if (texto) {
           datos = datos.filter((c) => {
             const enNombre = (c.nombre || "").toLowerCase().includes(texto);
             const enMiembros = (c.miembros || []).some((m) =>
-              `${m.nombre} ${m.apellido} ${m.nickname}`.toLowerCase().includes(texto),
+              `${m.nombre} ${m.apellido} ${m.nickname}`
+                .toLowerCase()
+                .includes(texto),
             );
             return enNombre || enMiembros;
           });
@@ -543,16 +764,32 @@
           .map((c) => {
             const miembrosHtml = (c.miembros || []).length
               ? c.miembros
-                  .map((m) => `<li>• ${m.nombre} ${m.apellido} (${m.nickname})</li>`)
+                  .map(
+                    (m) =>
+                      `<li>• ${m.nombre} ${m.apellido} (${m.nickname})</li>`,
+                  )
                   .join("")
               : `<li>Sin miembros asignados.</li>`;
+            const nombreEscapado = (c.nombre || "").replace(/'/g, "\\'");
+
+            // Si la cuadrilla ya tiene un camión, no se ofrece asignar otro:
+            // ni el botón tiene sentido (la API solo lista camiones libres,
+            // así que reabrir el modal mostraría la lista vacía) ni el
+            // backend tiene forma de reemplazarlo sin antes desasignarlo.
+            const botonAsignarCamion = c.camion_matricula
+              ? ""
+              : `<button class="btn-asignar-camion" onclick="opAbrirModalAsignarCamion(${c.ID_cuadrilla}, '${nombreEscapado}')">Asignar Camión</button>`;
 
             return `
           <div class="op-tarjeta" style="align-items: flex-start;">
             <div class="op-tarjeta-info">
               <span class="op-tarjeta-titulo">${c.nombre}</span>
               <span class="op-tarjeta-sub">Creada: ${c.fecha_creacion ?? "s/d"}</span>
+              <span class="op-tarjeta-sub">Camión: ${c.camion_matricula ?? "Sin asignar"}</span>
               <ul class="op-cuadrilla-miembros">${miembrosHtml}</ul>
+            </div>
+            <div class="op-tarjeta-acciones">
+              ${botonAsignarCamion}
             </div>
           </div>`;
           })
@@ -563,11 +800,15 @@
       function poblarFiltroEstados(selectId, datos) {
         const select = document.getElementById(selectId);
         const actual = select.value;
-        const estadosUnicos = [...new Set(datos.map((d) => d.estado).filter(Boolean))];
+        const estadosUnicos = [
+          ...new Set(datos.map((d) => d.estado).filter(Boolean)),
+        ];
 
         select.innerHTML =
           `<option value="">Todos los estados</option>` +
-          estadosUnicos.map((e) => `<option value="${e}">${e}</option>`).join("");
+          estadosUnicos
+            .map((e) => `<option value="${e}">${e}</option>`)
+            .join("");
 
         if (estadosUnicos.includes(actual)) select.value = actual;
       }
@@ -577,10 +818,15 @@
         const contador = document.getElementById("opContadorIncidencias");
         let datos = estadoSecciones.incidencias.datos;
 
-        poblarFiltroEstados("opFiltroEstadoIncidencias", estadoSecciones.incidencias.datos);
+        poblarFiltroEstados(
+          "opFiltroEstadoIncidencias",
+          estadoSecciones.incidencias.datos,
+        );
 
         const texto = document.getElementById("opBuscarIncidencias").value;
-        const estado = document.getElementById("opFiltroEstadoIncidencias").value;
+        const estado = document.getElementById(
+          "opFiltroEstadoIncidencias",
+        ).value;
 
         datos = filtrarPorTexto(datos, texto, ["mail", "calle", "barrio"]);
         if (estado) datos = datos.filter((i) => i.estado === estado);
@@ -593,8 +839,23 @@
         }
 
         lista.innerHTML = datos
-          .map(
-            (i) => `
+          .map((i) => {
+            // Si ya tiene operario y/o cuadrilla asignados, no se ofrece
+            // repetir esa asignación: se oculta el botón correspondiente.
+            const tieneOperario = Boolean(i.ID_operario);
+            const tieneCuadrilla = Boolean(
+              i.ID_cuadrilla || i.nombre_cuadrilla,
+            );
+
+            const botonAsignarme = tieneOperario
+              ? ""
+              : `<button class="btn-asignarme" onclick="asignarmeIncidencia(${i.ID_incidencia})">Asignarme</button>`;
+
+            const botonAsignarCuadrilla = tieneCuadrilla
+              ? ""
+              : `<button class="btn-asignar-cuadrilla" onclick="abrirModalAsignar('incidencia', ${i.ID_incidencia}, '#${i.ID_incidencia}')">Asignar Cuadrilla</button>`;
+
+            return `
           <div class="op-tarjeta" style="align-items: flex-start;">
             <div class="op-incidencia-cuerpo">
               ${
@@ -605,27 +866,31 @@
               <div class="op-tarjeta-info">
                 <span class="op-tarjeta-titulo">#${i.ID_incidencia} — ${i.tipo ?? "Sin tipo"}</span>
                 <span class="op-tarjeta-sub">${i.mail ?? ""} · ${i.calle ?? ""} ${i.numero ?? ""}, ${i.barrio ?? ""}</span>
-                <span class="op-tarjeta-sub">Operario asignado: ${i.ID_operario ? i.ID_operario : "Sin asignar"}</span>
-                <span class="op-tarjeta-sub">Cuadrilla asignada: ${i.nombre_cuadrilla ? i.nombre_cuadrilla : "Sin asignar"}</span>
+                <span class="op-tarjeta-sub">Operario asignado: ${tieneOperario ? i.ID_operario : "Sin asignar"}</span>
+                <span class="op-tarjeta-sub">Cuadrilla asignada: ${tieneCuadrilla ? i.nombre_cuadrilla || i.ID_cuadrilla : "Sin asignar"}</span>
               </div>
             </div>
             <div class="op-tarjeta-acciones">
-              ${badgeEstado(i.estado)}
-              <button class="op-btn-asignarme" onclick="asignarmeIncidencia(${i.ID_incidencia})">Asignarme</button>
-              <button class="op-btn-asignar" onclick="abrirModalAsignar('incidencia', ${i.ID_incidencia}, '#${i.ID_incidencia}')">Asignar Cuadrilla</button>
+              ${colores(i.estado)}
+              ${botonAsignarme}
+              ${botonAsignarCuadrilla}
             </div>
-          </div>`,
-          )
+          </div>`;
+          })
           .join("");
       }
 
       async function asignarmeIncidencia(id) {
         try {
-          const resp = await fetch(`${API_GESTION}Incidencias/AsignarOperario`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ idIncidencia: id }),
-          });
+          const resp = await fetch(
+            `${API_GESTION}Incidencias/AsignarOperario`,
+            {
+              method: "PATCH",
+              credentials: "same-origin",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ idIncidencia: id }),
+            },
+          );
           const resultado = await resp.json();
           if (resultado.status === "ok") {
             cargarSeccion("incidencias", true);
@@ -649,13 +914,13 @@
         }
       }
 
-      // ---------- MODAL COMPARTIDO: ASIGNAR CUADRILLA ----------
+      // ---------- MODAL: ASIGNAR CUADRILLA (a ruta o incidencia) ----------
       let opAsignarContexto = { tipo: null, id: null };
 
       async function abrirModalAsignar(tipo, id, etiqueta) {
         opAsignarContexto = { tipo, id };
 
-        const nombresTipo = { ruta: "la ruta", incidencia: "la incidencia", camion: "el camión" };
+        const nombresTipo = { ruta: "la ruta", incidencia: "la incidencia" };
         document.getElementById("opAsignarTitulo").textContent =
           `Asignar cuadrilla a ${nombresTipo[tipo] || ""} ${etiqueta ?? ""}`.trim();
 
@@ -667,77 +932,179 @@
           await cargarSeccion("cuadrillas");
         }
 
-        const cuadrillas = estadoSecciones.cuadrillas.datos;
+        const cuadrillas =
+          tipo === "ruta"
+            ? estadoSecciones.cuadrillas.datos.filter((c) => c.camion_matricula)
+            : estadoSecciones.cuadrillas.datos;
+
         if (!cuadrillas.length) {
-          select.innerHTML = `<option value="" disabled selected>No hay cuadrillas creadas</option>`;
+          select.innerHTML =
+            tipo === "ruta"
+              ? `<option value="" disabled selected>No hay cuadrillas con camión asignado</option>`
+              : `<option value="" disabled selected>No hay cuadrillas creadas</option>`;
           return;
         }
 
         select.innerHTML =
           `<option value="" disabled selected>Seleccione una cuadrilla</option>` +
           cuadrillas
-            .map((c) => `<option value="${c.ID_cuadrilla}">${c.nombre}</option>`)
+            .map(
+              (c) => `<option value="${c.ID_cuadrilla}">${c.nombre}</option>`,
+            )
             .join("");
       }
 
       function opCerrarModalAsignar(evento) {
         if (!evento || evento.target.id === "opOverlayAsignar") {
-          document.getElementById("opOverlayAsignar").classList.remove("activo");
+          document
+            .getElementById("opOverlayAsignar")
+            .classList.remove("activo");
         }
       }
 
-      document.getElementById("opFormAsignar").addEventListener("submit", async (event) => {
-        event.preventDefault();
+      document
+        .getElementById("opFormAsignar")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
 
-        const idCuadrilla = document.getElementById("opSelectCuadrilla").value;
-        if (!idCuadrilla) return;
+          const idCuadrilla =
+            document.getElementById("opSelectCuadrilla").value;
+          if (!idCuadrilla) return;
 
-        const { tipo, id } = opAsignarContexto;
+          const { tipo, id } = opAsignarContexto;
 
-        // Los endpoints de Rutas e Incidencias ya existen en el sistema.
-        // El de Camiones es nuevo: falta exponerlo en el backend con esta
-        // misma forma (ver aviso al usuario).
-        const peticiones = {
-          ruta: {
-            url: `${API_RECOLECCION}Rutas/AsignarCuadrilla`,
-            method: "POST",
-            body: { idRuta: id, idCuadrilla },
-          },
-          incidencia: {
-            url: `${API_GESTION}Incidencias/AsignarCuadrilla`,
-            method: "PATCH",
-            body: { idIncidencia: id, idCuadrilla },
-          },
-          camion: {
-            url: `${API_RECOLECCION}Camiones/AsignarCuadrilla`,
-            method: "PATCH",
-            body: { matricula: id, idCuadrilla },
-          },
-        };
+          const peticiones = {
+            ruta: {
+              url: `${API_RECOLECCION}Rutas/AsignarCuadrilla`,
+              method: "PATCH",
+              body: { idRuta: id, idCuadrilla },
+            },
+            incidencia: {
+              url: `${API_GESTION}Incidencias/AsignarCuadrilla`,
+              method: "PATCH",
+              body: { idIncidencia: id, idCuadrilla },
+            },
+          };
 
-        const peticion = peticiones[tipo];
-        if (!peticion) return;
+          const peticion = peticiones[tipo];
+          if (!peticion) return;
+
+          try {
+            const resp = await fetch(peticion.url, {
+              method: peticion.method,
+              credentials: "same-origin",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(peticion.body),
+            });
+            const resultado = await resp.json();
+
+            if (resultado.status === "ok") {
+              opCerrarModalAsignar();
+              const seccion = tipo === "ruta" ? "rutas" : "incidencias";
+              cargarSeccion(seccion, true);
+            } else {
+              alert(resultado.mensaje || "No se pudo asignar la cuadrilla.");
+            }
+          } catch (error) {
+            console.error("Error al asignar cuadrilla:", error);
+            alert("Error de conexión al asignar la cuadrilla.");
+          }
+        });
+
+      // ---------- MODAL: ASIGNAR CAMIÓN (a una cuadrilla) ----------
+      // Mismo flujo y mismos endpoints que panelcuadrilla.html:
+      // Cuadrillas/CamionesDisponibles para listar, Cuadrillas/AsignarCamion para guardar.
+      let opCuadrillaParaAsignarCamion = null;
+
+      async function opAbrirModalAsignarCamion(idCuadrilla, nombreCuadrilla) {
+        opCuadrillaParaAsignarCamion = idCuadrilla;
+        document.getElementById("opAsignarCamionTitulo").textContent =
+          `Asignar camión a ${nombreCuadrilla}`;
+
+        const select = document.getElementById("opSelectCamionDisponible");
+        select.innerHTML = `<option value="" disabled selected>Cargando camiones…</option>`;
+        document
+          .getElementById("opOverlayAsignarCamion")
+          .classList.add("activo");
 
         try {
-          const resp = await fetch(peticion.url, {
-            method: peticion.method,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(peticion.body),
-          });
-          const resultado = await resp.json();
+          const resp = await fetch(
+            `${CUADRILLA_API_BASE}/CamionesDisponibles`,
+            {
+              credentials: "same-origin",
+            },
+          );
+          const json = await resp.json();
 
-          if (resultado.status === "ok") {
-            opCerrarModalAsignar();
-            const seccion = tipo === "ruta" ? "rutas" : tipo === "incidencia" ? "incidencias" : "camiones";
-            cargarSeccion(seccion, true);
-          } else {
-            alert(resultado.mensaje || "No se pudo asignar la cuadrilla.");
+          if (!resp.ok || json.status !== "ok") {
+            select.innerHTML = `<option value="" disabled selected>${json.mensaje || "No se pudieron cargar los camiones"}</option>`;
+            return;
           }
+
+          if (!(json.data || []).length) {
+            select.innerHTML = `<option value="" disabled selected>No hay camiones disponibles</option>`;
+            return;
+          }
+
+          select.innerHTML =
+            `<option value="" disabled selected>Seleccione un camión</option>` +
+            json.data
+              .map(
+                (c) =>
+                  `<option value="${c.matricula}">${c.matricula} — ${c.tipo}</option>`,
+              )
+              .join("");
         } catch (error) {
-          console.error("Error al asignar cuadrilla:", error);
-          alert("Error de conexión al asignar la cuadrilla.");
+          console.error("Error al cargar camiones disponibles:", error);
+          select.innerHTML = `<option value="" disabled selected>Error al cargar camiones</option>`;
         }
-      });
+      }
+
+      function opCerrarModalAsignarCamion(evento) {
+        if (!evento || evento.target.id === "opOverlayAsignarCamion") {
+          document
+            .getElementById("opOverlayAsignarCamion")
+            .classList.remove("activo");
+          opCuadrillaParaAsignarCamion = null;
+        }
+      }
+
+      document
+        .getElementById("opFormAsignarCamion")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const matricula = document.getElementById(
+            "opSelectCamionDisponible",
+          ).value;
+          if (!matricula || !opCuadrillaParaAsignarCamion) return;
+
+          try {
+            const resp = await fetch(`${CUADRILLA_API_BASE}/AsignarCamion`, {
+              method: "PATCH",
+              credentials: "same-origin",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                idCuadrilla: opCuadrillaParaAsignarCamion,
+                matricula,
+              }),
+            });
+            const resultado = await resp.json();
+
+            if (resultado.status === "ok") {
+              opCerrarModalAsignarCamion();
+              cargarSeccion("cuadrillas", true);
+              // Si la pestaña de camiones ya se había cargado, refresca también
+              // para que se vea la cuadrilla nueva junto al camión asignado.
+              if (estadoSecciones.camiones.cargado) renderCamiones();
+            } else {
+              alert(resultado.mensaje || "No se pudo asignar el camión.");
+            }
+          } catch (error) {
+            console.error("Error al asignar camión:", error);
+            alert("Error de conexión al asignar el camión.");
+          }
+        });
 
       // ---------- RUTAS ----------
       let opRutaSeleccionada = null;
@@ -768,7 +1135,7 @@
         const texto = document.getElementById("opBuscarRutas").value;
         const estado = document.getElementById("opFiltroEstadoRutas").value;
 
-        datos = filtrarPorTexto(datos, texto, ["nombre", "matricula"]);
+        datos = filtrarPorTexto(datos, texto, ["nombre", "camion_matricula"]);
         if (estado) datos = datos.filter((r) => r.estado === estado);
 
         contador.textContent = `${datos.length} ruta(s)`;
@@ -780,20 +1147,24 @@
 
         lista.innerHTML = datos
           .map((r) => {
-            const cuadrillaActual = r.nombre_cuadrilla || r.cuadrilla || null;
             const nombreEscapado = (r.nombre || "").replace(/'/g, "\\'");
+
+            const botonAsignar = r.ID_Cuadrilla
+              ? ""
+              : `<button class="btn-asignar-cuadrilla" onclick="abrirModalAsignar('ruta', ${r.ID_ruta}, '${nombreEscapado}')">Asignar Cuadrilla</button>`;
+
             return `
-          <div class="op-tarjeta op-ruta-item${r.ID_ruta === opRutaSeleccionada ? " op-seleccionada" : ""}" onclick="opVerRutaEnMapa(${r.ID_ruta})">
-            <div class="op-tarjeta-info">
-              <span class="op-tarjeta-titulo">${r.nombre}</span>
-              <span class="op-tarjeta-sub">${r.matricula ? `Camión ${r.matricula}` : "Sin camión asignado"} · ${r.cantidad_paradas ?? 0} paradas</span>
-              <span class="op-tarjeta-sub">Cuadrilla: ${cuadrillaActual ?? "Sin asignar"}</span>
-            </div>
-            <div class="op-tarjeta-acciones" onclick="event.stopPropagation()">
-              ${badgeEstado(r.estado)}
-              <button class="op-btn-asignar" onclick="abrirModalAsignar('ruta', ${r.ID_ruta}, '${nombreEscapado}')">Asignar Cuadrilla</button>
-            </div>
-          </div>`;
+  <div class="op-tarjeta op-ruta-item${r.ID_ruta === opRutaSeleccionada ? " op-seleccionada" : ""}" onclick="opVerRutaEnMapa(${r.ID_ruta})">
+    <div class="op-tarjeta-info">
+      <span class="op-tarjeta-titulo">${r.nombre}</span>
+      <span class="op-tarjeta-sub">${r.camion_matricula ? `Camión ${r.camion_matricula}` : "Sin camión asignado"} · ${r.cantidad_paradas ?? 0} paradas</span>
+      <span class="op-tarjeta-sub">Cuadrilla: ${r.cuadrilla_nombre ?? "Sin asignar"}</span>
+    </div>
+    <div class="op-tarjeta-acciones" onclick="event.stopPropagation()">
+      ${colores(r.estado)}
+      ${botonAsignar}
+    </div>
+  </div>`;
           })
           .join("");
       }
@@ -803,7 +1174,9 @@
         renderRutas();
 
         try {
-          const resp = await fetch(`${API_RECOLECCION}Rutas/${idRuta}`);
+          const resp = await fetch(`${API_RECOLECCION}Rutas/${idRuta}`, {
+            credentials: "same-origin",
+          });
           if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
           const data = await resp.json();
           await opDibujarRuta(data?.data || []);
@@ -848,12 +1221,16 @@
           try {
             const resp = await fetch(`${API_RECOLECCION}Rutas/CalcularCamino`, {
               method: "POST",
+              credentials: "same-origin",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ paradas: puntos }),
             });
             const resultado = await resp.json();
             if (resultado.status === "ok" && resultado.data) {
-              coordenadasLinea = resultado.data.geometria.map((p) => [p.lat, p.lon]);
+              coordenadasLinea = resultado.data.geometria.map((p) => [
+                p.lat,
+                p.lon,
+              ]);
             }
           } catch (error) {
             console.error("Error al calcular el camino por calles:", error);
@@ -865,7 +1242,9 @@
           return;
         }
 
-        L.polyline(coordenadasLinea, { color: "#2f8f3a", weight: 4 }).addTo(capa);
+        L.polyline(coordenadasLinea, { color: "#2f8f3a", weight: 4 }).addTo(
+          capa,
+        );
         opCapaRuta = capa;
 
         opMap.fitBounds(L.latLngBounds(puntos.map((p) => [p.lat, p.lon])), {
@@ -877,7 +1256,9 @@
       document.addEventListener("DOMContentLoaded", () => {
         const rolUsuario = (localStorage.getItem("rol") || "").trim();
         document.querySelectorAll("[data-rol]").forEach((boton) => {
-          const rolesPermitidos = boton.dataset.rol.split(",").map((r) => r.trim());
+          const rolesPermitidos = boton.dataset.rol
+            .split(",")
+            .map((r) => r.trim());
           if (!rolesPermitidos.includes(rolUsuario)) {
             boton.style.display = "none";
           }

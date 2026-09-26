@@ -7,12 +7,6 @@
     <title>Cuadrillas - Epsilon</title>
 
     <link rel="stylesheet" href="style.css" />
-
-    <style>
-      .btn-asignar-camion {
-        background: #2a6df4;
-      }
-    </style>
   </head>
 
   <body>
@@ -285,6 +279,18 @@
               ? `Camión asignado: <strong>${cuadrilla.camion_matricula}</strong>`
               : "Sin camión asignado";
 
+            // Si ya tiene un camión, no se ofrece asignar otro: la API de
+            // camiones disponibles solo devuelve los libres, así que abrir
+            // el modal para una cuadrilla que ya tiene uno mostraría la
+            // lista vacía sin explicación.
+            const botonAsignarCamion = cuadrilla.camion_matricula
+              ? ""
+              : `<button
+                  class="btn-asignar-camion"
+                  onclick="abrirModalAsignarCamion(${cuadrilla.ID_cuadrilla}, '${cuadrilla.nombre.replace(/'/g, "\\'")}', event)">
+                  Asignar Camión
+                </button>`;
+
             return `
               <li class="usuario-item" style="align-items: flex-start;">
                 <div style="display: flex; flex-direction: column; gap: 6px;">
@@ -296,12 +302,7 @@
                   </ul>
                 </div>
                 <span class="usuario-acciones" style="display: flex; gap: 8px;">
-                  <button
-                    class="btn-asignar-camion"
-                    style="color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;"
-                    onclick="abrirModalAsignarCamion(${cuadrilla.ID_cuadrilla}, '${cuadrilla.nombre.replace(/'/g, "\\'")}', event)">
-                    Asignar Camión
-                  </button>
+                  ${botonAsignarCamion}
                   <button 
                     class="btn-eliminar" 
                     style="color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;"
@@ -374,7 +375,12 @@
           const resp = await fetch(`${CUADRILLA_API_BASE}/CamionesDisponibles`);
           const json = await resp.json();
 
-          if (!resp.ok || json.status !== "ok" || !(json.data || []).length) {
+          if (!resp.ok || json.status !== "ok") {
+            select.innerHTML = `<option value="">${json.mensaje || "No se pudieron cargar los camiones"}</option>`;
+            return;
+          }
+
+          if (!(json.data || []).length) {
             select.innerHTML = `<option value="">No hay camiones disponibles</option>`;
             return;
           }
@@ -385,7 +391,7 @@
               .map((c) => `<option value="${c.matricula}">${c.matricula} — ${c.tipo}</option>`)
               .join("");
         } catch (error) {
-          select.innerHTML = `<option value="">Error al cargar camiones</option>`;
+          select.innerHTML = `<option value="">Error de conexión al cargar camiones</option>`;
         }
       }
 
