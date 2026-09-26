@@ -94,8 +94,8 @@
         <button onclick="vertodo()">Ver todo</button>
         <button onclick="soloContenedores()">Ver Contenedores</button>
         <button onclick="soloIncidencias()">Ver Incidencias</button>
+        <button onclick="soloCentrosAcopio()">Ver Centros de Acopio</button>
         <button>Ver Camiones</button>
-        <button>Ver Rutas</button>
         <button>Actualizar Mapa</button>
       </div>
 
@@ -233,6 +233,47 @@
         }
       }
 
+      async function CargarCentrosAcopioMapa() {
+        try {
+          const respuesta = await fetch(
+            "/Proyecto/ProyectoSyntropy/Gestion/miApi/CentrosAcopio/CentrosAcopio",
+          );
+          const respuestaJson = await respuesta.json();
+
+          if (
+            respuestaJson &&
+            respuestaJson.status &&
+            respuestaJson.status !== "ok"
+          ) {
+            console.error(
+              "Error al cargar los centros de acopio:",
+              respuestaJson.message,
+            );
+            return;
+          }
+          const centrosAcopio = Array.isArray(respuestaJson)
+            ? respuestaJson
+            : respuestaJson?.data || [];
+          console.log("Centros de acopio cargados:", centrosAcopio);
+
+          centrosAcopio.forEach((centro) => {
+            if (!centro.lat || !centro.lon) return;
+            L.circleMarker([centro.lat, centro.lon], {
+              radius: 3,
+              color: "#0000ff",
+              fillColor: "#0000ff",
+              fillOpacity: 1,
+            })
+              .addTo(map)
+              .bindPopup(
+                `<strong>Centro de Acopio</strong><br>${centro.calle} ${centro.numero}, ${centro.barrio}<br>Capacidad: ${centro.capacidadCarga}<br>Tipo: ${centro.tipo}<br>Estado: ${centro.estado}`,
+              );
+          });
+        } catch (err) {
+          console.error("Error al cargar los centros de acopio:", err);
+        }
+      }
+
       document.addEventListener("DOMContentLoaded", () => {
         const rolUsuario = (localStorage.getItem("rol") || "").trim();
         document.querySelectorAll("[data-rol]").forEach((boton) => {
@@ -306,10 +347,15 @@
         limpiarMapa();
         CargarIncidenciasMapa();
       }
+      function soloCentrosAcopio() {
+        limpiarMapa();
+        CargarCentrosAcopioMapa();
+      }
       function vertodo() {
         limpiarMapa();
         CargarContenedoresMapa();
         CargarIncidenciasMapa();
+        CargarCentrosAcopioMapa();
       }
 
       CargarIncidenciasMapa();
