@@ -34,10 +34,9 @@ $method = $_SERVER['REQUEST_METHOD'];
 $uri    = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $resultado = ["status" => "no_encontrado", "mensaje" => "Ruta no encontrada.", "data" => null];
 
-// Gestionar camiones (crear/editar/borrar) sigue siendo exclusivo de Administrador.
 $rolesCamiones = ['Administrador'];
-// Pero listar camiones y todo lo de Rutas lo usan ambos roles por igual.
 $rolesRutas = ['Administrador', 'Operario'];
+$rolRecolector = ['Recolector'];
 
 switch ($method) {
     case 'GET':

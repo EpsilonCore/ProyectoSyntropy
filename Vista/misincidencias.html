@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Mi cuadrilla - Epsilon</title>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <script>
+      if (localStorage.getItem("logueado") !== "si") {
+        window.location.href = "login.html";
+      }
+      if ((localStorage.getItem("rol") || "").trim() !== "Recolector") {
+        window.location.href = "index.html";
+      }
+      if (!localStorage.getItem("mail")) {
+        window.location.href = "login.html";
+      }
+    </script>
+
+    <header>
+      <div class="logo">
+        <a href="index.html">
+          <img src="logo.png" alt="Epsilon" />
+        </a>
+      </div>
+
+      <div class="header-actions">
+        <div id="usuario" class="usuario"></div>
+
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+      </div>
+
+      <nav id="menu">
+        <ul>
+          <li>
+            <button
+              data-rol="Recolector"
+              class="link-button"
+              onclick="window.location.href = 'index.html'"
+            >
+              Inicio
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="pagina">
+      <h2>Mi cuadrilla</h2>
+
+      <p>Incidencias y rutas asignadas a tu cuadrilla.</p>
+
+      <div class="lista-panel">
+        <h3>Incidencias</h3>
+        <ul id="listaIncidencias">
+          <p>Cargando incidencias...</p>
+        </ul>
+      </div>
+
+      <div class="lista-panel">
+        <h3>Rutas</h3>
+        <ul id="listaRutas">
+          <p>Cargando rutas...</p>
+        </ul>
+      </div>
+    </div>
+
+    <script>
+      const API_URL =
+        "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/";
+      const API_URL_RUTAS =
+        "http://localhost/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas/";
+      let incidencias = [];
+      let rutas = [];
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const rolUsuario = (localStorage.getItem("rol") || "").trim();
+        document.querySelectorAll("[data-rol]").forEach((boton) => {
+          const rolesPermitidos = boton.dataset.rol
+            .split(",")
+            .map((rol) => rol.trim());
+          if (!rolesPermitidos.includes(rolUsuario)) {
+            boton.style.display = "none";
+          }
+        });
+      });
+
+      function toggleMenu() {
+        document.getElementById("menu").classList.toggle("activo");
+      }
+
+      function cerrarSesion() {
+        localStorage.removeItem("logueado");
+        localStorage.removeItem("rol");
+        localStorage.removeItem("nickname");
+        localStorage.removeItem("mail");
+
+        window.location.href = "index.html";
+      }
+
+      function cargarUsuario() {
+        const nombre = localStorage.getItem("nickname") || "Usuario";
+        const inicial = nombre.charAt(0).toUpperCase();
+
+        document.getElementById("usuario").innerHTML = `
+
+      <span class="nombre-usuario">${nombre}</span>
+
+      <button class="usuario-btn" onclick="abrirUsuario()">
+          ${inicial}
+      </button>
+
+      <div id="menuUsuario" class="menu-usuario">
+
+          <button onclick="cerrarSesion()">
+              Cerrar Sesión
+          </button>
+
+      </div>
+
+      `;
+      }
+
+      function abrirUsuario() {
+        document.getElementById("menuUsuario").classList.toggle("activo");
+      }
+
+      cargarUsuario();
+
+      async function obtenerIncidencias() {
+        try {
+          const datos = {
+            mail: localStorage.getItem("mail"),
+          };
+
+          const resp = await fetch(`${API_URL}MisIncidencias`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          incidencias = Array.isArray(data) ? data : data?.data || [];
+          renderizarIncidencias();
+        } catch (error) {
+          console.error("Error al obtener incidencias:", error);
+          document.getElementById("listaIncidencias").innerHTML =
+            "<p>No se pudieron cargar las incidencias.</p>";
+        }
+      }
+
+      async function obtenerRutas() {
+        try {
+          const datos = {
+            mail: localStorage.getItem("mail"),
+          };
+
+          const resp = await fetch(`${API_URL_RUTAS}MisRutas`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          rutas = Array.isArray(data) ? data : data?.data || [];
+          renderizarRutas();
+        } catch (error) {
+          console.error("Error al obtener rutas:", error);
+          document.getElementById("listaRutas").innerHTML =
+            "<p>No se pudieron cargar las rutas.</p>";
+        }
+      }
+
+      async function marcarRealizada(id) {
+        if (!confirm("¿Marcar esta incidencia como realizada?")) return;
+        try {
+          const datos = {
+            idIncidencia: id,
+            mail: localStorage.getItem("mail"),
+          };
+
+          const resp = await fetch(`${API_URL}Realizada`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
+          const resultado = await resp.json();
+          if (resultado.status === "ok") {
+            obtenerIncidencias(); // refresca la lista
+          } else {
+            alert(resultado.mensaje);
+          }
+        } catch (error) {
+          console.error("Error al marcar la incidencia:", error);
+          alert("Error de conexión al marcar la incidencia.");
+        }
+      }
+
+      // accion: "Iniciar" o "Finalizar"
+      async function cambiarEstadoRuta(id, accion) {
+        if (!confirm(`¿${accion} esta ruta?`)) return;
+        try {
+          const datos = {
+            idRuta: id,
+            mail: localStorage.getItem("mail"),
+          };
+
+          const resp = await fetch(`${API_URL_RUTAS}${accion}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
+          const resultado = await resp.json();
+          if (resultado.status === "ok") {
+            obtenerRutas(); // refresca la lista
+          } else {
+            alert(resultado.mensaje);
+          }
+        } catch (error) {
+          console.error("Error al actualizar la ruta:", error);
+          alert("Error de conexión al actualizar la ruta.");
+        }
+      }
+
+      function renderizarIncidencias() {
+        const listaContainer = document.getElementById("listaIncidencias");
+
+        if (incidencias.length === 0) {
+          listaContainer.innerHTML = "<p>No hay incidencias asignadas.</p>";
+          return;
+        }
+
+        let html = '<ul style="list-style: none; padding: 0; margin: 0;">';
+
+        incidencias.forEach((incidencia) => {
+          const realizada =
+            (incidencia.estado || "").toLowerCase() === "terminada";
+
+          html += `
+<li class="incidencia-item">
+  <div class="incidencia-cuerpo">
+    ${
+      incidencia.imagen
+        ? `<img src="${incidencia.imagen}" alt="Foto de la incidencia" class="incidencia-thumb" />`
+        : ""
+    }
+    <div class="incidencia-info">
+      <strong>#${incidencia.ID_incidencia} — ${incidencia.tipo}</strong>
+      <span class="incidencia-estado">${incidencia.estado}</span>
+      <p>${incidencia.calle} ${incidencia.numero}, ${incidencia.barrio}</p>
+    </div>
+  </div>
+  <span class="incidencia-acciones">
+    ${
+      realizada
+        ? ""
+        : `<button class="btn-modificar" onclick="marcarRealizada(${incidencia.ID_incidencia})">
+      Marcar como realizada
+    </button>`
+    }
+  </span>
+</li>`;
+        });
+
+        html += "</ul>";
+        listaContainer.innerHTML = html;
+      }
+
+      function renderizarRutas() {
+        const listaContainer = document.getElementById("listaRutas");
+
+        if (rutas.length === 0) {
+          listaContainer.innerHTML = "<p>No hay rutas asignadas.</p>";
+          return;
+        }
+
+        const hayEnCurso = rutas.some((ruta) => ruta.estado === "En Curso");
+        let html = '<ul style="list-style: none; padding: 0; margin: 0;">';
+
+        rutas.forEach((ruta) => {
+          let boton = "";
+          const sinIniciar = ["Planificada", "Pendiente"].includes(ruta.estado);
+          if (sinIniciar && !hayEnCurso) {
+            boton = `<button class="btn-modificar" onclick="cambiarEstadoRuta(${ruta.ID_ruta}, 'Iniciar')">Iniciar ruta</button>`;
+          } else if (ruta.estado === "En Curso") {
+            boton = `<button class="btn-modificar" onclick="cambiarEstadoRuta(${ruta.ID_ruta}, 'Finalizar')">Finalizar ruta</button>`;
+          }
+
+          html += `
+<li class="incidencia-item">
+  <div class="incidencia-cuerpo">
+    <div class="incidencia-info">
+      <strong>${ruta.nombre ? ruta.nombre : `Ruta #${ruta.ID_ruta}`}</strong>
+      <span class="incidencia-estado">${ruta.estado}</span>
+      <p>Iniciada: ${ruta.fecha_inicio ? ruta.fecha_inicio : "—"}</p>
+      <p>Finalizada: ${ruta.fecha_fin ? ruta.fecha_fin : "—"}</p>
+    </div>
+  </div>
+  <span class="incidencia-acciones">${boton}</span>
+</li>`;
+        });
+
+        html += "</ul>";
+        listaContainer.innerHTML = html;
+      }
+
+      obtenerIncidencias();
+      obtenerRutas();
+    </script>
+  </body>
+</html>

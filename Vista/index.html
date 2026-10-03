@@ -196,6 +196,15 @@
                 Gestión
               </button>
             </li>
+            <li>
+              <button
+                data-rol="Recolector"
+                class="link-button"
+                onclick="verificarAcceso('misincidencias.html')"
+              >
+                Mis Inciencias
+              </button>
+            </li>
 
             <li>
               <button
@@ -521,7 +530,9 @@
 
       function cerrarSesion() {
         localStorage.removeItem("logueado");
-        localStorage.removeItem("nombreUsuario");
+        localStorage.removeItem("rol");
+        localStorage.removeItem("nickname");
+        localStorage.removeItem("mail");
 
         location.reload();
       }

@@ -2,6 +2,7 @@
 
 require_once __DIR__ . "/../Gestion/geocodificacion.php";
 require_once __DIR__ . "/../Gestion/ContenedorModel.php";
+require_once __DIR__ . "/../Gestion/CuadrillaModel.php";
 
 class IncidenciaModel{
     private $mail;
@@ -17,12 +18,14 @@ class IncidenciaModel{
     private $fecha;
     private $tipoContenedor;
     private $contenedorModel;
+    private $cuadrillaModel;
 
     public function __construct($bd)
     {
         $this->conexion = $bd;
         $this->geocodificador = new geocodificacion();
         $this->contenedorModel = new ContenedorModel($bd);
+        $this->cuadrillaModel = new CuadrillaModel($bd);
     }
 
     public function getAllIncidencias()
@@ -127,6 +130,43 @@ class IncidenciaModel{
         mysqli_stmt_close($stmt);
         return $resultado;
     }
+
+    public function getIncidenciasPorMail($mail) {
+    $sql = "SELECT i.*
+            FROM incidencia i
+            INNER JOIN integrante_cuadrilla ic ON ic.ID_cuadrilla = i.ID_cuadrilla
+            WHERE ic.mail = ?
+            ORDER BY (i.estado = 'Terminada') ASC, i.fecha_creacion DESC";
+    $stmt = $this->conexion->prepare($sql);
+    $stmt->bind_param('s', $mail);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
+public function marcarRealizada($idIncidencia, $mail) {
+    $sql = "SELECT i.ID_cuadrilla
+            FROM incidencia i
+            INNER JOIN integrante_cuadrilla ic ON ic.ID_cuadrilla = i.ID_cuadrilla
+            WHERE i.ID_incidencia = ? AND ic.mail = ?";
+    $stmt = $this->conexion->prepare($sql);
+    $stmt->bind_param('is', $idIncidencia, $mail);
+    $stmt->execute();
+    $incidencia = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    if (!$incidencia) {
+        return false;
+    }
+
+    $sql = "UPDATE incidencia SET estado = 'Terminada' WHERE ID_incidencia = ?";
+    $stmt = $this->conexion->prepare($sql);
+    $stmt->bind_param('i', $idIncidencia);
+    $stmt->execute();
+    $stmt->close();
+
+    $this->cuadrillaModel->liberarCamionSiCorresponde($incidencia['ID_cuadrilla']);
+    return true;
+}
 
 
 }

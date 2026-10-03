@@ -444,7 +444,7 @@
         "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/";
       const API_RECOLECCION =
         "http://localhost/Proyecto/ProyectoSyntropy/Recoleccion/miApi/";
-      // La API de Cuadrillas se sirve por ruta relativa (así la usa panelcuadrilla.html).
+
       const CUADRILLA_API_BASE =
         "/Proyecto/ProyectoSyntropy/Gestion/miApi/Cuadrillas";
 
@@ -476,7 +476,7 @@
         rutas: renderRutas,
       };
 
-      // ---------- Navegación por pestañas (carga perezosa) ----------
+      // ---------- Navegación por pestañas ----------
       function cambiarSeccion(seccion) {
         document.querySelectorAll(".op-tab").forEach((btn) => {
           btn.classList.toggle("activo", btn.dataset.seccion === seccion);
@@ -646,9 +646,6 @@
       }
 
       // ---------- CAMIONES ----------
-      // La relación vive del lado de la cuadrilla (campo camion_matricula),
-      // así que para mostrar "Cuadrilla: X" en cada camión hace falta la
-      // lista de cuadrillas. Se pide en segundo plano si todavía no está.
       function mapaCuadrillaPorCamion() {
         const mapa = {};
         (estadoSecciones.cuadrillas.datos || []).forEach((c) => {
@@ -1028,12 +1025,7 @@
           .classList.add("activo");
 
         try {
-          const resp = await fetch(
-            `${CUADRILLA_API_BASE}/CamionesDisponibles`,
-            {
-              credentials: "same-origin",
-            },
-          );
+          const resp = await fetch(`${CUADRILLA_API_BASE}/CamionesDisponibles`);
           const json = await resp.json();
 
           if (!resp.ok || json.status !== "ok") {
@@ -1082,7 +1074,6 @@
           try {
             const resp = await fetch(`${CUADRILLA_API_BASE}/AsignarCamion`, {
               method: "PATCH",
-              credentials: "same-origin",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 idCuadrilla: opCuadrillaParaAsignarCamion,
@@ -1252,7 +1243,6 @@
         });
       }
 
-      // ---------- Cabecera / sesión (igual al resto del sitio) ----------
       document.addEventListener("DOMContentLoaded", () => {
         const rolUsuario = (localStorage.getItem("rol") || "").trim();
         document.querySelectorAll("[data-rol]").forEach((boton) => {
@@ -1299,7 +1289,6 @@
 
       cargarUsuario();
 
-      // Carga inicial: solo la primera pestaña, el resto se carga al abrirla.
       cargarSeccion("contenedores");
     </script>
   </body>

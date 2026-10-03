@@ -2627,3 +2627,90 @@ nav button:not(.link-button):hover {
     width: 100%;
   }
 }
+
+/* =========================================================
+   MIS INCIDENCIAS Y RUTAS (misincidencias.html)
+   Prefijo "rc-" (recolector) para no chocar con clases
+   existentes. El resto de la página
+   reutiliza .pagina, .op-tab, .op-tarjeta, .op-badge,
+   .op-resumen-grid, .btn-asignar-cuadrilla y .btn-asignarme.
+========================================================= */
+
+.rc-volver {
+  font-family: var(--fuente-display);
+  font-size: 14.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--verde-bosque);
+  text-decoration: none;
+  padding: 8px 16px;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.rc-volver:hover {
+  border-color: var(--verde);
+  color: var(--verde);
+}
+
+/* Aviso de acción (ruta iniciada/finalizada, incidencia realizada) */
+.rc-aviso {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  border: 1px solid var(--borde);
+  border-left-width: 4px;
+  border-radius: 10px;
+  background: var(--panel);
+  font-weight: 600;
+}
+
+.rc-aviso[hidden] {
+  display: none;
+}
+
+.rc-aviso-ok {
+  border-left-color: var(--verde);
+  background: var(--verde-tinte);
+  color: var(--verde-bosque);
+}
+
+.rc-aviso-error {
+  border-left-color: var(--oxido);
+  color: var(--oxido);
+}
+
+/* Colores de estado para .op-badge */
+.rc-estado-pendiente {
+  background: #f7ead7;
+  color: #8a5210;
+}
+
+.rc-estado-curso {
+  background: #e1ebf0;
+  color: var(--acero-hover);
+}
+
+.rc-estado-ok {
+  background: var(--verde-tinte);
+  color: var(--verde-bosque);
+}
+
+/* Ruta actualmente en curso */
+.op-tarjeta.rc-en-curso {
+  border-color: var(--acero);
+  box-shadow: 0 0 0 1px var(--acero) inset;
+}
+
+/* Botones de acción deshabilitados */
+.btn-asignar-cuadrilla:disabled,
+.btn-asignarme:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

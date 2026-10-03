@@ -1,6 +1,6 @@
 <?php
-error_reporting(0);
-ini_set('display_errors', 0);
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type");
@@ -41,9 +41,11 @@ $resultado = ["status" => "no_encontrado", "mensaje" => "Ruta no encontrada.", "
 
 $soloAdministrador = ['Administrador'];
 $administradorUOperario = ['Administrador', 'Operario'];
+$soloRecolector = ['Recolector'];
 
 switch ($method) {
     case 'GET':
+
         // Abierto a cualquier logueado: lo usa mapa.html para pintar el mapa, además del panel.
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Contenedores') {
             $resultado = $controladorContenedor->getAllContenedores();
@@ -63,11 +65,16 @@ switch ($method) {
             $resultado = verificarRol($soloAdministrador) ?? $controladorCuadrilla->getRecolectoresDisponibles();
         }
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Cuadrillas/CamionesDisponibles') {
-            $resultado = verificarRol($soloAdministrador) ?? $controladorCuadrilla->getCamionesDisponibles();
+            $resultado = $controladorCuadrilla->getCamionesDisponibles();
         }
         break;
 
     case 'POST':
+
+        // Recolector: ve las incidencias asignadas a su cuadrilla.
+        if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/MisIncidencias') {
+        $resultado = verificarRol($soloRecolector) ?? $controladorIncidencia->getIncidenciasPorMail();
+}
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/RegistrarContenedor') {
             $resultado = verificarRol($soloAdministrador) ?? $controladorContenedor->crearContenedor();
         }
@@ -99,6 +106,11 @@ switch ($method) {
         break;
 
     case 'PATCH':
+
+        // Recolector: marca como realizada una incidencia de su cuadrilla.
+        if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/Realizada') {
+        $resultado = verificarRol($soloRecolector) ?? $controladorIncidencia->marcarRealizada();
+}
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/ActualizarContenedor') {
             $resultado = verificarRol($soloAdministrador) ?? $controladorContenedor->actualizarContenedor();
         }
@@ -112,7 +124,7 @@ switch ($method) {
             $resultado = verificarRol($soloAdministrador) ?? $controladorIncidencia->AsignarCuadrilla();
         }
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Cuadrillas/AsignarCamion') {
-            $resultado = verificarRol($soloAdministrador) ?? $controladorCuadrilla->asignarCamion();
+            $resultado = verificarRol($administradorUOperario) ?? $controladorCuadrilla->asignarCamion();
         }
         break;
 

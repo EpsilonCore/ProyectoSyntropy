@@ -101,4 +101,33 @@ class IncidenciaController
 		}
 		return ["status" => "error", "mensaje" => "No se pudo eliminar la incidencia.", "data" => null];
 	}
+	public function getIncidenciasPorMail() {
+
+	$json = file_get_contents('php://input');
+	$datos = json_decode($json);
+if (!$datos || !isset($datos->mail)) {
+		return ["status" => "datos_invalidos", "mensaje" => "Falta el mail del usuario.", "data" => null];
 }
+
+	$incidencias = $this->modeloObj->getIncidenciasPorMail($datos->mail);
+	return ["status" => "ok", "mensaje" => "Incidencias obtenidas correctamente.", "data" => $incidencias ?: []];
+	
+}
+
+public function marcarRealizada() {
+    $json = file_get_contents('php://input');
+    $datos = json_decode($json);
+    if (!$datos || !isset($datos->idIncidencia)) {
+        return ["status" => "datos_invalidos", "mensaje" => "Falta el ID de la incidencia.", "data" => null];
+    }
+    if (!isset($datos->mail)) {
+        return ["status" => "datos_invalidos", "mensaje" => "Falta el mail del usuario.", "data" => null];
+    }
+    $ok = $this->modeloObj->marcarRealizada($datos->idIncidencia, $datos->mail);
+    if ($ok) {
+        return ["status" => "ok", "mensaje" => "Incidencia marcada como realizada.", "data" => null];
+    }
+    return ["status" => "no_autorizado", "mensaje" => "No se pudo marcar la incidencia como realizada.", "data" => null];
+}
+}
+

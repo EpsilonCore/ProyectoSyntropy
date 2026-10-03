@@ -1,10 +1,14 @@
 <?php
+require_once __DIR__ . "/../Gestion/CuadrillaModel.php";
+
 class RutasModel {
     private $conexion;
+    private $cuadrillaModel;
 
 
 public function __construct($bd){
     $this->conexion = $bd;
+    $this->cuadrillaModel = new CuadrillaModel($bd);
 }
 
 public function crearRuta($nombre, array $paradas){
@@ -56,7 +60,7 @@ public function getAllRutas(){
     FROM ruta r
     LEFT JOIN rutaparada p ON p.ID_ruta = r.ID_ruta
     LEFT JOIN cuadrilla c ON c.ID_cuadrilla = r.ID_Cuadrilla
-    LEFT JOIN camioncuadrilla cc ON cc.ID_cuadrilla = r.ID_Cuadrilla
+    LEFT JOIN camioncuadrilla cc ON cc.ID_cuadrilla = r.ID_Cuadrilla AND cc.fecha_liberacion IS NULL
     GROUP BY r.ID_ruta
     ORDER BY r.fecha_creacion DESC";
     $stmt = mysqli_prepare($this->conexion, $sql);
@@ -125,7 +129,7 @@ public function eliminarRuta($idRuta){
 
 public function AsignarCuadrilla($idRuta, $idCuadrilla){
     // Solo se puede asignar la ruta a una cuadrilla que ya tenga un camión asignado.
-    $sql = "SELECT 1 FROM camioncuadrilla WHERE ID_cuadrilla = ?";
+    $sql = "SELECT 1 FROM camioncuadrilla WHERE ID_cuadrilla = ? AND fecha_liberacion IS NULL";
     $stmt = mysqli_prepare($this->conexion, $sql);
     if(!$stmt){
         throw new Exception("Error al preparar la consulta: " . mysqli_error($this->conexion));
@@ -166,6 +170,121 @@ public function AsignarCuadrilla($idRuta, $idCuadrilla){
         throw new Exception("Error al ejecutar la consulta: " . mysqli_error($this->conexion));
     }
     $stmt->close();
+    return ["ok" => true, "motivo" => null];
+}
+
+// Rutas del recolector
+public function getRutasPorMail($mail){
+    $sql = "SELECT r.ID_ruta, r.nombre, r.estado, r.fecha_inicio, r.fecha_fin,
+    COUNT(p.ID_parada) AS cantidad_paradas
+    FROM ruta r
+    INNER JOIN integrante_cuadrilla ic ON ic.ID_cuadrilla = r.ID_Cuadrilla
+    LEFT JOIN rutaparada p ON p.ID_ruta = r.ID_ruta
+    WHERE ic.mail = ?
+    GROUP BY r.ID_ruta
+    ORDER BY (r.estado = 'Finalizada') ASC, r.fecha_creacion DESC";
+    $stmt = mysqli_prepare($this->conexion, $sql);
+    if(!$stmt){
+        throw new Exception("Error al preparar la consulta: " . mysqli_error($this->conexion));
+    }
+    $stmt->bind_param("s", $mail);
+    if(! $stmt->execute()){
+        throw new Exception("Error al ejecutar la consulta: " . mysqli_error($this->conexion));
+    }
+    $resultado = $stmt->get_result();
+    $rutas = [];
+    while($fila = mysqli_fetch_assoc($resultado)){
+        $rutas[] = $fila;
+    }
+    $stmt->close();
+    return $rutas;
+}
+
+private function buscarRutaDeIntegrante($idRuta, $mail){
+    $sql = "SELECT r.estado, r.ID_Cuadrilla
+            FROM ruta r
+            INNER JOIN integrante_cuadrilla ic ON ic.ID_cuadrilla = r.ID_Cuadrilla
+            WHERE r.ID_ruta = ? AND ic.mail = ?";
+    $stmt = mysqli_prepare($this->conexion, $sql);
+    if(!$stmt){
+        throw new Exception("Error al preparar la consulta: " . mysqli_error($this->conexion));
+    }
+    $stmt->bind_param("is", $idRuta, $mail);
+    if(! $stmt->execute()){
+        throw new Exception("Error al ejecutar la consulta: " . mysqli_error($this->conexion));
+    }
+    $ruta = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+    return $ruta;
+}
+
+// Inicio de ruta
+public function iniciarRuta($idRuta, $mail){
+    $ruta = $this->buscarRutaDeIntegrante($idRuta, $mail);
+    if (!$ruta) {
+        return ["ok" => false, "motivo" => "no_encontrado"];
+    }
+    if (!in_array($ruta['estado'], ['Planificada', 'Pendiente'])) {
+        return ["ok" => false, "motivo" => "estado_invalido"];
+    }
+
+    $sql = "SELECT 1 FROM ruta WHERE ID_Cuadrilla = ? AND estado = 'En Curso'";
+    $stmt = mysqli_prepare($this->conexion, $sql);
+    if(!$stmt){
+        throw new Exception("Error al preparar la consulta: " . mysqli_error($this->conexion));
+    }
+    $stmt->bind_param("i", $ruta['ID_Cuadrilla']);
+    if(! $stmt->execute()){
+        throw new Exception("Error al ejecutar la consulta: " . mysqli_error($this->conexion));
+    }
+    $rutaEnCurso = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    if ($rutaEnCurso) {
+        return ["ok" => false, "motivo" => "ruta_en_curso"];
+    }
+
+    date_default_timezone_set('America/Montevideo');
+    $fechaHora = date('Y-m-d H:i:s');
+
+    $sql = "UPDATE ruta SET estado = 'En Curso', fecha_inicio = ?, iniciada_por = ? WHERE ID_ruta = ?";
+    $stmt = mysqli_prepare($this->conexion, $sql);
+    if(!$stmt){
+        throw new Exception("Error al preparar la consulta: " . mysqli_error($this->conexion));
+    }
+    $stmt->bind_param("ssi", $fechaHora, $mail, $idRuta);
+    if(! $stmt->execute()){
+        throw new Exception("Error al ejecutar la consulta: " . mysqli_error($this->conexion));
+    }
+    $stmt->close();
+    return ["ok" => true, "motivo" => null];
+}
+
+// Fin de ruta
+public function finalizarRuta($idRuta, $mail){
+    $ruta = $this->buscarRutaDeIntegrante($idRuta, $mail);
+    if (!$ruta) {
+        return ["ok" => false, "motivo" => "no_encontrado"];
+    }
+    if ($ruta['estado'] !== 'En Curso') {
+        return ["ok" => false, "motivo" => "estado_invalido"];
+    }
+
+    date_default_timezone_set('America/Montevideo');
+    $fechaHora = date('Y-m-d H:i:s');
+
+    $sql = "UPDATE ruta SET estado = 'Finalizada', fecha_fin = ?, finalizada_por = ? WHERE ID_ruta = ?";
+    $stmt = mysqli_prepare($this->conexion, $sql);
+    if(!$stmt){
+        throw new Exception("Error al preparar la consulta: " . mysqli_error($this->conexion));
+    }
+    $stmt->bind_param("ssi", $fechaHora, $mail, $idRuta);
+    if(! $stmt->execute()){
+        throw new Exception("Error al ejecutar la consulta: " . mysqli_error($this->conexion));
+    }
+    $stmt->close();
+
+    $this->cuadrillaModel->liberarCamionSiCorresponde($ruta['ID_Cuadrilla']);
     return ["ok" => true, "motivo" => null];
 }
 }

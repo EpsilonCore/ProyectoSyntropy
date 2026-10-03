@@ -62,11 +62,13 @@
               localStorage.setItem("logueado", "si");
               localStorage.setItem("rol", result.usuario.rol);
               localStorage.setItem("nickname", result.usuario.nickname);
+              localStorage.setItem("mail", data.mail);
               window.location.href = "index.html";
             } else {
               localStorage.removeItem("logueado");
               localStorage.removeItem("rol");
               localStorage.removeItem("nickname");
+              localStorage.removeItem("mail");
               window.location.href = "login.html";
             }
           } catch (error) {

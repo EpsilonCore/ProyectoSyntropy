@@ -147,4 +147,72 @@ class RutaController
 
         return ["status" => "ok", "mensaje" => "Cuadrilla asignada correctamente.", "data" => null];
     }
+
+    public function getRutasPorMail()
+    {
+        $json = file_get_contents('php://input');
+        $datos = json_decode($json);
+
+        if (!$datos || empty($datos->mail)) {
+            return ["status" => "datos_invalidos", "mensaje" => "Falta el mail del usuario.", "data" => null];
+        }
+
+        try {
+            $rutas = $this->modeloObj->getRutasPorMail($datos->mail);
+        } catch (Exception $e) {
+            return ["status" => "error", "mensaje" => "No se pudieron obtener las rutas.", "data" => null];
+        }
+
+        return ["status" => "ok", "mensaje" => "Rutas obtenidas correctamente.", "data" => $rutas];
+    }
+
+    public function iniciarRuta()
+    {
+        $json = file_get_contents('php://input');
+        $datos = json_decode($json);
+
+        if (!$datos || empty($datos->idRuta) || !ctype_digit((string)$datos->idRuta) || empty($datos->mail)) {
+            return ["status" => "datos_invalidos", "mensaje" => "Faltan el id de la ruta y el mail del usuario.", "data" => null];
+        }
+
+        try {
+            $resultado = $this->modeloObj->iniciarRuta((int)$datos->idRuta, $datos->mail);
+        } catch (Exception $e) {
+            return ["status" => "error", "mensaje" => "No se pudo iniciar la ruta.", "data" => null];
+        }
+
+        return $this->responderCambioDeEstado($resultado, "Ruta iniciada correctamente.");
+    }
+
+    public function finalizarRuta()
+    {
+        $json = file_get_contents('php://input');
+        $datos = json_decode($json);
+
+        if (!$datos || empty($datos->idRuta) || !ctype_digit((string)$datos->idRuta) || empty($datos->mail)) {
+            return ["status" => "datos_invalidos", "mensaje" => "Faltan el id de la ruta y el mail del usuario.", "data" => null];
+        }
+
+        try {
+            $resultado = $this->modeloObj->finalizarRuta((int)$datos->idRuta, $datos->mail);
+        } catch (Exception $e) {
+            return ["status" => "error", "mensaje" => "No se pudo finalizar la ruta.", "data" => null];
+        }
+
+        return $this->responderCambioDeEstado($resultado, "Ruta finalizada correctamente.");
+    }
+
+    private function responderCambioDeEstado($resultado, $mensajeOk)
+    {
+        if ($resultado['ok']) {
+            return ["status" => "ok", "mensaje" => $mensajeOk, "data" => null];
+        }
+        if ($resultado['motivo'] === 'no_encontrado') {
+            return ["status" => "no_encontrado", "mensaje" => "No se encontró la ruta o no pertenece a tu cuadrilla.", "data" => null];
+        }
+        if ($resultado['motivo'] === 'ruta_en_curso') {
+            return ["status" => "no_disponible", "mensaje" => "Tu cuadrilla ya tiene una ruta en curso.", "data" => null];
+        }
+        return ["status" => "no_disponible", "mensaje" => "La ruta no está en un estado válido para esta acción.", "data" => null];
+    }
 }
