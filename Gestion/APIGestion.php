@@ -29,11 +29,13 @@ require_once 'ContenedoresController.php';
 require_once 'CentrosAcopioController.php';
 require_once 'IncidenciaController.php';
 require_once 'CuadrillaController.php';
+require_once 'NotificacionController.php';
 
 $controladorContenedor   = new ContenedoresController();
 $controladorCentroAcopio = new CentrosAcopioController();
 $controladorIncidencia   = new IncidenciaController();
 $controladorCuadrilla    = new CuadrillaController();
+$controladorNotificacion = new NotificacionController();
 
 $method = $_SERVER['REQUEST_METHOD'];
 $uri    = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -88,6 +90,9 @@ switch ($method) {
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Cuadrillas/Registrar') {
             $resultado = verificarRol($soloAdministrador) ?? $controladorCuadrilla->crearCuadrilla();
         }
+        if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Notificaciones/Mis') {
+            $resultado = $controladorNotificacion->getMisNotificaciones();
+        }
         break;
 
     case 'DELETE':
@@ -125,6 +130,9 @@ switch ($method) {
         }
         if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Cuadrillas/AsignarCamion') {
             $resultado = verificarRol($administradorUOperario) ?? $controladorCuadrilla->asignarCamion();
+        }
+        if ($uri === '/Proyecto/ProyectoSyntropy/Gestion/miApi/Notificaciones/Leidas') {
+            $resultado = $controladorNotificacion->marcarLeidas();
         }
         break;
 

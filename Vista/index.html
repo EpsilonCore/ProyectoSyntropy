@@ -14,6 +14,8 @@
   </head>
 
   <body>
+    <div id="avisoHeader" class="aviso-header" role="status"></div>
+
     <div class="hero-portada">
       <header class="header-epsilon">
         <div class="logo-tarjeta">
@@ -44,6 +46,45 @@
             </button>
           </div>
 
+          <div id="notificaciones" class="notificaciones" style="display: none">
+            <button
+              class="btn-campana"
+              type="button"
+              title="Notificaciones"
+              aria-label="Notificaciones"
+              onclick="abrirNotificaciones()"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+              <span id="contadorNotificaciones" class="contador-notificaciones"
+                >0</span
+              >
+            </button>
+
+            <div id="panelNotificaciones" class="panel-notificaciones">
+              <div class="panel-notificaciones-encabezado">
+                <h4>Notificaciones</h4>
+                <button
+                  type="button"
+                  class="btn-link"
+                  onclick="marcarTodasLeidas()"
+                >
+                  Marcar todas como leídas
+                </button>
+              </div>
+              <div id="listaNotificaciones"></div>
+            </div>
+          </div>
+
           <div id="usuario" class="usuario"></div>
 
           <button
@@ -52,12 +93,7 @@
             type="button"
             title="Reportar incidencia"
             aria-label="Reportar incidencia"
-            onclick="
-              document
-                .getElementById('overlayCrearIncidencias')
-                .classList.add('activo');
-              cargarListaContenedores();
-            "
+            onclick="abrirReporte()"
           >
             <svg
               viewBox="0 0 24 24"
@@ -79,9 +115,6 @@
               <h3>Crear Incidencia</h3>
               <form id="formCrearIncidencia">
                 <input type="hidden" id="estadoCrear" value="Pendiente" />
-
-                <label>Mail</label>
-                <input id="mailCrear" type="email" required />
 
                 <label>Tipo</label>
                 <select id="tipoCrear" required>
@@ -108,6 +141,13 @@
                 </div>
 
                 <label>Contenedor:</label>
+                <input
+                  id="buscadorContenedores"
+                  type="search"
+                  placeholder="Buscar por calle, número o barrio"
+                  autocomplete="off"
+                  oninput="filtrarContenedores()"
+                />
                 <div id="listaContenedores" class="lista-contenedores"></div>
 
                 <input
@@ -451,6 +491,8 @@
     <script>
       const API_URL =
         "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/";
+      const NOTIFICACIONES_URL =
+        "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/Notificaciones/";
 
       document.addEventListener("DOMContentLoaded", () => {
         const rolUsuario = (localStorage.getItem("rol") || "").trim();
@@ -470,36 +512,73 @@
         });
       });
 
+      let contenedoresCargados = [];
+
       async function cargarListaContenedores() {
         const contenedores = document.getElementById("listaContenedores");
         contenedores.innerHTML = "Cargando contenedores...";
+        document.getElementById("buscadorContenedores").value = "";
         try {
           const respuesta = await fetch(
             "/Proyecto/ProyectoSyntropy/Gestion/miApi/Contenedores",
           );
           const json = await respuesta.json();
           // La API devuelve {status, mensaje, data}, no un array directo.
-          const datos = Array.isArray(json) ? json : json?.data || [];
+          contenedoresCargados = Array.isArray(json) ? json : json?.data || [];
 
-          if (!datos || datos.length === 0) {
+          if (contenedoresCargados.length === 0) {
             contenedores.innerHTML = "No hay contenedores disponibles.";
             return;
           }
-          contenedores.innerHTML = "";
-
-          datos.forEach(function (cont) {
-            const item = document.createElement("div");
-            item.classList.add("item-contenedores");
-            item.innerHTML = `<strong>ID:</strong> ${cont.ID_contenedor} - ${cont.calle} ${cont.numero}, ${cont.barrio}`;
-            item.addEventListener("click", function (event) {
-              seleccionarContenedor(cont, event);
-            });
-            contenedores.appendChild(item);
-          });
+          renderizarContenedores(contenedoresCargados);
         } catch (error) {
           console.error("Error al cargar la lista de contenedores:", error);
           contenedores.innerHTML = "Error al cargar los contenedores.";
         }
+      }
+
+      function renderizarContenedores(datos) {
+        const contenedores = document.getElementById("listaContenedores");
+        const idSeleccionado = document.getElementById(
+          "idContenedorSeleccionado",
+        ).value;
+        contenedores.innerHTML = "";
+
+        if (datos.length === 0) {
+          contenedores.innerHTML = "No se encontraron contenedores.";
+          return;
+        }
+
+        datos.forEach(function (cont) {
+          const item = document.createElement("div");
+          item.classList.add("item-contenedores");
+          if (String(cont.ID_contenedor) === idSeleccionado) {
+            item.classList.add("seleccionado");
+          }
+          item.innerHTML = `<strong>ID:</strong> ${cont.ID_contenedor} - ${cont.calle} ${cont.numero}, ${cont.barrio}`;
+          item.addEventListener("click", function (event) {
+            seleccionarContenedor(cont, event);
+          });
+          contenedores.appendChild(item);
+        });
+      }
+
+      function filtrarContenedores() {
+        const normalizar = (texto) =>
+          texto
+            .normalize("NFD")
+            .replace(/[̀-ͯ]/g, "")
+            .toLowerCase();
+        const busqueda = normalizar(
+          document.getElementById("buscadorContenedores").value.trim(),
+        );
+
+        const filtrados = contenedoresCargados.filter((cont) =>
+          normalizar(`${cont.calle} ${cont.numero} ${cont.barrio}`).includes(
+            busqueda,
+          ),
+        );
+        renderizarContenedores(filtrados);
       }
 
       function seleccionarContenedor(cont, event) {
@@ -548,6 +627,9 @@
           registro.style.display = "none";
           login.style.display = "none";
 
+          document.getElementById("notificaciones").style.display = "block";
+          obtenerNotificaciones();
+
           const nombre = localStorage.getItem("nickname") || "Usuario";
           const inicial = nombre.charAt(0).toUpperCase();
 
@@ -575,6 +657,104 @@
 
       cargarUsuario();
 
+      // ===== AVISO Y REPORTE =====
+
+      function mostrarAviso(texto) {
+        const aviso = document.getElementById("avisoHeader");
+        aviso.textContent = texto;
+        aviso.classList.add("activo");
+        setTimeout(() => aviso.classList.remove("activo"), 3500);
+      }
+
+      function abrirReporte() {
+        if (localStorage.getItem("logueado") !== "si") {
+          mostrarAviso("Necesitás iniciar sesión para reportar una incidencia.");
+          return;
+        }
+        document
+          .getElementById("overlayCrearIncidencias")
+          .classList.add("activo");
+        cargarListaContenedores();
+      }
+
+      // ===== NOTIFICACIONES =====
+
+      async function obtenerNotificaciones() {
+        const datos = { mail: localStorage.getItem("mail") };
+
+        try {
+          const respuesta = await fetch(`${NOTIFICACIONES_URL}Mis`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
+          const json = await respuesta.json();
+          renderizarNotificaciones(json.data || []);
+        } catch (error) {
+          console.error("Error al obtener las notificaciones:", error);
+        }
+      }
+
+      function renderizarNotificaciones(notificaciones) {
+        const lista = document.getElementById("listaNotificaciones");
+        const contador = document.getElementById("contadorNotificaciones");
+        const sinLeer = notificaciones.filter(
+          (n) => Number(n.leida) === 0,
+        ).length;
+
+        lista.innerHTML = "";
+
+        if (notificaciones.length === 0) {
+          lista.innerHTML =
+            '<p class="notificaciones-vacio">No tenés notificaciones.</p>';
+        }
+
+        notificaciones.forEach((n) => {
+          const item = document.createElement("div");
+          item.classList.add("item-notificacion");
+          if (Number(n.leida) === 0) {
+            item.classList.add("sin-leer");
+          }
+
+          const texto = document.createElement("p");
+          texto.textContent = n.mensaje;
+
+          const fecha = document.createElement("span");
+          fecha.textContent = new Date(
+            n.fecha.replace(" ", "T"),
+          ).toLocaleString("es-UY", { dateStyle: "short", timeStyle: "short" });
+
+          item.append(texto, fecha);
+          lista.appendChild(item);
+        });
+
+        contador.textContent = sinLeer;
+        contador.style.display = sinLeer > 0 ? "flex" : "none";
+      }
+
+      function abrirNotificaciones() {
+        const panel = document.getElementById("panelNotificaciones");
+        panel.classList.toggle("activo");
+        if (panel.classList.contains("activo")) {
+          obtenerNotificaciones();
+        }
+      }
+
+      async function marcarTodasLeidas() {
+        const datos = { mail: localStorage.getItem("mail") };
+
+        try {
+          await fetch(`${NOTIFICACIONES_URL}Leidas`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
+          obtenerNotificaciones();
+        } catch (error) {
+          console.error("Error al marcar las notificaciones:", error);
+        }
+      }
+
       document
         .getElementById("formCrearIncidencia")
         .addEventListener("submit", async (event) => {
@@ -585,7 +765,7 @@
           ).value;
 
           const datos = {
-            mail: document.getElementById("mailCrear").value,
+            mail: localStorage.getItem("mail"),
             tipo: document.getElementById("tipoCrear").value,
             estado: document.getElementById("estadoCrear").value,
             imagen: await leerImagenComoBase64(
@@ -697,6 +877,7 @@
           const listaDiv = document.getElementById("listaContenedores");
           const camposDiv = document.getElementById("camposDireccionNueva");
           const boton = document.getElementById("btnDireccionNueva");
+          const buscador = document.getElementById("buscadorContenedores");
 
           const mostrandoDireccionNueva = camposDiv.style.display === "block";
 
@@ -704,6 +885,7 @@
             // Volver a la lista de contenedores
             camposDiv.style.display = "none";
             listaDiv.style.display = "block";
+            buscador.style.display = "block";
             document.getElementById("idContenedorSeleccionado").value = "";
             document.getElementById("calleSeleccionada").value = "";
             document.getElementById("numeroSeleccionada").value = "";
@@ -715,6 +897,7 @@
             // Mostrar campos de dirección nueva y limpiar el contenedor elegido
             camposDiv.style.display = "block";
             listaDiv.style.display = "none";
+            buscador.style.display = "none";
             document.getElementById("idContenedorSeleccionado").value = "";
             document.getElementById("calleSeleccionada").value = "";
             document.getElementById("numeroSeleccionada").value = "";
