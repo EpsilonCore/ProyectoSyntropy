@@ -496,11 +496,6 @@
 
       document.addEventListener("DOMContentLoaded", () => {
         const rolUsuario = (localStorage.getItem("rol") || "").trim();
-        /*console.log(
-          "[filtro-roles] rol en localStorage:",
-          JSON.stringify(localStorage.getItem("rol")),
-        );*/
-
         document.querySelectorAll("[data-rol]").forEach((boton) => {
           const rolesPermitidos = boton.dataset.rol
             .split(",")
@@ -523,7 +518,6 @@
             "/Proyecto/ProyectoSyntropy/Gestion/miApi/Contenedores",
           );
           const json = await respuesta.json();
-          // La API devuelve {status, mensaje, data}, no un array directo.
           contenedoresCargados = Array.isArray(json) ? json : json?.data || [];
 
           if (contenedoresCargados.length === 0) {
@@ -565,10 +559,7 @@
 
       function filtrarContenedores() {
         const normalizar = (texto) =>
-          texto
-            .normalize("NFD")
-            .replace(/[̀-ͯ]/g, "")
-            .toLowerCase();
+          texto.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
         const busqueda = normalizar(
           document.getElementById("buscadorContenedores").value.trim(),
         );
@@ -668,7 +659,9 @@
 
       function abrirReporte() {
         if (localStorage.getItem("logueado") !== "si") {
-          mostrarAviso("Necesitás iniciar sesión para reportar una incidencia.");
+          mostrarAviso(
+            "Necesitás iniciar sesión para reportar una incidencia.",
+          );
           return;
         }
         document
@@ -826,9 +819,6 @@
         return TIPOS_IMAGEN_PERMITIDOS.includes(archivo.type);
       }
 
-      // Convierte el archivo elegido en el input a un data URL en base64,
-      // para poder mandarlo dentro del mismo body JSON que ya usa el resto
-      // del formulario (sin cambiar a multipart/form-data ni tocar el backend).
       function leerImagenComoBase64(inputFile) {
         return new Promise((resolve, reject) => {
           const archivo = inputFile.files[0];
