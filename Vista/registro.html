@@ -3,8 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Registro - Epsilon</title>
+    <title data-texto="pagina.registro">Registro - Epsilon</title>
     <link rel="stylesheet" href="style.css" />
+    <script src="idiomas.js"></script>
   </head>
 
   <body>
@@ -16,30 +17,30 @@
       </div>
 
       <form id="registerForm">
-        <input type="text" name="nombre" placeholder="Nombre" required />
-        <input type="text" name="apellido" placeholder="Apellido" required />
+        <input type="text" name="nombre" placeholder="Nombre" data-placeholder="registro.nombre" required />
+        <input type="text" name="apellido" placeholder="Apellido" data-placeholder="registro.apellido" required />
         <input
           type="email"
           name="mail"
-          placeholder="Correo Electrónico"
+          placeholder="Correo Electrónico" data-placeholder="registro.mail"
           required
         />
 
-        <input type="text" name="usuario" placeholder="Usuario" required />
+        <input type="text" name="usuario" placeholder="Usuario" data-placeholder="registro.usuario" required />
 
         <input
           type="password"
           name="contrasenia"
-          placeholder="Contraseña"
+          placeholder="Contraseña" data-placeholder="registro.contrasenia"
           required
         />
-        <input type="password" placeholder="Confirmar Contraseña" required />
+        <input type="password" placeholder="Confirmar Contraseña" data-placeholder="registro.confirmar" required />
 
-        <input type="submit" value="Registrarse" />
+        <input type="submit" value="Registrarse" data-valor="registro.registrarse" />
       </form>
 
       <div class="login-links">
-        <a href="login.html"> Ya tengo una cuenta </a>
+        <a href="login.html" data-texto="registro.yaTengo"> Ya tengo una cuenta </a>
       </div>
     </div>
 

@@ -1,148 +1,505 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estadísticas - Epsilon</title>
-    <link rel="stylesheet" href="style.css">
-</head>
+    <title data-texto="pagina.estadisticas">Estadísticas - Epsilon</title>
 
-<body>
+    <link rel="stylesheet" href="style.css" />
+    <script src="idiomas.js"></script>
+  </head>
 
-<script>
-if(localStorage.getItem("logueado") !== "si"){
-    window.location.href = "login.html";
-}
-</script>
+  <body>
+    <script>
+      if (localStorage.getItem("logueado") !== "si") {
+        window.location.href = "login.html";
+      }
+    </script>
 
-<header>
-
-    <div class="logo">
+    <header>
+      <div class="logo">
         <a href="index.html">
-            <img src="logo.png" alt="Epsilon">
+          <img src="logo.png" alt="Epsilon" />
         </a>
-    </div>
+      </div>
 
-    <div class="header-actions">
-
+      <div class="header-actions">
         <div id="usuario" class="usuario"></div>
 
         <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+      </div>
 
-    </div>
-
-    <nav id="menu">
-
+      <nav id="menu">
         <ul>
+          <li>
+            <button
+              data-rol="Administrador, Operario"
+              class="link-button"
+              data-texto="menu.gestion"
+              onclick="window.location.href = 'gestion.html'"
+            >
+              Gestión
+            </button>
+          </li>
 
-            <li><button class="link-button" data-rol="Administrador" onclick="window.location.href='gestion.html'">Gestión</button></li>
-            <li><button class="link-button" data-rol="Administrador, Operario" onclick="window.location.href='rutas.html'">Rutas</button></li>
-            <li><button class="link-button" onclick="window.location.href='mapa.html'">Mapa</button></li>
-            <li><button class="link-button" onclick="window.location.href='estadisticas.html'">Estadísticas</button></li>
-            <li><button class="link-button" onclick="window.location.href='documentacion.html'">Documentación</button></li>
+          <li>
+            <button
+              data-rol="Administrador, Operario"
+              class="link-button"
+              data-texto="menu.panelRutas"
+              onclick="window.location.href = 'panelrutas.html'"
+            >
+              Panel Rutas
+            </button>
+          </li>
 
+          <li>
+            <button
+              data-rol="Recolector"
+              class="link-button"
+              data-texto="menu.misIncidencias"
+              onclick="window.location.href = 'misincidencias.html'"
+            >
+              Mis Incidencias
+            </button>
+          </li>
+
+          <li>
+            <button
+              data-rol="Operario"
+              class="link-button"
+              data-texto="menu.panelOperario"
+              onclick="window.location.href = 'paneloperario.html'"
+            >
+              Panel Operario
+            </button>
+          </li>
+
+          <li>
+            <button
+              class="link-button"
+              data-texto="menu.mapa"
+              onclick="window.location.href = 'mapa.html'"
+            >
+              Mapa
+            </button>
+          </li>
+
+          <li>
+            <button
+              class="link-button"
+              data-texto="menu.estadisticas"
+              onclick="window.location.href = 'estadisticas.html'"
+            >
+              Estadísticas
+            </button>
+          </li>
+
+          <li>
+            <button
+              class="link-button"
+              data-texto="menu.documentacion"
+              onclick="window.location.href = 'documentacion.html'"
+            >
+              Documentación
+            </button>
+          </li>
         </ul>
+      </nav>
+    </header>
 
-    </nav>
+    <section class="dashboard">
+      <h2 data-texto="est.titulo">Panel de Control</h2>
+      <p>
+        <span data-texto="est.subtitulo">Resumen general del sistema.</span>
+        <span id="estFecha" class="est-fecha"></span>
+      </p>
 
-</header>
-
-<section class="dashboard">
-
-    <h2>Panel de Control</h2>
-    <p>Resumen general del sistema</p>
-
-    <div class="stats-grid">
-
-        <div class="card-stat">
-            <h3>Contenedores activos</h3>
-            <p>128</p>
+      <div class="stats-grid">
+        <div class="card-stat est-verde">
+          <h3 data-texto="est.contenedores">Contenedores totales</h3>
+          <p id="estContenedores">–</p>
         </div>
 
-        <div class="card-stat">
-            <h3>Rutas optimizadas</h3>
-            <p>12</p>
+        <div class="card-stat est-oxido">
+          <h3 data-texto="est.incidencias">Incidencias pendientes</h3>
+          <p id="estIncidencias">–</p>
         </div>
 
-        <div class="card-stat">
-            <h3>Recolecciones hoy</h3>
-            <p>34</p>
+        <div class="card-stat est-bosque">
+          <h3 data-texto="est.centros">Centros de acopio</h3>
+          <p id="estCentros">–</p>
         </div>
 
-        <div class="card-stat">
-            <h3>Eficiencia</h3>
-            <p>92%</p>
+        <div class="card-stat est-acero" data-rol="Administrador, Operario">
+          <h3 data-texto="est.camiones">Camiones disponibles</h3>
+          <p id="estCamiones">–</p>
         </div>
 
-    </div>
+        <div class="card-stat est-ambar" data-rol="Administrador, Operario">
+          <h3 data-texto="est.rutas">Rutas en curso</h3>
+          <p id="estRutas">–</p>
+        </div>
 
-    <div class="panel-actions">
+        <div class="card-stat est-brote" data-rol="Administrador, Operario">
+          <h3 data-texto="est.cuadrillas">Cuadrillas activas</h3>
+          <p id="estCuadrillas">–</p>
+        </div>
+      </div>
 
-        <button>Generar reporte</button>
-        <button>Exportar datos</button>
-        <button>Actualizar métricas</button>
+      <div class="est-eficiencia">
+        <div class="est-eficiencia-cabecera">
+          <div>
+            <h3 data-texto="est.eficiencia">Eficiencia</h3>
+            <span class="est-eficiencia-desc" data-texto="est.eficienciaDesc"
+              >Porcentaje de contenedores sin saturar (vacíos o a media
+              capacidad).</span
+            >
+          </div>
+          <span class="est-eficiencia-valor" id="estEficiencia">–</span>
+        </div>
 
-    </div>
+        <div class="est-barra" id="estBarra"></div>
+        <ul class="est-leyenda" id="estLeyenda"></ul>
+      </div>
 
-</section>
+      <div class="panel-actions">
+        <button
+          class="est-btn-claro"
+          data-rol="Administrador, Operario"
+          data-texto="est.reporte"
+          onclick="generarReporte()"
+        >
+          Generar reporte
+        </button>
+        <button
+          class="est-btn-acero"
+          data-rol="Administrador, Operario"
+          data-texto="est.exportar"
+          onclick="exportarDatos()"
+        >
+          Exportar datos
+        </button>
+        <button
+          class="est-btn-acero"
+          data-rol="Administrador, Operario"
+          data-texto="est.informe"
+          onclick="exportarIncidencias()"
+        >
+          Exportar historial de incidencias
+        </button>
+        <button data-texto="est.actualizar" onclick="cargarMetricas()">
+          Actualizar métricas
+        </button>
+      </div>
+    </section>
 
-<script>
+    <script>
+      const API_GESTION =
+        "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/";
+      const API_RECOLECCION =
+        "http://localhost/Proyecto/ProyectoSyntropy/Recoleccion/miApi/";
 
-document.addEventListener("DOMContentLoaded", () => {
-    const rolUsuario = (localStorage.getItem("rol") || "").trim();
-    document.querySelectorAll("[data-rol]").forEach((boton) => {
-        const rolesPermitidos = boton.dataset.rol
+      const ESTADOS_CONTENEDOR = [
+        { estado: "Vacio", clase: "est-vacio" },
+        { estado: "Media capacidad", clase: "est-media" },
+        { estado: "Lleno", clase: "est-lleno" },
+        { estado: "Desbordado", clase: "est-desbordado" },
+      ];
+
+      let contenedores = [];
+      let eficiencia = null;
+      let ultimaActualizacion = null;
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const rolUsuario = (localStorage.getItem("rol") || "").trim();
+        document.querySelectorAll("[data-rol]").forEach((boton) => {
+          const rolesPermitidos = boton.dataset.rol
             .split(",")
             .map((rol) => rol.trim());
-        if (!rolesPermitidos.includes(rolUsuario)) {
+          if (!rolesPermitidos.includes(rolUsuario)) {
             boton.style.display = "none";
+          }
+        });
+      });
+
+      // ---------- Usuario y menú ----------
+      function toggleMenu() {
+        document.getElementById("menu").classList.toggle("activo");
+      }
+
+      function cerrarSesion() {
+        localStorage.removeItem("logueado");
+        localStorage.removeItem("rol");
+        localStorage.removeItem("nickname");
+        localStorage.removeItem("mail");
+
+        window.location.href = "index.html";
+      }
+
+      function cargarUsuario() {
+        const nombre =
+          localStorage.getItem("nickname") || traducir("usuario.porDefecto");
+        const inicial = nombre.charAt(0).toUpperCase();
+
+        document.getElementById("usuario").innerHTML = `
+
+      <span class="nombre-usuario">${nombre}</span>
+
+      <button class="usuario-btn" onclick="abrirUsuario()">
+          ${inicial}
+      </button>
+
+      <div id="menuUsuario" class="menu-usuario">
+
+          <button onclick="cerrarSesion()">
+              ${traducir("usuario.cerrarSesion")}
+          </button>
+
+      </div>
+
+      `;
+      }
+
+      function abrirUsuario() {
+        document.getElementById("menuUsuario").classList.toggle("activo");
+      }
+
+      cargarUsuario();
+
+      // ---------- Idioma ----------
+      function alCambiarIdioma() {
+        cargarUsuario();
+        renderizarEficiencia(contenedores);
+        mostrarFecha();
+      }
+
+      // ---------- Datos ----------
+      async function obtenerLista(url) {
+        try {
+          const resp = await fetch(url);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          return Array.isArray(data) ? data : data?.data || [];
+        } catch (error) {
+          console.error("Error al obtener datos:", error);
+          return null;
         }
-    });
-});
+      }
 
-function toggleMenu(){
-    document.getElementById("menu").classList.toggle("activo");
-}
+      async function cargarMetricas() {
+        const rolUsuario = (localStorage.getItem("rol") || "").trim();
+        const esGestion = ["Administrador", "Operario"].includes(rolUsuario);
 
-function cerrarSesion(){
-    localStorage.removeItem("logueado");
-    localStorage.removeItem("nombreUsuario");
-    window.location.href = "index.html";
-}
+        const [
+          listaContenedores,
+          incidencias,
+          centros,
+          camiones,
+          rutas,
+          cuadrillas,
+        ] = await Promise.all([
+          obtenerLista(`${API_GESTION}Contenedores`),
+          obtenerLista(`${API_GESTION}Incidencias/Incidencias`),
+          obtenerLista(`${API_GESTION}CentrosAcopio/CentrosAcopio`),
+          esGestion ? obtenerLista(`${API_RECOLECCION}Camiones`) : null,
+          esGestion ? obtenerLista(`${API_RECOLECCION}Rutas`) : null,
+          esGestion ? obtenerLista(`${API_GESTION}Cuadrillas/Cuadrillas`) : null,
+        ]);
 
-function cargarUsuario(){
+        contenedores = listaContenedores || [];
 
-    const nombre = localStorage.getItem("nombreUsuario") || "Usuario";
-    const inicial = nombre.charAt(0).toUpperCase();
+        mostrarValor("estContenedores", listaContenedores, (l) => l.length);
+        mostrarValor(
+          "estIncidencias",
+          incidencias,
+          (l) =>
+            l.filter((i) => (i.estado || "").toLowerCase() === "pendiente")
+              .length,
+        );
+        mostrarValor("estCentros", centros, (l) => l.length);
+        mostrarValor(
+          "estCamiones",
+          camiones,
+          (l) => l.filter((c) => c.estado === "Disponible").length,
+        );
+        mostrarValor(
+          "estRutas",
+          rutas,
+          (l) => l.filter((r) => r.estado === "En Curso").length,
+        );
+        mostrarValor("estCuadrillas", cuadrillas, (l) => l.length);
 
-    document.getElementById("usuario").innerHTML = `
+        renderizarEficiencia(listaContenedores);
 
-    <span class="nombre-usuario">${nombre}</span>
+        ultimaActualizacion = new Date();
+        mostrarFecha();
+      }
 
-    <button class="usuario-btn" onclick="abrirUsuario()">
-        ${inicial}
-    </button>
+      function mostrarValor(id, lista, calcular) {
+        document.getElementById(id).textContent = lista ? calcular(lista) : "–";
+      }
 
-    <div id="menuUsuario" class="menu-usuario">
+      function mostrarFecha() {
+        document.getElementById("estFecha").textContent = ultimaActualizacion
+          ? `${traducir("est.actualizado")} ${formatearFechaHora(ultimaActualizacion)}`
+          : "";
+      }
 
-        <button onclick="cerrarSesion()">
-            Cerrar Sesión
-        </button>
+      function renderizarEficiencia(lista) {
+        const valor = document.getElementById("estEficiencia");
+        const barra = document.getElementById("estBarra");
+        const leyenda = document.getElementById("estLeyenda");
 
-    </div>
+        if (!lista || lista.length === 0) {
+          eficiencia = null;
+          valor.textContent = "–";
+          barra.innerHTML = "";
+          leyenda.innerHTML = "";
+          return;
+        }
 
-    `;
+        const total = lista.length;
+        const sinSaturar = lista.filter(
+          (c) => c.estado === "Vacio" || c.estado === "Media capacidad",
+        ).length;
+        eficiencia = Math.round((sinSaturar / total) * 100);
+        valor.textContent = `${eficiencia}%`;
 
-}
+        let htmlBarra = "";
+        let htmlLeyenda = "";
 
-function abrirUsuario(){
-    document.getElementById("menuUsuario").classList.toggle("activo");
-}
+        ESTADOS_CONTENEDOR.forEach((item) => {
+          const cantidad = lista.filter((c) => c.estado === item.estado).length;
+          const porcentaje = (cantidad / total) * 100;
 
-cargarUsuario();
+          htmlBarra += `<div class="est-tramo ${item.clase}" style="width: ${porcentaje}%"></div>`;
+          htmlLeyenda += `
+<li>
+  <span class="est-punto ${item.clase}"></span>
+  ${traducirValor("estado", item.estado)}: <strong>${cantidad}</strong>
+</li>`;
+        });
 
-</script>
+        barra.innerHTML = htmlBarra;
+        leyenda.innerHTML = htmlLeyenda;
+      }
 
-</body>
+      // ---------- Exportar ----------
+      function celdaCSV(valor) {
+        let texto = valor === null || valor === undefined ? "" : String(valor);
+
+        if (/^[=+\-@]/.test(texto)) {
+          texto = "'" + texto;
+        }
+
+        return /[;"\n\r]/.test(texto) ? `"${texto.replace(/"/g, '""')}"` : texto;
+      }
+
+      function descargarCSV(nombreArchivo, filas) {
+        const csv = filas.map((fila) => fila.map(celdaCSV).join(";")).join("\n");
+        const archivo = new Blob(["﻿" + csv], {
+          type: "text/csv;charset=utf-8;",
+        });
+
+        const enlace = document.createElement("a");
+        enlace.href = URL.createObjectURL(archivo);
+        enlace.download = nombreArchivo;
+        enlace.click();
+        URL.revokeObjectURL(enlace.href);
+      }
+
+      // ---------- Botones ----------
+      function generarReporte() {
+        window.print();
+      }
+
+      function exportarDatos() {
+        const filas = [[traducir("csv.metrica"), traducir("csv.valor")]];
+
+        document.querySelectorAll(".card-stat").forEach((tarjeta) => {
+          if (tarjeta.style.display !== "none") {
+            filas.push([
+              tarjeta.querySelector("h3").textContent,
+              tarjeta.querySelector("p").textContent,
+            ]);
+          }
+        });
+
+        filas.push([
+          traducir("est.eficiencia"),
+          eficiencia === null ? "–" : `${eficiencia}%`,
+        ]);
+
+        ESTADOS_CONTENEDOR.forEach((item) => {
+          const cantidad = contenedores.filter(
+            (c) => c.estado === item.estado,
+          ).length;
+          filas.push([
+            `${traducir("csv.contenedores")} ${traducirValor("estado", item.estado)}`,
+            cantidad,
+          ]);
+        });
+
+        descargarCSV(`estadisticas_${fechaUruguay()}.csv`, filas);
+      }
+
+      async function exportarIncidencias() {
+        const incidencias = await obtenerLista(
+          `${API_GESTION}Incidencias/Incidencias`,
+        );
+
+        if (incidencias === null) {
+          alert(traducir("est.errorIncidencias"));
+          return;
+        }
+
+        if (incidencias.length === 0) {
+          alert(traducir("est.sinIncidencias"));
+          return;
+        }
+
+        incidencias.sort((a, b) =>
+          (b.fecha_creacion || "").localeCompare(a.fecha_creacion || ""),
+        );
+
+        const filas = [
+          [
+            traducir("inc.id"),
+            traducir("inc.fecha"),
+            traducir("inc.tipo"),
+            traducir("inc.estado"),
+            traducir("inc.mail"),
+            traducir("inc.calle"),
+            traducir("inc.numero"),
+            traducir("inc.barrio"),
+            traducir("inc.tipoContenedor"),
+            traducir("inc.operario"),
+            traducir("inc.cuadrilla"),
+          ],
+        ];
+
+        incidencias.forEach((incidencia) => {
+          filas.push([
+            incidencia.ID_incidencia,
+            incidencia.fecha_creacion,
+            traducirValor("tipoIncidencia", incidencia.tipo),
+            traducirValor("estado", incidencia.estado),
+            incidencia.mail,
+            incidencia.calle,
+            incidencia.numero,
+            incidencia.barrio,
+            traducirValor("tipoContenedor", incidencia.tipoContenedor),
+            incidencia.ID_operario || traducir("comun.sinAsignar"),
+            incidencia.nombre_cuadrilla || traducir("comun.sinAsignar"),
+          ]);
+        });
+
+        descargarCSV(`incidencias_${fechaUruguay()}.csv`, filas);
+      }
+
+      cargarMetricas();
+    </script>
+  </body>
 </html>

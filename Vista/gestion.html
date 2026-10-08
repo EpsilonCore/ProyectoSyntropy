@@ -4,9 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Gestión - Epsilon</title>
+    <title data-texto="pagina.gestion">Gestión - Epsilon</title>
 
     <link rel="stylesheet" href="style.css" />
+    <script src="idiomas.js"></script>
 
     <style>
       .gestion-icono-morado {
@@ -50,6 +51,7 @@
             <button
               class="link-button"
               data-rol="Administrador, Operario"
+              data-texto="menu.gestion"
               onclick="window.location.href = 'gestion.html'"
             >
               Gestión
@@ -60,6 +62,7 @@
             <button
               class="link-button"
               data-rol="Administrador, Operario"
+              data-texto="menu.panelRutas"
               onclick="window.location.href = 'panelrutas.html'"
             >
               Panel Rutas
@@ -69,6 +72,7 @@
           <li>
             <button
               class="link-button"
+              data-texto="menu.mapa"
               onclick="window.location.href = 'mapa.html'"
             >
               Mapa
@@ -78,6 +82,7 @@
           <li>
             <button
               class="link-button"
+              data-texto="menu.estadisticas"
               onclick="window.location.href = 'estadisticas.html'"
             >
               Estadísticas
@@ -87,6 +92,7 @@
           <li>
             <button
               class="link-button"
+              data-texto="menu.documentacion"
               onclick="window.location.href = 'documentacion.html'"
             >
               Documentación
@@ -98,19 +104,19 @@
 
     <div class="gestion-portada">
       <div class="gestion-encabezado">
-        <span class="gestion-eyebrow">Administración</span>
-        <h2>Gestión de Residuos</h2>
+        <span class="gestion-eyebrow" data-texto="gestion.eyebrow">Administración</span>
+        <h2 data-texto="gestion.titulo">Gestión de Residuos</h2>
         <p id="gestionSaludo">Panel general del sistema Epsilon.</p>
       </div>
 
       <div class="gestion-resumen">
         <div class="gestion-resumen-item">
           <span class="gestion-resumen-numero">8</span>
-          <span class="gestion-resumen-label">Módulos activos</span>
+          <span class="gestion-resumen-label" data-texto="gestion.modulos">Módulos activos</span>
         </div>
         <div class="gestion-resumen-item">
           <span class="gestion-resumen-numero">24/7</span>
-          <span class="gestion-resumen-label">Monitoreo continuo</span>
+          <span class="gestion-resumen-label" data-texto="gestion.monitoreo">Monitoreo continuo</span>
         </div>
       </div>
     </div>
@@ -137,8 +143,8 @@
           </svg>
         </span>
         <span class="gestion-card-texto">
-          <span class="gestion-card-titulo">Registro</span>
-          <span class="gestion-card-desc"
+          <span class="gestion-card-titulo" data-texto="gestion.registro">Registro</span>
+          <span class="gestion-card-desc" data-texto="gestion.registroDesc"
             >Alta general de operaciones y movimientos del sistema.</span
           >
         </span>
@@ -168,8 +174,8 @@
           </svg>
         </span>
         <span class="gestion-card-texto">
-          <span class="gestion-card-titulo">Contenedores</span>
-          <span class="gestion-card-desc"
+          <span class="gestion-card-titulo" data-texto="gestion.contenedores">Contenedores</span>
+          <span class="gestion-card-desc" data-texto="gestion.contenedoresDesc"
             >Ubicación, tipo y estado de cada contenedor de la ciudad.</span
           >
         </span>
@@ -197,8 +203,8 @@
           </svg>
         </span>
         <span class="gestion-card-texto">
-          <span class="gestion-card-titulo">Camiones</span>
-          <span class="gestion-card-desc"
+          <span class="gestion-card-titulo" data-texto="gestion.camiones">Camiones</span>
+          <span class="gestion-card-desc" data-texto="gestion.camionesDesc"
             >Flota disponible y asignación de camiones recolectores.</span
           >
         </span>
@@ -223,8 +229,8 @@
           </svg>
         </span>
         <span class="gestion-card-texto">
-          <span class="gestion-card-titulo">Usuarios</span>
-          <span class="gestion-card-desc"
+          <span class="gestion-card-titulo" data-texto="gestion.usuarios">Usuarios</span>
+          <span class="gestion-card-desc" data-texto="gestion.usuariosDesc"
             >Cuentas, roles y permisos del personal.</span
           >
         </span>
@@ -252,8 +258,8 @@
           </svg>
         </span>
         <span class="gestion-card-texto">
-          <span class="gestion-card-titulo">Centros de Acopio</span>
-          <span class="gestion-card-desc"
+          <span class="gestion-card-titulo" data-texto="gestion.centros">Centros de Acopio</span>
+          <span class="gestion-card-desc" data-texto="gestion.centrosDesc"
             >Puntos de acopio, capacidad y estado de cada centro.</span
           >
         </span>
@@ -279,8 +285,8 @@
           </svg>
         </span>
         <span class="gestion-card-texto">
-          <span class="gestion-card-titulo">Rutas</span>
-          <span class="gestion-card-desc"
+          <span class="gestion-card-titulo" data-texto="gestion.rutas">Rutas</span>
+          <span class="gestion-card-desc" data-texto="gestion.rutasDesc"
             >Trazado y ajuste de las rutas de recolección.</span
           >
         </span>
@@ -307,8 +313,8 @@
           </svg>
         </span>
         <span class="gestion-card-texto">
-          <span class="gestion-card-titulo">Cuadrillas</span>
-          <span class="gestion-card-desc"
+          <span class="gestion-card-titulo" data-texto="gestion.cuadrillas">Cuadrillas</span>
+          <span class="gestion-card-desc" data-texto="gestion.cuadrillasDesc"
             >Formación y gestión de cuadrillas de recolectores.</span
           >
         </span>
@@ -334,8 +340,8 @@
           </svg>
         </span>
         <span class="gestion-card-texto">
-          <span class="gestion-card-titulo">Incidencias</span>
-          <span class="gestion-card-desc"
+          <span class="gestion-card-titulo" data-texto="gestion.incidencias">Incidencias</span>
+          <span class="gestion-card-desc" data-texto="gestion.incidenciasDesc"
             >Reportes de la ciudadanía pendientes de resolución.</span
           >
         </span>
@@ -368,12 +374,16 @@
       }
 
       function cargarUsuario() {
-        const nombre = localStorage.getItem("nickname") || "Usuario";
+        const nombre =
+          localStorage.getItem("nickname") || traducir("usuario.porDefecto");
         const inicial = nombre.charAt(0).toUpperCase();
 
         const saludo = document.getElementById("gestionSaludo");
         if (saludo) {
-          saludo.textContent = `Bienvenido/a, ${nombre}. Elegí un módulo para empezar.`;
+          saludo.textContent = traducir("gestion.bienvenida").replace(
+            "{nombre}",
+            nombre,
+          );
         }
 
         document.getElementById("usuario").innerHTML = `
@@ -387,7 +397,7 @@
     <div id="menuUsuario" class="menu-usuario">
 
         <button onclick="cerrarSesion()">
-            Cerrar Sesión
+            ${traducir("usuario.cerrarSesion")}
         </button>
 
     </div>
@@ -400,6 +410,10 @@
       }
 
       cargarUsuario();
+
+      function alCambiarIdioma() {
+        cargarUsuario();
+      }
     </script>
   </body>
 </html>

@@ -3,8 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - Epsilon</title>
+    <title data-texto="pagina.login">Login - Epsilon</title>
     <link rel="stylesheet" href="style.css" />
+    <script src="idiomas.js"></script>
   </head>
 
   <body>
@@ -16,23 +17,23 @@
       </div>
 
       <form id="loginForm">
-        <input type="text" name="mail" id="mail" placeholder="Mail" required />
+        <input type="text" name="mail" id="mail" placeholder="Mail" data-placeholder="login.mail" required />
 
         <input
           type="password"
           name="contrasenia"
           id="password"
-          placeholder="Contraseña"
+          placeholder="Contraseña" data-placeholder="login.contrasenia"
           required
         />
 
-        <input type="submit" value="Ingresar" />
+        <input type="submit" value="Ingresar" data-valor="login.ingresar" />
       </form>
 
       <div class="login-links">
-        <a href="recuperar.html"> ¿Olvidaste tu contraseña? </a>
+        <a href="recuperar.html" data-texto="login.olvido"> ¿Olvidaste tu contraseña? </a>
 
-        <a href="registro.html"> Crear Cuenta </a>
+        <a href="registro.html" data-texto="login.crearCuenta"> Crear Cuenta </a>
       </div>
     </div>
 

@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Documentación - Epsilon</title>
+    <title data-texto="pagina.documentacion">Documentación - Epsilon</title>
     <link rel="stylesheet" href="style.css">
+    <script src="idiomas.js"></script>
 </head>
 
 <body>
@@ -39,35 +40,35 @@ if(localStorage.getItem("logueado") !== "si"){
         <ul>
 
             <li>
-                <button class="link-button" data-rol="Administrador"
+                <button class="link-button" data-rol="Administrador" data-texto="menu.gestion"
                 onclick="window.location.href='gestion.html'">
                     Gestión
                 </button>
             </li>
 
             <li>
-                <button class="link-button" data-rol="Administrador, Operario"
-                onclick="window.location.href='rutas.html'">
-                    Rutas
+                <button class="link-button" data-rol="Administrador, Operario" data-texto="menu.panelRutas"
+                onclick="window.location.href='panelrutas.html'">
+                    Panel Rutas
                 </button>
             </li>
 
             <li>
-                <button class="link-button"
+                <button class="link-button" data-texto="menu.mapa"
                 onclick="window.location.href='mapa.html'">
                     Mapa
                 </button>
             </li>
 
             <li>
-                <button class="link-button"
+                <button class="link-button" data-texto="menu.estadisticas"
                 onclick="window.location.href='estadisticas.html'">
                     Estadísticas
                 </button>
             </li>
 
             <li>
-                <button class="link-button"
+                <button class="link-button" data-texto="menu.documentacion"
                 onclick="window.location.href='documentacion.html'">
                     Documentación
                 </button>
@@ -81,23 +82,23 @@ if(localStorage.getItem("logueado") !== "si"){
 
 <div class="pagina">
 
-    <h2>Documentación</h2>
+    <h2 data-texto="doc.titulo">Documentación</h2>
 
-    <p>
+    <p data-texto="doc.subtitulo">
         Manuales e información del sistema.
     </p>
 
     <div class="panel">
 
-        <button>
+        <button data-texto="doc.manual">
             Manual de Usuario
         </button>
 
-        <button>
+        <button data-texto="doc.guias">
             Guías
         </button>
 
-        <button>
+        <button data-texto="doc.faq">
             Preguntas Frecuentes
         </button>
 
@@ -126,7 +127,7 @@ function toggleMenu(){
 function cerrarSesion(){
 
     localStorage.removeItem("logueado");
-    localStorage.removeItem("nombreUsuario");
+    localStorage.removeItem("nickname");
 
     window.location.href =
     "index.html";
@@ -135,7 +136,7 @@ function cerrarSesion(){
 
 function cargarUsuario(){
 
-    const nombre = localStorage.getItem("nombreUsuario") || "Usuario";
+    const nombre = localStorage.getItem("nickname") || traducir("usuario.porDefecto");
     const inicial = nombre.charAt(0).toUpperCase();
 
     document.getElementById("usuario").innerHTML = `
@@ -149,7 +150,7 @@ function cargarUsuario(){
     <div id="menuUsuario" class="menu-usuario">
 
         <button onclick="cerrarSesion()">
-            Cerrar Sesión
+            ${traducir("usuario.cerrarSesion")}
         </button>
 
     </div>
@@ -163,6 +164,10 @@ function abrirUsuario(){
 }
 
 cargarUsuario();
+
+function alCambiarIdioma(){
+    cargarUsuario();
+}
 
 </script>
 
