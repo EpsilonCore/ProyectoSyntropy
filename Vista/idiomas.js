@@ -116,7 +116,8 @@ const TEXTOS = {
     "gestion.usuarios": "Usuarios",
     "gestion.usuariosDesc": "Cuentas, roles y permisos del personal.",
     "gestion.centros": "Centros de Acopio",
-    "gestion.centrosDesc": "Puntos de acopio, capacidad y estado de cada centro.",
+    "gestion.centrosDesc":
+      "Puntos de acopio, capacidad y estado de cada centro.",
     "gestion.rutas": "Rutas",
     "gestion.rutasDesc": "Trazado y ajuste de las rutas de recolección.",
     "gestion.cuadrillas": "Cuadrillas",
@@ -170,7 +171,8 @@ const TEXTOS = {
     "form.errorContenedores": "Error al cargar los contenedores.",
     "form.noEncontrados": "No se encontraron contenedores.",
     "form.errorRegistrar": "No se pudo registrar la incidencia.",
-    "form.soloImagenes": "Solo se permiten imágenes en formato JPG, JPEG o PNG.",
+    "form.soloImagenes":
+      "Solo se permiten imágenes en formato JPG, JPEG o PNG.",
     "form.necesitasLogin":
       "Necesitás iniciar sesión para reportar una incidencia.",
 
@@ -205,7 +207,8 @@ const TEXTOS = {
     "serv.titulo": "Explorá la plataforma",
     "serv.subtitulo":
       "Todo lo que necesitás para seguir la gestión de residuos de la ciudad.",
-    "serv.mapaDesc": "Ubicación en vivo de contenedores, camiones e incidencias.",
+    "serv.mapaDesc":
+      "Ubicación en vivo de contenedores, camiones e incidencias.",
     "serv.estadisticasDesc":
       "Indicadores de recolección, incidencias y desempeño por zona.",
     "serv.documentacionDesc":
@@ -250,7 +253,8 @@ const TEXTOS = {
     "index.notificaciones": "Notificaciones",
     "index.marcarLeidas": "Marcar todas como leídas",
     "index.sinNotificaciones": "No tenés notificaciones.",
-    "notificacion.incidencia_asignada": "Tu incidencia #{id} fue asignada a una cuadrilla.",
+    "notificacion.incidencia_asignada":
+      "Tu incidencia #{id} fue asignada a una cuadrilla.",
     "notificacion.incidencia_resuelta": "Tu incidencia #{id} fue resuelta.",
     "index.reportar": "Reportar incidencia",
     "index.crearIncidencia": "Crear Incidencia",
@@ -271,7 +275,8 @@ const TEXTOS = {
     "index.errorContenedores": "Error al cargar los contenedores.",
     "index.necesitaLogin":
       "Necesitás iniciar sesión para reportar una incidencia.",
-    "index.errorImagen": "Solo se permiten imágenes en formato JPG, JPEG o PNG.",
+    "index.errorImagen":
+      "Solo se permiten imágenes en formato JPG, JPEG o PNG.",
     "index.errorRegistrar": "No se pudo registrar la incidencia.",
     "index.overline": "Plataforma de gestión ambiental urbana",
     "index.titulo":
@@ -429,7 +434,8 @@ const TEXTOS = {
     "gestion.usuarios": "Users",
     "gestion.usuariosDesc": "Staff accounts, roles and permissions.",
     "gestion.centros": "Collection Centers",
-    "gestion.centrosDesc": "Collection points, capacity and status of each center.",
+    "gestion.centrosDesc":
+      "Collection points, capacity and status of each center.",
     "gestion.rutas": "Routes",
     "gestion.rutasDesc": "Layout and adjustment of collection routes.",
     "gestion.cuadrillas": "Crews",
@@ -518,8 +524,7 @@ const TEXTOS = {
     "serv.mapaDesc": "Live location of containers, trucks and incidents.",
     "serv.estadisticasDesc":
       "Collection, incident and performance indicators by area.",
-    "serv.documentacionDesc":
-      "System guides, waste types and good practices.",
+    "serv.documentacionDesc": "System guides, waste types and good practices.",
 
     "pie.tagline": "Integrated urban waste management, in real time.",
     "pie.plataforma": "Platform",
@@ -560,8 +565,10 @@ const TEXTOS = {
     "index.notificaciones": "Notifications",
     "index.marcarLeidas": "Mark all as read",
     "index.sinNotificaciones": "You have no notifications.",
-    "notificacion.incidencia_asignada": "Your incident #{id} was assigned to a crew.",
-    "notificacion.incidencia_resuelta": "Your incident #{id} has been resolved.",
+    "notificacion.incidencia_asignada":
+      "Your incident #{id} was assigned to a crew.",
+    "notificacion.incidencia_resuelta":
+      "Your incident #{id} has been resolved.",
     "index.reportar": "Report incident",
     "index.crearIncidencia": "Create Incident",
     "index.tipo": "Type",
@@ -608,8 +615,7 @@ const TEXTOS = {
     "index.explora": "Explore the platform",
     "index.exploraDesc":
       "Everything you need to follow the city's waste management.",
-    "index.servicioMapa":
-      "Live location of containers, trucks and incidents.",
+    "index.servicioMapa": "Live location of containers, trucks and incidents.",
     "index.servicioEstadisticas":
       "Collection, incident and performance indicators by zone.",
     "index.servicioDocumentacion":
@@ -703,7 +709,8 @@ const TEXTOS = {
     "est.informe": "Exportar histórico de incidências",
     "est.actualizar": "Atualizar métricas",
     "est.sinIncidencias": "Não há incidências para exportar.",
-    "est.errorIncidencias": "Não foi possível obter o histórico de incidências.",
+    "est.errorIncidencias":
+      "Não foi possível obter o histórico de incidências.",
 
     "csv.metrica": "Métrica",
     "csv.valor": "Valor",
@@ -826,7 +833,8 @@ const TEXTOS = {
     "serv.titulo": "Explore a plataforma",
     "serv.subtitulo":
       "Tudo o que você precisa para acompanhar a gestão de resíduos da cidade.",
-    "serv.mapaDesc": "Localização ao vivo de contêineres, caminhões e incidências.",
+    "serv.mapaDesc":
+      "Localização ao vivo de contêineres, caminhões e incidências.",
     "serv.estadisticasDesc":
       "Indicadores de coleta, incidências e desempenho por zona.",
     "serv.documentacionDesc":
@@ -871,7 +879,8 @@ const TEXTOS = {
     "index.notificaciones": "Notificações",
     "index.marcarLeidas": "Marcar todas como lidas",
     "index.sinNotificaciones": "Você não tem notificações.",
-    "notificacion.incidencia_asignada": "Sua ocorrência #{id} foi atribuída a uma equipe.",
+    "notificacion.incidencia_asignada":
+      "Sua ocorrência #{id} foi atribuída a uma equipe.",
     "notificacion.incidencia_resuelta": "Sua ocorrência #{id} foi resolvida.",
     "index.reportar": "Reportar incidência",
     "index.crearIncidencia": "Criar Incidência",
