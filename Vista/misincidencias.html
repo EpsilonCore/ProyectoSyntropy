@@ -4,9 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Mi cuadrilla - Epsilon</title>
+    <title data-texto="pagina.misincidencias">Mi cuadrilla - Epsilon</title>
 
     <link rel="stylesheet" href="style.css" />
+    <script src="idiomas.js"></script>
   </head>
 
   <body>
@@ -41,6 +42,7 @@
             <button
               data-rol="Recolector"
               class="link-button"
+              data-texto="menu.inicio"
               onclick="window.location.href = 'index.html'"
             >
               Inicio
@@ -51,21 +53,23 @@
     </header>
 
     <div class="pagina">
-      <h2>Mi cuadrilla</h2>
+      <h2 data-texto="mis.titulo">Mi cuadrilla</h2>
 
-      <p>Incidencias y rutas asignadas a tu cuadrilla.</p>
+      <p data-texto="mis.descripcion">
+        Incidencias y rutas asignadas a tu cuadrilla.
+      </p>
 
       <div class="lista-panel">
-        <h3>Incidencias</h3>
+        <h3 data-texto="mis.incidencias">Incidencias</h3>
         <ul id="listaIncidencias">
-          <p>Cargando incidencias...</p>
+          <p data-texto="mis.cargandoIncidencias">Cargando incidencias...</p>
         </ul>
       </div>
 
       <div class="lista-panel">
-        <h3>Rutas</h3>
+        <h3 data-texto="mis.rutas">Rutas</h3>
         <ul id="listaRutas">
-          <p>Cargando rutas...</p>
+          <p data-texto="mis.cargandoRutas">Cargando rutas...</p>
         </ul>
       </div>
     </div>
@@ -75,8 +79,8 @@
         "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/";
       const API_URL_RUTAS =
         "http://localhost/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas/";
-      let incidencias = [];
-      let rutas = [];
+      let incidencias = null;
+      let rutas = null;
 
       document.addEventListener("DOMContentLoaded", () => {
         const rolUsuario = (localStorage.getItem("rol") || "").trim();
@@ -104,7 +108,8 @@
       }
 
       function cargarUsuario() {
-        const nombre = localStorage.getItem("nickname") || "Usuario";
+        const nombre =
+          localStorage.getItem("nickname") || traducir("usuario.porDefecto");
         const inicial = nombre.charAt(0).toUpperCase();
 
         document.getElementById("usuario").innerHTML = `
@@ -118,7 +123,7 @@
       <div id="menuUsuario" class="menu-usuario">
 
           <button onclick="cerrarSesion()">
-              Cerrar Sesión
+              ${traducir("usuario.cerrarSesion")}
           </button>
 
       </div>
@@ -131,6 +136,12 @@
       }
 
       cargarUsuario();
+
+      function alCambiarIdioma() {
+        cargarUsuario();
+        if (incidencias) renderizarIncidencias();
+        if (rutas) renderizarRutas();
+      }
 
       async function obtenerIncidencias() {
         try {
@@ -150,7 +161,7 @@
         } catch (error) {
           console.error("Error al obtener incidencias:", error);
           document.getElementById("listaIncidencias").innerHTML =
-            "<p>No se pudieron cargar las incidencias.</p>";
+            `<p>${traducir("mis.errorIncidencias")}</p>`;
         }
       }
 
@@ -172,12 +183,12 @@
         } catch (error) {
           console.error("Error al obtener rutas:", error);
           document.getElementById("listaRutas").innerHTML =
-            "<p>No se pudieron cargar las rutas.</p>";
+            `<p>${traducir("mis.errorRutas")}</p>`;
         }
       }
 
       async function marcarRealizada(id) {
-        if (!confirm("¿Marcar esta incidencia como realizada?")) return;
+        if (!confirm(traducir("mis.confirmarRealizada"))) return;
         try {
           const datos = {
             idIncidencia: id,
@@ -193,17 +204,21 @@
           if (resultado.status === "ok") {
             obtenerIncidencias(); // refresca la lista
           } else {
-            alert(resultado.mensaje);
+            alert(mensajeStatus(resultado));
           }
         } catch (error) {
           console.error("Error al marcar la incidencia:", error);
-          alert("Error de conexión al marcar la incidencia.");
+          alert(traducir("comun.conexion"));
         }
       }
 
       // accion: "Iniciar" o "Finalizar"
       async function cambiarEstadoRuta(id, accion) {
-        if (!confirm(`¿${accion} esta ruta?`)) return;
+        const confirmaciones = {
+          Iniciar: "mis.confirmarIniciar",
+          Finalizar: "mis.confirmarFinalizar",
+        };
+        if (!confirm(traducir(confirmaciones[accion]))) return;
         try {
           const datos = {
             idRuta: id,
@@ -219,11 +234,11 @@
           if (resultado.status === "ok") {
             obtenerRutas(); // refresca la lista
           } else {
-            alert(resultado.mensaje);
+            alert(mensajeStatus(resultado));
           }
         } catch (error) {
           console.error("Error al actualizar la ruta:", error);
-          alert("Error de conexión al actualizar la ruta.");
+          alert(traducir("comun.conexion"));
         }
       }
 
@@ -231,7 +246,7 @@
         const listaContainer = document.getElementById("listaIncidencias");
 
         if (incidencias.length === 0) {
-          listaContainer.innerHTML = "<p>No hay incidencias asignadas.</p>";
+          listaContainer.innerHTML = `<p>${traducir("mis.sinIncidencias")}</p>`;
           return;
         }
 
@@ -246,12 +261,12 @@
   <div class="incidencia-cuerpo">
     ${
       incidencia.imagen
-        ? `<img src="${incidencia.imagen}" alt="Foto de la incidencia" class="incidencia-thumb" />`
+        ? `<img src="${incidencia.imagen}" alt="${traducir("mis.fotoIncidencia")}" class="incidencia-thumb" />`
         : ""
     }
     <div class="incidencia-info">
-      <strong>#${incidencia.ID_incidencia} — ${incidencia.tipo}</strong>
-      <span class="incidencia-estado">${incidencia.estado}</span>
+      <strong>#${incidencia.ID_incidencia} — ${traducirValor("tipoIncidencia", incidencia.tipo)}</strong>
+      <span class="incidencia-estado">${traducirValor("estado", incidencia.estado)}</span>
       <p>${incidencia.calle} ${incidencia.numero}, ${incidencia.barrio}</p>
     </div>
   </div>
@@ -260,7 +275,7 @@
       realizada
         ? ""
         : `<button class="btn-modificar" onclick="marcarRealizada(${incidencia.ID_incidencia})">
-      Marcar como realizada
+      ${traducir("mis.marcarRealizada")}
     </button>`
     }
   </span>
@@ -275,7 +290,7 @@
         const listaContainer = document.getElementById("listaRutas");
 
         if (rutas.length === 0) {
-          listaContainer.innerHTML = "<p>No hay rutas asignadas.</p>";
+          listaContainer.innerHTML = `<p>${traducir("mis.sinRutas")}</p>`;
           return;
         }
 
@@ -286,19 +301,19 @@
           let boton = "";
           const sinIniciar = ["Planificada", "Pendiente"].includes(ruta.estado);
           if (sinIniciar && !hayEnCurso) {
-            boton = `<button class="btn-modificar" onclick="cambiarEstadoRuta(${ruta.ID_ruta}, 'Iniciar')">Iniciar ruta</button>`;
+            boton = `<button class="btn-modificar" onclick="cambiarEstadoRuta(${ruta.ID_ruta}, 'Iniciar')">${traducir("mis.iniciarRuta")}</button>`;
           } else if (ruta.estado === "En Curso") {
-            boton = `<button class="btn-modificar" onclick="cambiarEstadoRuta(${ruta.ID_ruta}, 'Finalizar')">Finalizar ruta</button>`;
+            boton = `<button class="btn-modificar" onclick="cambiarEstadoRuta(${ruta.ID_ruta}, 'Finalizar')">${traducir("mis.finalizarRuta")}</button>`;
           }
 
           html += `
 <li class="incidencia-item">
   <div class="incidencia-cuerpo">
     <div class="incidencia-info">
-      <strong>${ruta.nombre ? ruta.nombre : `Ruta #${ruta.ID_ruta}`}</strong>
-      <span class="incidencia-estado">${ruta.estado}</span>
-      <p>Iniciada: ${ruta.fecha_inicio ? ruta.fecha_inicio : "—"}</p>
-      <p>Finalizada: ${ruta.fecha_fin ? ruta.fecha_fin : "—"}</p>
+      <strong>${ruta.nombre ? ruta.nombre : `${traducir("mis.ruta")} #${ruta.ID_ruta}`}</strong>
+      <span class="incidencia-estado">${traducirValor("estado", ruta.estado)}</span>
+      <p>${traducir("mis.iniciada")}: ${ruta.fecha_inicio ? ruta.fecha_inicio : "—"}</p>
+      <p>${traducir("mis.finalizada")}: ${ruta.fecha_fin ? ruta.fecha_fin : "—"}</p>
     </div>
   </div>
   <span class="incidencia-acciones">${boton}</span>

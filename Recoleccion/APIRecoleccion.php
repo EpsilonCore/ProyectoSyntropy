@@ -72,6 +72,9 @@ switch ($method) {
         if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas/CalcularCamino') {
             $resultado = verificarRol($rolesRutas) ?? $controladorRuta->calcularCamino();
         }
+        if($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas/MisRutas'){
+            $resultado = verificarRol($rolRecolector) ?? $controladorRuta->getRutasPorMail();
+        }
         break;
 
     case 'PATCH':
@@ -80,6 +83,13 @@ switch ($method) {
         }
         if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas/AsignarCuadrilla') {
             $resultado = verificarRol($rolesRutas) ?? $controladorRuta->AsignarCuadrilla();
+        }
+        if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas/Iniciar'){
+            $resultado = verificarRol($rolRecolector) ?? $controladorRuta->iniciarRuta();
+        }
+        
+        if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas/Finalizar'){
+            $resultado = verificarRol($rolRecolector) ?? $controladorRuta->finalizarRuta();
         }
         break;
 
@@ -108,6 +118,7 @@ $codigosHttp = [
     "sin_camion"       => 409,
     "no_permitido"     => 405,
     "error"            => 500,
+    "no_disponible"    => 409,
 ];
 
 http_response_code($codigosHttp[$resultado["status"]] ?? 500);

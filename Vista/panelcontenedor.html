@@ -4,9 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Panel Contenedores - Epsilon</title>
+    <title data-texto="pagina.panelcontenedor">Panel Contenedores - Epsilon</title>
 
     <link rel="stylesheet" href="style.css" />
+    <script src="idiomas.js"></script>
   </head>
 
   <body>
@@ -38,6 +39,7 @@
             <button
               data-rol="Administrador"
               class="link-button"
+              data-texto="menu.gestion"
               onclick="window.location.href = 'gestion.html'"
             >
               Gestión
@@ -48,6 +50,7 @@
             <button
               data-rol="Administrador"
               class="link-button"
+              data-texto="menu.panelRegistro"
               onclick="window.location.href = 'panelregistro.html'"
             >
               Panel Registro
@@ -58,6 +61,7 @@
             <button
               data-rol="Administrador"
               class="link-button"
+              data-texto="menu.contenedores"
               onclick="window.location.href = 'panelcontenedor.html'"
             >
               Contenedores
@@ -68,6 +72,7 @@
             <button
               data-rol="Administrador"
               class="link-button"
+              data-texto="menu.camiones"
               onclick="window.location.href = 'panelcamion.html'"
             >
               Camiones
@@ -78,6 +83,7 @@
             <button
               data-rol="Administrador"
               class="link-button"
+              data-texto="menu.panelUsuario"
               onclick="window.location.href = 'panelusuario.html'"
             >
               Panel de Usuario
@@ -88,52 +94,65 @@
     </header>
 
     <div class="pagina">
-      <h2>Panel Contenedores</h2>
+      <h2 data-texto="pcon.titulo">Panel Contenedores</h2>
 
-      <p>Gestión de contenedores registrados en el sistema.</p>
+      <p data-texto="pcon.descripcion">
+        Gestión de contenedores registrados en el sistema.
+      </p>
 
       <div class="panel" id="OverlayCrearContenedor">
-        <button onclick="abrirCrearContenedor()">Crear Contenedor</button>
+        <button data-texto="pcon.crear" onclick="abrirCrearContenedor()">
+          Crear Contenedor
+        </button>
       </div>
       <div class="overlay" id="overlayCrearContenedores">
         <div class="crear-contenedor">
-          <h3>Crear Contenedor</h3>
+          <h3 data-texto="pcon.crear">Crear Contenedor</h3>
           <form id="formCrearContenedor">
-            <label>Tipo</label>
+            <label data-texto="comun.tipo">Tipo</label>
             <select id="tipoCrear" required>
-              <option value="" disabled>Seleccione un tipo</option>
-              <option value="Naranja">Naranja - Reciclables</option>
-              <option value="Metalico">Metalico - Residuos mezclados</option>
-              <option value="Plastico">Plastico - Residuos mezclados</option>
+              <option value="" disabled data-texto="comun.seleccioneTipo">
+                Seleccione un tipo
+              </option>
+              <option value="Naranja" data-texto="tipoContenedor.Naranja">Naranja - Reciclables</option>
+              <option value="Metalico" data-texto="tipoContenedor.Metalico">Metalico - Residuos mezclados</option>
+              <option value="Plastico" data-texto="tipoContenedor.Plastico">Plastico - Residuos mezclados</option>
             </select>
 
-            <label>Capacidad de carga</label>
+            <label data-texto="comun.capacidadCarga">Capacidad de carga</label>
             <input id="capCargaCrear" type="number" required />
 
-            <label>Estado</label>
+            <label data-texto="comun.estado">Estado</label>
             <select id="estadoCrear" required>
-              <option value="" disabled>Seleccione un estado</option>
-              <option value="Lleno">Lleno</option>
-              <option value="Vacio">Vacio</option>
-              <option value="Desbordado">Desbordado</option>
-              <option value="Media capacidad">Media capacidad</option>
+              <option value="" disabled data-texto="comun.seleccioneEstado">
+                Seleccione un estado
+              </option>
+              <option value="Lleno" data-texto="estado.Lleno">Lleno</option>
+              <option value="Vacio" data-texto="estado.Vacio">Vacio</option>
+              <option value="Desbordado" data-texto="estado.Desbordado">Desbordado</option>
+              <option value="Media capacidad" data-texto="estado.Media capacidad">Media capacidad</option>
             </select>
 
-            <label>Calle</label>
+            <label data-texto="comun.calle">Calle</label>
             <input id="calleCrear" required />
 
-            <label>Número</label>
+            <label data-texto="comun.numero">Número</label>
             <input id="numeroCrear" required />
 
-            <label>Barrio</label>
+            <label data-texto="comun.barrio">Barrio</label>
             <input id="barrioCrear" required />
 
-            <button class="btn-crear-contenedor" type="submit">
+            <button
+              class="btn-crear-contenedor"
+              type="submit"
+              data-texto="pcon.crear"
+            >
               Crear Contenedor
             </button>
             <button
               class="btn-cancelar-usuario"
               type="button"
+            data-texto="comun.cancelar"
               onclick="
                 document
                   .getElementById('overlayCrearContenedores')
@@ -147,9 +166,9 @@
       </div>
 
       <div class="lista-panel">
-        <h3>Lista de Contenedores</h3>
+        <h3 data-texto="pcon.listaTitulo">Lista de Contenedores</h3>
         <ul id="listaContenedores">
-          <p>Cargando contenedores...</p>
+          <p data-texto="pcon.cargando">Cargando contenedores...</p>
         </ul>
       </div>
     </div>
@@ -160,46 +179,55 @@
       onclick="cerrarModalContenedores(event)"
     >
       <div class="modal-contenedores">
-        <h3>Modificar contenedor</h3>
+        <h3 data-texto="pcon.modificarTitulo">Modificar contenedor</h3>
 
         <form id="formModificarContenedor">
           <input type="hidden" id="idOriginalContenedor" />
 
-          <label>Tipo</label>
+          <label data-texto="comun.tipo">Tipo</label>
           <select id="tipoEditar" required>
-            <option value="" disabled selected>Seleccione un tipo</option>
-            <option value="Naranja">Naranja - Reciclables</option>
-            <option value="Metalico">Metalico - Residuos mezclados</option>
-            <option value="Plastico">Plastico - Residuos mezclados</option>
+            <option value="" disabled selected data-texto="comun.seleccioneTipo">
+              Seleccione un tipo
+            </option>
+            <option value="Naranja" data-texto="tipoContenedor.Naranja">Naranja - Reciclables</option>
+            <option value="Metalico" data-texto="tipoContenedor.Metalico">Metalico - Residuos mezclados</option>
+            <option value="Plastico" data-texto="tipoContenedor.Plastico">Plastico - Residuos mezclados</option>
           </select>
 
-          <label>Capacidad de carga</label>
+          <label data-texto="comun.capacidadCarga">Capacidad de carga</label>
           <input id="capCargaEditar" type="number" required />
 
-          <label>Estado</label>
+          <label data-texto="comun.estado">Estado</label>
           <select id="estadoEditar" required>
-            <option value="" disabled>Seleccione un estado</option>
-            <option value="Lleno">Lleno</option>
-            <option value="Vacio">Vacio</option>
-            <option value="Desbordado">Desbordado</option>
-            <option value="Media capacidad">Media capacidad</option>
+            <option value="" disabled data-texto="comun.seleccioneEstado">
+                Seleccione un estado
+              </option>
+            <option value="Lleno" data-texto="estado.Lleno">Lleno</option>
+            <option value="Vacio" data-texto="estado.Vacio">Vacio</option>
+            <option value="Desbordado" data-texto="estado.Desbordado">Desbordado</option>
+            <option value="Media capacidad" data-texto="estado.Media capacidad">Media capacidad</option>
           </select>
 
-          <label>Calle</label>
+          <label data-texto="comun.calle">Calle</label>
           <input id="calleEditar" required />
 
-          <label>Número</label>
+          <label data-texto="comun.numero">Número</label>
           <input id="numeroEditar" required />
 
-          <label>Barrio</label>
+          <label data-texto="comun.barrio">Barrio</label>
           <input id="barrioEditar" required />
 
-          <button class="btn-guardar-usuario" type="submit">
+          <button
+            class="btn-guardar-usuario"
+            type="submit"
+            data-texto="comun.guardar"
+          >
             Guardar cambios
           </button>
           <button
             class="btn-cancelar-usuario"
             type="button"
+            data-texto="comun.cancelar"
             onclick="
               document
                 .getElementById('overlayContenedores')
@@ -215,7 +243,7 @@
     <script>
       const API_URL =
         "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/";
-      let contenedores = [];
+      let contenedores = null;
 
       document
         .getElementById("formModificarContenedor")
@@ -246,7 +274,7 @@
               .classList.remove("activo");
             obtenerContenedores(); // refresca la lista
           } else {
-            alert(resultado.mensaje);
+            alert(mensajeStatus(resultado));
           }
         });
 
@@ -278,7 +306,7 @@
               .classList.remove("activo");
             obtenerContenedores();
           } else {
-            alert(resultado.mensaje);
+            alert(mensajeStatus(resultado));
           }
         });
 
@@ -306,7 +334,7 @@
       }
 
       function cargarUsuario() {
-        const nombre = localStorage.getItem("nickname") || "Usuario";
+        const nombre = localStorage.getItem("nickname") || traducir("usuario.porDefecto");
         const inicial = nombre.charAt(0).toUpperCase();
 
         document.getElementById("usuario").innerHTML = `
@@ -320,7 +348,7 @@
       <div id="menuUsuario" class="menu-usuario">
 
           <button onclick="cerrarSesion()">
-              Cerrar Sesión
+              ${traducir("usuario.cerrarSesion")}
           </button>
 
       </div>
@@ -333,6 +361,11 @@
       }
 
       cargarUsuario();
+
+      function alCambiarIdioma() {
+        cargarUsuario();
+        if (contenedores) renderizarLista();
+      }
 
       function abrirCrearContenedor() {
         document
@@ -378,7 +411,7 @@
       }
 
       async function eliminarContenedor(id) {
-        if (confirm("¿Está seguro de que desea eliminar este contenedor?")) {
+        if (confirm(traducir("pcon.confirmarEliminar"))) {
           const resp = await fetch(`${API_URL}EliminarContenedor`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
@@ -389,11 +422,11 @@
             if (resultado.status === "ok") {
               obtenerContenedores();
             } else {
-              alert("No se pudo eliminar el contenedor.");
+              alert(mensajeStatus(resultado));
             }
           } catch (error) {
             console.error(error);
-            alert("Error de conexión al eliminar contenedor.");
+            alert(traducir("comun.conexion"));
           }
         }
       }
@@ -402,7 +435,7 @@
         const listaContainer = document.getElementById("listaContenedores");
 
         if (contenedores.length === 0) {
-          listaContainer.innerHTML = "<p>No hay contenedores disponibles.</p>";
+          listaContainer.innerHTML = `<p>${traducir("pcon.vacio")}</p>`;
           return;
         }
 
@@ -412,17 +445,17 @@
           html += `
 <li class="contenedor-item">
   <span>
-    <strong>Contenedor #${contenedor.ID_contenedor} - ${contenedor.tipo ?? "Sin tipo"}</strong>
-    - ${contenedor.calle ?? ""} ${contenedor.numero ?? ""}, ${contenedor.barrio ?? "Sin barrio"}
-    - Carga: ${contenedor.capacidadCarga ?? "Sin capacidad"}
-    - ${contenedor.estado ?? "Sin estado"}
+    <strong>${traducir("pcon.contenedor")} #${contenedor.ID_contenedor} - ${contenedor.tipo ? traducirValor("tipoContenedor", contenedor.tipo) : traducir("comun.sinTipo")}</strong>
+    - ${contenedor.calle ?? ""} ${contenedor.numero ?? ""}, ${contenedor.barrio ?? traducir("comun.sinBarrio")}
+    - ${traducir("comun.carga")}: ${contenedor.capacidadCarga ?? traducir("comun.sinCapacidad")}
+    - ${contenedor.estado ? traducirValor("estado", contenedor.estado) : traducir("comun.sinEstado")}
   </span>
   <span class="contenedor-acciones">
     <button class="btn-modificar" onclick="seleccionarContenedor('${contenedor.ID_contenedor}')">
-      Modificar
+      ${traducir("comun.modificar")}
     </button>
     <button class="btn-eliminar"style="background-color: #e74c3c; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-size: 14px; cursor: pointer;" onclick="eliminarContenedor('${contenedor.ID_contenedor}')">
-      Eliminar
+      ${traducir("comun.eliminar")}
     </button>
   </span>
 </li>`;

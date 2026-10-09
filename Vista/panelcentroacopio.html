@@ -4,9 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Panel de Centros de Acopio - Epsilon</title>
+    <title data-texto="pagina.panelcentroacopio">Panel de Centros de Acopio - Epsilon</title>
 
     <link rel="stylesheet" href="style.css" />
+    <script src="idiomas.js"></script>
   </head>
 
   <body>
@@ -38,6 +39,7 @@
             <button
               data-rol="Administrador"
               class="link-button"
+              data-texto="menu.gestion"
               onclick="window.location.href = 'gestion.html'"
             >
               Gestión
@@ -48,6 +50,7 @@
             <button
               data-rol="Administrador"
               class="link-button"
+              data-texto="menu.panelRegistro"
               onclick="window.location.href = 'panelregistro.html'"
             >
               Panel Registro
@@ -58,6 +61,7 @@
             <button
               data-rol="Administrador"
               class="link-button"
+              data-texto="menu.contenedores"
               onclick="window.location.href = 'panelcontenedor.html'"
             >
               Contenedores
@@ -68,6 +72,7 @@
             <button
               data-rol="Administrador"
               class="link-button"
+              data-texto="menu.camiones"
               onclick="window.location.href = 'panelcamion.html'"
             >
               Camiones
@@ -78,6 +83,7 @@
             <button
               data-rol="Administrador"
               class="link-button"
+              data-texto="menu.panelUsuario"
               onclick="window.location.href = 'panelusuario.html'"
             >
               Panel de Usuario
@@ -88,40 +94,47 @@
     </header>
 
     <div class="pagina">
-      <h2>Panel de Centros de Acopio</h2>
+      <h2 data-texto="pcen.titulo">Panel de Centros de Acopio</h2>
 
-      <p>Administración de centros de acopio del sistema.</p>
+      <p data-texto="pcen.descripcion">
+        Administración de centros de acopio del sistema.
+      </p>
 
       <div class="panel" id="OverlayCrearUsuario">
-        <button onclick="abrirCrearCentroAcopio()">
+        <button data-texto="pcen.crear" onclick="abrirCrearCentroAcopio()">
           Crear Centro de Acopio
         </button>
       </div>
       <div class="overlay" id="overlayCrearCentrosAcopio">
         <div class="crear-centro-acopio">
-          <h3>Crear Centro de Acopio</h3>
+          <h3 data-texto="pcen.crear">Crear Centro de Acopio</h3>
           <form id="formCrearCentroAcopio">
-            <label>Tipo de residuo</label>
+            <label data-texto="pcen.tipoResiduo">Tipo de residuo</label>
             <input id="tipoResiduoCrear" required />
 
-            <label>Capacidad</label>
+            <label data-texto="comun.capacidad">Capacidad</label>
             <input id="capacidadCrear" required />
 
-            <label>Calle</label>
+            <label data-texto="comun.calle">Calle</label>
             <input id="calleCrear" required />
 
-            <label>Barrio</label>
+            <label data-texto="comun.barrio">Barrio</label>
             <input id="barrioCrear" required />
 
-            <label>Numero</label>
+            <label data-texto="comun.numero">Número</label>
             <input id="numeroCrear" required />
 
-            <button class="btn-crear-centro-acopio" type="submit">
+            <button
+              class="btn-crear-centro-acopio"
+              type="submit"
+              data-texto="pcen.crear"
+            >
               Crear Centro de Acopio
             </button>
             <button
               class="btn-cancelar-centro-acopio"
               type="button"
+            data-texto="comun.cancelar"
               onclick="
                 document
                   .getElementById('overlayCrearCentrosAcopio')
@@ -135,9 +148,9 @@
       </div>
 
       <div class="lista-panel">
-        <h3>Lista de Centros de Acopio</h3>
+        <h3 data-texto="pcen.listaTitulo">Lista de Centros de Acopio</h3>
         <ul id="listaCentrosAcopio">
-          <p>Cargando centros de acopio...</p>
+          <p data-texto="pcen.cargando">Cargando centros de acopio...</p>
         </ul>
       </div>
     </div>
@@ -148,42 +161,52 @@
       onclick="cerrarModalCentrosAcopio(event)"
     >
       <div class="modal-usuarios">
-        <h3>Modificar centro de acopio</h3>
+        <h3 data-texto="pcen.modificarTitulo">Modificar centro de acopio</h3>
 
         <form id="formModificarCentroAcopio">
           <input type="hidden" id="idOriginal" />
 
-          <label>Tipo de residuo</label>
+          <label data-texto="pcen.tipoResiduo">Tipo de residuo</label>
           <input
             id="tipoResiduoEditar"
+            data-placeholder="comun.noModificar"
             placeholder="Dejar vacío para no modificar"
           />
 
-          <label>Capacidad</label>
+          <label data-texto="comun.capacidad">Capacidad</label>
           <input
             id="capacidadEditar"
+            data-placeholder="comun.noModificar"
             placeholder="Dejar vacío para no modificar"
           />
 
-          <label>Calle </label>
-          <input id="calleEditar" placeholder="Dejar vacío para no modificar" />
-          <label>Barrio </label>
+          <label data-texto="comun.calle">Calle</label>
+          <input id="calleEditar" data-placeholder="comun.noModificar"
+            placeholder="Dejar vacío para no modificar" />
+          <label data-texto="comun.barrio">Barrio</label>
           <input
             id="barrioEditar"
+            data-placeholder="comun.noModificar"
             placeholder="Dejar vacío para no modificar"
           />
-          <label>Numero </label>
+          <label data-texto="comun.numero">Número</label>
           <input
             id="numeroEditar"
+            data-placeholder="comun.noModificar"
             placeholder="Dejar vacío para no modificar"
           />
 
-          <button class="btn-guardar-centro-acopio" type="submit">
+          <button
+            class="btn-guardar-centro-acopio"
+            type="submit"
+            data-texto="comun.guardar"
+          >
             Guardar cambios
           </button>
           <button
             class="btn-cancelar-centro-acopio"
             type="button"
+            data-texto="comun.cancelar"
             onclick="
               document
                 .getElementById('overlayCentrosAcopio')
@@ -199,7 +222,7 @@
     <script>
       const API_URL =
         "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/CentrosAcopio/";
-      let centros = [];
+      let centros = null;
 
       document
         .getElementById("formModificarCentroAcopio")
@@ -229,7 +252,7 @@
               .classList.remove("activo");
             obtenerCentrosAcopio(); // refresca la lista
           } else {
-            alert(resultado.mensaje);
+            alert(mensajeStatus(resultado));
           }
         });
       document
@@ -259,7 +282,7 @@
               .classList.remove("activo");
             obtenerCentrosAcopio();
           } else {
-            alert(resultado.mensaje);
+            alert(mensajeStatus(resultado));
           }
         });
 
@@ -287,7 +310,7 @@
       }
 
       function cargarUsuario() {
-        const nombre = localStorage.getItem("nickname") || "Usuario";
+        const nombre = localStorage.getItem("nickname") || traducir("usuario.porDefecto");
         const inicial = nombre.charAt(0).toUpperCase();
 
         document.getElementById("usuario").innerHTML = `
@@ -301,7 +324,7 @@
       <div id="menuUsuario" class="menu-usuario">
 
           <button onclick="cerrarSesion()">
-              Cerrar Sesión
+              ${traducir("usuario.cerrarSesion")}
           </button>
 
       </div>
@@ -314,6 +337,11 @@
       }
 
       cargarUsuario();
+
+      function alCambiarIdioma() {
+        cargarUsuario();
+        if (centros) renderizarLista();
+      }
 
       function abrirModalCentroAcopio() {
         document.getElementById("overlayCentrosAcopio").classList.add("activo");
@@ -359,7 +387,7 @@
       }
       async function eliminarCentroAcopio(id) {
         if (
-          confirm("¿Está seguro de que desea eliminar este centro de acopio?")
+          confirm(traducir("pcen.confirmarEliminar"))
         ) {
           const resp = await fetch(`${API_URL}Borrar`, {
             method: "DELETE",
@@ -371,11 +399,11 @@
             if (resultado.status === "ok") {
               obtenerCentrosAcopio();
             } else {
-              alert("No se pudo eliminar el usuario.");
+              alert(mensajeStatus(resultado));
             }
           } catch (error) {
             console.error(error);
-            alert("Error de conexión al eliminar usuario.");
+            alert(traducir("comun.conexion"));
           }
         }
       }
@@ -384,7 +412,7 @@
 
         if (centros.length === 0) {
           listaContainer.innerHTML =
-            "<p>No hay centros de acopio disponibles.</p>";
+            `<p>${traducir("pcen.vacio")}</p>`;
           return;
         }
 
@@ -398,13 +426,13 @@
   </span>
   <span class="centro-acciones">
     <button class="btn-modificar" onclick="seleccionarCentro(${centro.ID_acopio})">
-      Modificar
+      ${traducir("comun.modificar")}
     </button>
     <button
       class="btn-eliminar"
       style="background-color: #e74c3c; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-size: 14px; cursor: pointer;"
       onclick="eliminarCentroAcopio('${centro.ID_acopio}')">
-      Eliminar
+      ${traducir("comun.eliminar")}
     </button>
   </span>
 </li>`;
