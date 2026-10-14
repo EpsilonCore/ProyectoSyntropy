@@ -4,9 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Panel de Incidencias - Epsilon</title>
+    <title data-texto="pagina.panelincidencia">Panel de Incidencias - Epsilon</title>
 
     <link rel="stylesheet" href="style.css" />
+    <script src="idiomas.js"></script>
   </head>
 
   <body>
@@ -38,6 +39,7 @@
             <button
               data-rol="Administrador"
               class="link-button"
+              data-texto="menu.gestion"
               onclick="window.location.href = 'gestion.html'"
             >
               Gestión
@@ -48,6 +50,7 @@
             <button
               data-rol="Administrador"
               class="link-button"
+              data-texto="menu.panelRegistro"
               onclick="window.location.href = 'panelregistro.html'"
             >
               Panel Registro
@@ -58,6 +61,7 @@
             <button
               data-rol="Administrador"
               class="link-button"
+              data-texto="menu.contenedores"
               onclick="window.location.href = 'panelcontenedor.html'"
             >
               Contenedores
@@ -68,6 +72,7 @@
             <button
               data-rol="Administrador"
               class="link-button"
+              data-texto="menu.camiones"
               onclick="window.location.href = 'panelcamion.html'"
             >
               Camiones
@@ -78,6 +83,7 @@
             <button
               data-rol="Administrador"
               class="link-button"
+              data-texto="menu.panelUsuario"
               onclick="window.location.href = 'panelusuario.html'"
             >
               Panel de Usuario
@@ -88,6 +94,7 @@
             <button
               data-rol="Administrador"
               class="link-button"
+              data-texto="menu.cuadrillas"
               onclick="window.location.href = 'panelcuadrilla.html'"
             >
               Cuadrillas
@@ -98,41 +105,49 @@
     </header>
 
     <div class="pagina">
-      <h2>Panel de Incidencias</h2>
+      <h2 data-texto="pinc.titulo">Panel de Incidencias</h2>
 
-      <p>Administración de Incidencias del sistema.</p>
+      <p data-texto="pinc.descripcion">
+        Administración de Incidencias del sistema.
+      </p>
 
       <div class="panel" id="OverlayCrearUsuario">
-        <button onclick="abrirCrearIncidencia()">Crear Incidencia</button>
+        <button data-texto="pinc.crear" onclick="abrirCrearIncidencia()">
+          Crear Incidencia
+        </button>
       </div>
 
       <div class="overlay" id="overlayCrearIncidencias">
         <div class="crear-centro-acopio">
-          <h3>Crear Incidencia</h3>
+          <h3 data-texto="pinc.crear">Crear Incidencia</h3>
           <form id="formCrearIncidencia">
             <input type="hidden" id="estadoCrear" value="Pendiente" />
 
-            <label>Mail</label>
+            <label data-texto="comun.mail">Mail</label>
             <input id="mailCrear" type="email" required />
 
-            <label>Tipo</label>
+            <label data-texto="comun.tipo">Tipo</label>
             <select id="tipoCrear" required>
-              <option value="" disabled selected>Seleccione un tipo</option>
-              <option value="rotura">Contenedor dañado</option>
-              <option value="lleno">Contenedor lleno</option>
-              <option value="desbordado">Contenedor desbordado</option>
-              <option value="incendiado">Contenedor incendiado</option>
+              <option value="" disabled selected data-texto="comun.seleccioneTipo">
+                Seleccione un tipo
+              </option>
+              <option value="rotura" data-texto="tipoIncidencia.rotura">Contenedor dañado</option>
+              <option value="lleno" data-texto="tipoIncidencia.lleno">Contenedor lleno</option>
+              <option value="desbordado" data-texto="tipoIncidencia.desbordado">Contenedor desbordado</option>
+              <option value="incendiado" data-texto="tipoIncidencia.incendiado">Contenedor incendiado</option>
             </select>
 
-            <label>Tipo de contenedor</label>
+            <label data-texto="pinc.tipoContenedor">Tipo de contenedor</label>
             <select id="tipoContenedorCrear" required>
-              <option value="" disabled selected>Seleccione un tipo</option>
-              <option value="Naranja">Naranja - Reciclables</option>
-              <option value="Metalico">Metalico - Residuos mezclados</option>
-              <option value="Plastico">Plastico - Residuos mezclados</option>
+              <option value="" disabled selected data-texto="comun.seleccioneTipo">
+                Seleccione un tipo
+              </option>
+              <option value="Naranja" data-texto="tipoContenedor.Naranja">Naranja - Reciclables</option>
+              <option value="Metalico" data-texto="tipoContenedor.Metalico">Metalico - Residuos mezclados</option>
+              <option value="Plastico" data-texto="tipoContenedor.Plastico">Plastico - Residuos mezclados</option>
             </select>
 
-            <label>Imagen</label>
+            <label data-texto="pinc.imagen">Imagen</label>
             <input
               id="imagenCrear"
               type="file"
@@ -144,24 +159,30 @@
                 id="imgPreviewCrear"
                 src=""
                 alt="Vista previa de la imagen"
+                data-titulo="pinc.vistaPrevia"
               />
             </div>
 
-            <label>Calle</label>
+            <label data-texto="comun.calle">Calle</label>
             <input id="calleCrear" required />
 
-            <label>Barrio</label>
+            <label data-texto="comun.barrio">Barrio</label>
             <input id="barrioCrear" required />
 
-            <label>Numero</label>
+            <label data-texto="comun.numero">Número</label>
             <input id="numeroCrear" required />
 
-            <button class="btn-crear-centro-acopio" type="submit">
+            <button
+              class="btn-crear-centro-acopio"
+              type="submit"
+              data-texto="pinc.crear"
+            >
               Crear Incidencia
             </button>
             <button
               class="btn-cancelar-centro-acopio"
               type="button"
+            data-texto="comun.cancelar"
               onclick="
                 document
                   .getElementById('overlayCrearIncidencias')
@@ -175,9 +196,9 @@
       </div>
 
       <div class="lista-panel">
-        <h3>Lista de Incidencias</h3>
+        <h3 data-texto="pinc.listaTitulo">Lista de Incidencias</h3>
         <ul id="listaIncidencias">
-          <p>Cargando incidencias...</p>
+          <p data-texto="pinc.cargando">Cargando incidencias...</p>
         </ul>
       </div>
     </div>
@@ -188,22 +209,29 @@
       onclick="cerrarModalAsignarCuadrilla(event)"
     >
       <div class="modal-usuarios">
-        <h3>Asignar cuadrilla</h3>
+        <h3 data-texto="op.modalCuadrilla">Asignar cuadrilla</h3>
 
         <form id="formAsignarCuadrilla">
           <input type="hidden" id="idIncidenciaCuadrilla" />
 
-          <label>Cuadrilla</label>
+          <label data-texto="op.cuadrilla">Cuadrilla</label>
           <select id="idCuadrillaAsignar" required>
-            <option value="" disabled selected>Seleccione una cuadrilla</option>
+            <option value="" disabled selected data-texto="op.seleccioneCuadrilla">
+              Seleccione una cuadrilla
+            </option>
           </select>
 
-          <button class="btn-guardar-centro-acopio" type="submit">
+          <button
+            class="btn-guardar-centro-acopio"
+            type="submit"
+            data-texto="comun.guardar"
+          >
             Guardar cambios
           </button>
           <button
             class="btn-cancelar-centro-acopio"
             type="button"
+            data-texto="comun.cancelar"
             onclick="
               document
                 .getElementById('overlayAsignarCuadrilla')
@@ -222,8 +250,13 @@
       onclick="cerrarOverlayImagen(event)"
     >
       <div class="crear-centro-acopio incidencia-visor">
-        <h3>Foto de la incidencia</h3>
-        <img id="imgIncidenciaGrande" src="" alt="Foto de la incidencia" />
+        <h3 data-texto="op.fotoIncidencia">Foto de la incidencia</h3>
+        <img
+          id="imgIncidenciaGrande"
+          src=""
+          alt="Foto de la incidencia"
+          data-titulo="op.fotoIncidencia"
+        />
       </div>
     </div>
 
@@ -232,7 +265,7 @@
         "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/";
       const API_URL_CUADRILLAS =
         "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/Cuadrillas/";
-      let incidencias = [];
+      let incidencias = null;
       let cuadrillas = [];
 
       document
@@ -260,7 +293,7 @@
               .classList.remove("activo");
             obtenerIncidencias(); // refresca la lista
           } else {
-            alert(resultado.mensaje);
+            alert(mensajeStatus(resultado));
           }
         });
 
@@ -302,7 +335,7 @@
             document.getElementById("imgPreviewCrear").src = "";
             obtenerIncidencias();
           } else {
-            alert(resultado.mensaje);
+            alert(mensajeStatus(resultado));
           }
         });
 
@@ -343,7 +376,7 @@
         }
 
         if (!archivoEsImagenValida(archivo)) {
-          alert("Solo se permiten imágenes en formato JPG, JPEG o PNG.");
+          alert(traducir("index.errorImagen"));
           e.target.value = "";
           preview.classList.remove("activo");
           img.src = "";
@@ -382,7 +415,7 @@
       }
 
       function cargarUsuario() {
-        const nombre = localStorage.getItem("nickname") || "Usuario";
+        const nombre = localStorage.getItem("nickname") || traducir("usuario.porDefecto");
         const inicial = nombre.charAt(0).toUpperCase();
 
         document.getElementById("usuario").innerHTML = `
@@ -396,7 +429,7 @@
       <div id="menuUsuario" class="menu-usuario">
 
           <button onclick="cerrarSesion()">
-              Cerrar Sesión
+              ${traducir("usuario.cerrarSesion")}
           </button>
 
       </div>
@@ -409,6 +442,11 @@
       }
 
       cargarUsuario();
+
+      function alCambiarIdioma() {
+        cargarUsuario();
+        if (incidencias) renderizarLista();
+      }
 
       function abrirCrearIncidencia() {
         document
@@ -427,11 +465,11 @@
           if (resultado.status === "ok") {
             obtenerIncidencias(); // refresca la lista
           } else {
-            alert(resultado.mensaje);
+            alert(mensajeStatus(resultado));
           }
         } catch (error) {
           console.error("Error al asignar incidencia:", error);
-          alert("Error de conexión al asignar la incidencia.");
+          alert(traducir("comun.conexion"));
         }
       }
 
@@ -508,7 +546,7 @@
       }
 
       async function eliminarIncidencia(id) {
-        if (confirm("¿Está seguro de que desea eliminar esta incidencia?")) {
+        if (confirm(traducir("pinc.confirmarEliminar"))) {
           const resp = await fetch(`${API_URL}Borrar`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
@@ -519,11 +557,11 @@
             if (resultado.status === "ok") {
               obtenerIncidencias();
             } else {
-              alert("No se pudo eliminar la incidencia.");
+              alert(mensajeStatus(resultado));
             }
           } catch (error) {
             console.error(error);
-            alert("Error de conexión al eliminar incidencia.");
+            alert(traducir("comun.conexion"));
           }
         }
       }
@@ -532,7 +570,7 @@
         const listaContainer = document.getElementById("listaIncidencias");
 
         if (incidencias.length === 0) {
-          listaContainer.innerHTML = "<p>No hay incidencias disponibles.</p>";
+          listaContainer.innerHTML = `<p>${traducir("pinc.vacio")}</p>`;
           return;
         }
 
@@ -546,31 +584,31 @@
       incidencia.imagen
         ? `<img
              src="${incidencia.imagen}"
-             alt="Foto de la incidencia"
+             alt="${traducir("op.fotoIncidencia")}"
              class="incidencia-thumb"
              onclick="verImagenIncidencia(${incidencia.ID_incidencia})"
            />`
         : ""
     }
     <div class="incidencia-info">
-      <strong>#${incidencia.ID_incidencia} — ${incidencia.tipo}</strong>
-      <span class="incidencia-estado">${incidencia.estado}</span>
+      <strong>#${incidencia.ID_incidencia} — ${traducirValor("tipoIncidencia", incidencia.tipo)}</strong>
+      <span class="incidencia-estado">${traducirValor("estado", incidencia.estado)}</span>
       <p>${incidencia.mail} · ${incidencia.calle} ${incidencia.numero}, ${incidencia.barrio}</p>
-      <p>Operario asignado: ${incidencia.ID_operario ? incidencia.ID_operario : "Sin asignar"}</p>
-      <p>Cuadrilla asignada: ${incidencia.nombre_cuadrilla ? incidencia.nombre_cuadrilla : "Sin asignar"}</p>
+      <p>${traducir("op.operarioAsignado")}: ${incidencia.ID_operario ? incidencia.ID_operario : traducir("comun.sinAsignar")}</p>
+      <p>${traducir("op.cuadrillaAsignada")}: ${incidencia.nombre_cuadrilla ? incidencia.nombre_cuadrilla : traducir("comun.sinAsignar")}</p>
     </div>
   </div>
   <span class="incidencia-acciones">
     <button class="btn-modificar" onclick="asignarmeIncidencia(${incidencia.ID_incidencia})">
-      Asignarme
+      ${traducir("op.asignarme")}
     </button>
     <button class="btn-modificar" onclick="abrirModalAsignarCuadrilla(${incidencia.ID_incidencia}, ${incidencia.ID_cuadrilla ?? "null"})">
-      Asignar Cuadrilla
+      ${traducir("op.asignarCuadrilla")}
     </button>
     <button
       class="btn-eliminar"
       onclick="eliminarIncidencia(${incidencia.ID_incidencia})">
-      Eliminar
+      ${traducir("comun.eliminar")}
     </button>
   </span>
 </li>`;

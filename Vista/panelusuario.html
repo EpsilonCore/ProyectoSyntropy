@@ -4,9 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Panel de Usuario - Epsilon</title>
+    <title data-texto="pagina.panelusuario">Panel de Usuario - Epsilon</title>
 
     <link rel="stylesheet" href="style.css" />
+    <script src="idiomas.js"></script>
   </head>
 
   <body>
@@ -38,6 +39,7 @@
             <button
               data-rol="Administrador"
               class="link-button"
+              data-texto="menu.gestion"
               onclick="window.location.href = 'gestion.html'"
             >
               Gestión
@@ -48,6 +50,7 @@
             <button
               data-rol="Administrador"
               class="link-button"
+              data-texto="menu.panelRegistro"
               onclick="window.location.href = 'panelregistro.html'"
             >
               Panel Registro
@@ -58,6 +61,7 @@
             <button
               data-rol="Administrador"
               class="link-button"
+              data-texto="menu.contenedores"
               onclick="window.location.href = 'panelcontenedor.html'"
             >
               Contenedores
@@ -68,6 +72,7 @@
             <button
               data-rol="Administrador"
               class="link-button"
+              data-texto="menu.camiones"
               onclick="window.location.href = 'panelcamion.html'"
             >
               Camiones
@@ -78,6 +83,7 @@
             <button
               data-rol="Administrador"
               class="link-button"
+              data-texto="menu.panelUsuario"
               onclick="window.location.href = 'panelusuario.html'"
             >
               Panel de Usuario
@@ -88,6 +94,7 @@
             <button
               data-rol="Administrador"
               class="link-button"
+              data-texto="menu.cuadrillas"
               onclick="window.location.href = 'panelcuadrilla.html'"
             >
               Cuadrillas
@@ -98,46 +105,57 @@
     </header>
 
     <div class="pagina">
-      <h2>Panel de Usuario</h2>
+      <h2 data-texto="pusu.titulo">Panel de Usuario</h2>
 
-      <p>Administración de usuarios del sistema.</p>
+      <p data-texto="pusu.descripcion">
+        Administración de usuarios del sistema.
+      </p>
 
       <div class="panel" id="OverlayCrearUsuario">
-        <button onclick="abrirCrearUsuario()">Crear Usuario</button>
+        <button data-texto="pusu.crear" onclick="abrirCrearUsuario()">
+          Crear Usuario
+        </button>
       </div>
       <div class="overlay" id="overlayCrearUsuarios">
         <div class="crear-usuario">
-          <h3>Crear Usuario</h3>
+          <h3 data-texto="pusu.crear">Crear Usuario</h3>
           <form id="formCrearUsuario">
-            <label>Nombre</label>
+            <label data-texto="comun.nombre">Nombre</label>
             <input id="nombreCrear" required />
 
-            <label>Apellido</label>
+            <label data-texto="comun.apellido">Apellido</label>
             <input id="apellidoCrear" required />
 
-            <label>Mail</label>
+            <label data-texto="comun.mail">Mail</label>
             <input id="mailCrear" type="email" required />
 
-            <label>Contraseña</label>
+            <label data-texto="pusu.contrasenia">Contraseña</label>
             <input id="passwordCrear" type="password" required />
 
-            <label>Usuario</label>
+            <label data-texto="pusu.usuario">Usuario</label>
             <input id="nicknameCrear" />
 
-            <label>Rol</label>
+            <label data-texto="pusu.rol">Rol</label>
             <select id="rolCrear" required>
-              <option value="" disabled>Seleccione un rol</option>
-              <option value="Vecino">Vecino</option>
-              <option value="Operario">Operario</option>
-              <option value="Recolector">Recolector</option>
-              <option value="Administrador">Administrador</option>
+              <option value="" disabled data-texto="pusu.seleccioneRol">
+                Seleccione un rol
+              </option>
+              <option value="Vecino" data-texto="rol.Vecino">Vecino</option>
+              <option value="Operario" data-texto="rol.Operario">Operario</option>
+              <option value="Recolector" data-texto="rol.Recolector">Recolector</option>
+              <option value="Administrador" data-texto="rol.Administrador">Administrador</option>
             </select>
 
-            <button class="btn-crear-usuario" type="submit">
+            <button
+              class="btn-crear-usuario"
+              type="submit"
+              data-texto="pusu.crear"
+            >
               Crear Usuario
             </button>
             <button
               class="btn-cancelar-usuario"
+              data-texto="comun.cancelar"
               onclick="
                 document
                   .getElementById('overlayCrearUsuarios')
@@ -151,9 +169,9 @@
       </div>
 
       <div class="lista-panel">
-        <h3>Lista de Usuarios</h3>
+        <h3 data-texto="pusu.listaTitulo">Lista de Usuarios</h3>
         <ul id="listaUsuarios">
-          <p>Cargando usuarios...</p>
+          <p data-texto="pusu.cargando">Cargando usuarios...</p>
         </ul>
       </div>
     </div>
@@ -164,42 +182,52 @@
       onclick="cerrarModalUsuarios(event)"
     >
       <div class="modal-usuarios">
-        <h3>Modificar usuario</h3>
+        <h3 data-texto="pusu.modificarTitulo">Modificar usuario</h3>
 
         <form id="formModificarUsuario">
           <input type="hidden" id="mailOriginal" />
 
-          <label>Nombre</label>
+          <label data-texto="comun.nombre">Nombre</label>
           <input
             id="nombreEditar"
+            data-placeholder="comun.noModificar"
             placeholder="Dejar vacío para no modificar"
           />
 
-          <label>Apellido</label>
+          <label data-texto="comun.apellido">Apellido</label>
           <input
             id="apellidoEditar"
+            data-placeholder="comun.noModificar"
             placeholder="Dejar vacío para no modificar"
           />
 
-          <label>Usuario</label>
+          <label data-texto="pusu.usuario">Usuario</label>
           <input
             id="nicknameEditar"
+            data-placeholder="comun.noModificar"
             placeholder="Dejar vacío para no modificar"
           />
-          <label>Rol</label>
+          <label data-texto="pusu.rol">Rol</label>
           <select id="rolEditar" required>
-            <option value="" disabled>Seleccione un rol</option>
-            <option value="Vecino">Vecino</option>
-            <option value="Operario">Operario</option>
-            <option value="Recolector">Recolector</option>
-            <option value="Administrador">Administrador</option>
+            <option value="" disabled data-texto="pusu.seleccioneRol">
+                Seleccione un rol
+              </option>
+            <option value="Vecino" data-texto="rol.Vecino">Vecino</option>
+            <option value="Operario" data-texto="rol.Operario">Operario</option>
+            <option value="Recolector" data-texto="rol.Recolector">Recolector</option>
+            <option value="Administrador" data-texto="rol.Administrador">Administrador</option>
           </select>
-          <button class="btn-guardar-usuario" type="submit">
+          <button
+            class="btn-guardar-usuario"
+            type="submit"
+            data-texto="comun.guardar"
+          >
             Guardar cambios
           </button>
           <button
             class="btn-cancelar-usuario"
             type="button"
+            data-texto="comun.cancelar"
             onclick="
               document
                 .getElementById('overlayUsuarios')
@@ -215,7 +243,7 @@
     <script>
       const API_URL =
         "http://localhost/Proyecto/ProyectoSyntropy/Usuarios/miApi/";
-      let usuarios = [];
+      let usuarios = null;
 
       document
         .getElementById("formModificarUsuario")
@@ -244,7 +272,7 @@
               .classList.remove("activo");
             obtenerUsuarios(); // refresca la lista
           } else {
-            alert(resultado.mensaje);
+            alert(mensajeStatus(resultado));
           }
         });
       document
@@ -275,7 +303,7 @@
               .classList.remove("activo");
             obtenerUsuarios();
           } else {
-            alert(resultado.mensaje);
+            alert(mensajeStatus(resultado));
           }
         });
 
@@ -303,7 +331,7 @@
       }
 
       function cargarUsuario() {
-        const nombre = localStorage.getItem("nickname") || "Usuario";
+        const nombre = localStorage.getItem("nickname") || traducir("usuario.porDefecto");
         const inicial = nombre.charAt(0).toUpperCase();
 
         document.getElementById("usuario").innerHTML = `
@@ -317,7 +345,7 @@
       <div id="menuUsuario" class="menu-usuario">
 
           <button onclick="cerrarSesion()">
-              Cerrar Sesión
+              ${traducir("usuario.cerrarSesion")}
           </button>
 
       </div>
@@ -330,6 +358,11 @@
       }
 
       cargarUsuario();
+
+      function alCambiarIdioma() {
+        cargarUsuario();
+        if (usuarios) renderizarLista();
+      }
 
       function abrirModalUsuarios() {
         document.getElementById("overlayUsuarios").classList.add("activo");
@@ -371,7 +404,7 @@
       }
       async function eliminarUsuario(mail) {
         const usuario = usuarios.find((u) => u.mail === mail);
-        if (confirm("¿Está seguro de que desea eliminar este usuario?")) {
+        if (confirm(traducir("pusu.confirmarEliminar"))) {
           const resp = await fetch(`${API_URL}Borrar`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
@@ -382,11 +415,11 @@
             if (resultado?.status === "ok") {
               obtenerUsuarios();
             } else {
-              alert("No se pudo eliminar el usuario.");
+              alert(mensajeStatus(resultado));
             }
           } catch (error) {
             console.error(error);
-            alert("Error de conexión al eliminar usuario.");
+            alert(traducir("comun.conexion"));
           }
         }
       }
@@ -394,7 +427,7 @@
         const listaContainer = document.getElementById("listaUsuarios");
 
         if (usuarios.length === 0) {
-          listaContainer.innerHTML = "<p>No hay usuarios disponibles.</p>";
+          listaContainer.innerHTML = `<p>${traducir("pusu.vacio")}</p>`;
           return;
         }
 
@@ -404,19 +437,19 @@
           html += `
 <li class="usuario-item">
   <span>
-    <strong>${usuario.nombre} ${usuario.apellido} ${usuario.nickname ?? "Sin nickname"} ${usuario.mail}</strong>
-    - ${usuario.rol ?? "Sin rol"}
-    - ${usuario.estado_registro ?? "Sin estado"}
+    <strong>${usuario.nombre} ${usuario.apellido} ${usuario.nickname ?? traducir("pusu.sinNickname")} ${usuario.mail}</strong>
+    - ${usuario.rol ? traducirValor("rol", usuario.rol) : traducir("pusu.sinRol")}
+    - ${usuario.estado_registro ? traducirValor("estado", usuario.estado_registro) : traducir("comun.sinEstado")}
   </span>
   <span class="usuario-acciones">
     <button class="btn-modificar" onclick="seleccionarUsuario('${usuario.mail}')">
-      Modificar
+      ${traducir("comun.modificar")}
     </button>
     <button
       class="btn-eliminar"
       style="background-color: #e74c3c; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-size: 14px; cursor: pointer;"
       onclick="eliminarUsuario('${usuario.mail}')">
-      Eliminar
+      ${traducir("comun.eliminar")}
     </button>
   </span>
 </li>`;

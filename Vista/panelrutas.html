@@ -3,8 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rutas - Epsilon</title>
+    <title data-texto="pagina.panelrutas">Rutas - Epsilon</title>
     <link rel="stylesheet" href="style.css" />
+    <script src="idiomas.js"></script>
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -45,6 +46,7 @@
             <button
               data-rol="Administrador"
               class="link-button"
+              data-texto="menu.gestion"
               onclick="window.location.href = 'gestion.html'"
             >
               Gestión
@@ -54,6 +56,7 @@
             <button
               data-rol="Administrador, Operario"
               class="link-button"
+              data-texto="menu.panelRutas"
               onclick="window.location.href = 'panelrutas.html'"
             >
               Panel Rutas
@@ -62,6 +65,7 @@
           <li>
             <button
               class="link-button"
+              data-texto="menu.mapa"
               onclick="window.location.href = 'mapa.html'"
             >
               Mapa
@@ -70,6 +74,7 @@
           <li>
             <button
               class="link-button"
+              data-texto="menu.estadisticas"
               onclick="window.location.href = 'estadisticas.html'"
             >
               Estadísticas
@@ -78,6 +83,7 @@
           <li>
             <button
               class="link-button"
+              data-texto="menu.documentacion"
               onclick="window.location.href = 'documentacion.html'"
             >
               Documentación
@@ -88,24 +94,40 @@
     </header>
 
     <div class="pagina">
-      <h2>Rutas</h2>
-      <p>Planificación de recorridos de recolección.</p>
+      <h2 data-texto="prut.titulo">Rutas</h2>
+      <p data-texto="prut.descripcion">
+        Planificación de recorridos de recolección.
+      </p>
 
       <div class="panel">
-        <button id="btnCrearRuta" onclick="iniciarCreacionRuta()">
+        <button
+          id="btnCrearRuta"
+          data-texto="prut.crear"
+          onclick="iniciarCreacionRuta()"
+        >
           Crear Ruta
         </button>
       </div>
 
       <form id="formNuevaRuta" class="form-nueva-ruta">
-        <input id="nombreRuta" placeholder="Nombre de la ruta" required />
+        <input
+          id="nombreRuta"
+          data-placeholder="prut.nombre"
+          placeholder="Nombre de la ruta"
+          required
+        />
 
-        <button type="submit" class="btn-crear-centro-acopio">
+        <button
+          type="submit"
+          class="btn-crear-centro-acopio"
+          data-texto="prut.guardar"
+        >
           Guardar Ruta
         </button>
         <button
           type="button"
           class="btn-cancelar-centro-acopio"
+          data-texto="comun.cancelar"
           onclick="cancelarCreacionRuta()"
         >
           Cancelar
@@ -113,8 +135,11 @@
       </form>
 
       <p id="instruccionMapa" class="instruccion-mapa" style="display: none">
-        Hacé click sobre los contenedores (color según su estado) para
-        agregarlos como paradas, en el orden en que el camión debe recorrerlos.
+        <span data-texto="prut.instruccion">
+          Hacé click sobre los contenedores (color según su estado) para
+          agregarlos como paradas, en el orden en que el camión debe
+          recorrerlos.
+        </span>
         <span id="resumenRuta"></span>
       </p>
 
@@ -123,27 +148,34 @@
       <ul id="listaParadasRuta"></ul>
 
       <div class="lista-panel">
-        <h3>Rutas guardadas</h3>
+        <h3 data-texto="prut.listaTitulo">Rutas guardadas</h3>
         <div id="listaRutas">
-          <p>Cargando rutas...</p>
+          <p data-texto="prut.cargando">Cargando rutas...</p>
         </div>
       </div>
     </div>
 
     <div id="modalAsignarCuadrilla" class="overlay">
       <div class="asignar-cuadrilla">
-        <h3>Asignar cuadrilla</h3>
+        <h3 data-texto="prut.modalTitulo">Asignar cuadrilla</h3>
         <p id="modalCuadrillaRutaNombre"></p>
         <form id="formAsignarCuadrilla">
           <select id="selectCuadrilla" required>
-            <option value="">Seleccioná una cuadrilla</option>
+            <option value="" data-texto="prut.seleccioneCuadrilla">
+              Seleccioná una cuadrilla
+            </option>
           </select>
-          <button type="submit" class="btn-crear-centro-acopio">
+          <button
+            type="submit"
+            class="btn-crear-centro-acopio"
+            data-texto="prut.asignar"
+          >
             Asignar
           </button>
           <button
             type="button"
             class="btn-cancelar-centro-acopio"
+            data-texto="comun.cancelar"
             onclick="cerrarModalCuadrilla()"
           >
             Cancelar
@@ -164,7 +196,7 @@
       let marcadoresContenedores = [];
       let lineaRuta = null;
       let lineaRutaContador = 0;
-      let rutas = [];
+      let rutas = null;
       let rutaSeleccionada = null;
       let capaRutaSeleccionada = null;
       let capaRutaSeleccionadaContador = 0;
@@ -227,7 +259,7 @@
           }).addTo(map);
 
           marker.bindTooltip(
-            `Contenedor #${cont.ID_contenedor} — ${cont.calle ?? ""} ${cont.numero ?? ""}, ${cont.barrio ?? ""} — ${cont.estado ?? ""}`,
+            `${traducir("prut.contenedor")} #${cont.ID_contenedor} — ${cont.calle ?? ""} ${cont.numero ?? ""}, ${cont.barrio ?? ""} — ${cont.estado ? traducirValor("estado", cont.estado) : ""}`,
           );
 
           marker.on("click", () => {
@@ -250,7 +282,8 @@
             lat: cont.lat,
             lon: cont.lon,
             idContenedor: cont.ID_contenedor,
-            etiqueta: `Contenedor #${cont.ID_contenedor} — ${cont.calle ?? ""} ${cont.numero ?? ""}`,
+            calle: cont.calle,
+            numero: cont.numero,
           });
         }
         redibujarParadas();
@@ -297,8 +330,8 @@
           .map(
             (p, i) => `
           <li>
-            <span>${i + 1}. ${p.etiqueta}</span>
-            <button type="button" onclick="quitarParada(${i})">Quitar</button>
+            <span>${i + 1}. ${traducir("prut.contenedor")} #${p.idContenedor} — ${p.calle ?? ""} ${p.numero ?? ""}</span>
+            <button type="button" onclick="quitarParada(${i})">${traducir("prut.quitar")}</button>
           </li>`,
           )
           .join("");
@@ -341,7 +374,9 @@
             const km = (resultado.data.distanciaMetros / 1000).toFixed(1);
             const min = Math.round(resultado.data.duracionSegundos / 60);
             document.getElementById("resumenRuta").textContent =
-              `(${km} km · ${min} min por calle)`;
+              traducir("prut.resumen")
+                .replace("{km}", km)
+                .replace("{min}", min);
             return;
           }
         } catch (error) {
@@ -356,7 +391,7 @@
           { color: "#2f8f3a", dashArray: "6 6" },
         ).addTo(map);
         document.getElementById("resumenRuta").textContent =
-          "(no se pudo calcular el camino por calle, se muestra en línea recta)";
+          traducir("prut.resumenRecta");
       }
 
       document
@@ -365,7 +400,7 @@
           event.preventDefault();
 
           if (paradas.length < 2) {
-            alert("Agregá al menos 2 paradas en el mapa antes de guardar.");
+            alert(traducir("prut.minimoParadas"));
             return;
           }
 
@@ -390,7 +425,7 @@
             cancelarCreacionRuta();
             obtenerRutas();
           } else {
-            alert(resultado.mensaje);
+            alert(mensajeStatus(resultado));
           }
         });
 
@@ -479,7 +514,7 @@
           await dibujarRutaSeleccionada(data?.data || []);
         } catch (error) {
           console.error("Error al obtener la ruta:", error);
-          alert("No se pudo cargar la ruta en el mapa.");
+          alert(traducir("op.errorRuta"));
         }
       }
 
@@ -487,9 +522,7 @@
         if (event) event.stopPropagation();
 
         if (
-          !confirm(
-            "¿Seguro que querés eliminar esta ruta? Esta acción no se puede deshacer.",
-          )
+          !confirm(traducir("prut.confirmarEliminar"))
         ) {
           return;
         }
@@ -509,11 +542,11 @@
             }
             obtenerRutas();
           } else {
-            alert(resultado.mensaje);
+            alert(mensajeStatus(resultado));
           }
         } catch (error) {
           console.error("Error al eliminar la ruta:", error);
-          alert("No se pudo eliminar la ruta.");
+          alert(traducir("comun.conexion"));
         }
       }
 
@@ -536,20 +569,20 @@
 
         idRutaParaAsignar = idRuta;
         document.getElementById("modalCuadrillaRutaNombre").textContent =
-          `Ruta: ${nombreRuta}`;
+          traducir("prut.rutaNombre").replace("{x}", nombreRuta);
 
         const select = document.getElementById("selectCuadrilla");
 
         if (cuadrillasDisponibles.length === 0) {
           select.innerHTML =
-            '<option value="">No hay cuadrillas con camión asignado</option>';
+            `<option value="">${traducir("prut.sinCuadrillas")}</option>`;
         } else {
           select.innerHTML =
-            '<option value="">Seleccioná una cuadrilla</option>' +
+            `<option value="">${traducir("prut.seleccioneCuadrilla")}</option>` +
             cuadrillasDisponibles
               .map(
                 (c) =>
-                  `<option value="${c.ID_cuadrilla}">${c.nombre || `Cuadrilla #${c.ID_cuadrilla}`} — Camión ${c.camion_matricula}</option>`,
+                  `<option value="${c.ID_cuadrilla}">${c.nombre || `${traducir("pcua.cuadrilla")} #${c.ID_cuadrilla}`} — ${traducir("pcam.camion")} ${c.camion_matricula}</option>`,
               )
               .join("");
         }
@@ -590,15 +623,13 @@
               cerrarModalCuadrilla();
               obtenerRutas();
             } else if (resultado.status === "sin_camion") {
-              alert(
-                "Esa cuadrilla todavía no tiene un camión asignado. Asignale uno primero desde el panel de Cuadrillas.",
-              );
+              alert(traducir("prut.cuadrillaSinCamion"));
             } else {
-              alert(resultado.mensaje);
+              alert(mensajeStatus(resultado));
             }
           } catch (error) {
             console.error("Error al asignar cuadrilla:", error);
-            alert("No se pudo asignar la cuadrilla.");
+            alert(traducir("comun.conexion"));
           }
         });
 
@@ -612,14 +643,14 @@
         } catch (error) {
           console.error("Error al obtener rutas:", error);
           document.getElementById("listaRutas").innerHTML =
-            "<p>Error al cargar rutas.</p>";
+            `<p>${traducir("prut.errorRutas")}</p>`;
         }
       }
 
       function renderizarListaRutas() {
         const contenedor = document.getElementById("listaRutas");
         if (rutas.length === 0) {
-          contenedor.innerHTML = "<p>No hay rutas registradas.</p>";
+          contenedor.innerHTML = `<p>${traducir("prut.vacio")}</p>`;
           return;
         }
         contenedor.innerHTML =
@@ -631,10 +662,10 @@
                 onclick="verRutaEnMapa(${r.ID_ruta}, event)">
               <div class="ruta-info">
                 <strong>${r.nombre}</strong>
-                — ${r.camion_matricula ? `Camión ${r.camion_matricula}` : "Sin camión"}
-                — ${r.cuadrilla_nombre ? `Cuadrilla ${r.cuadrilla_nombre}` : "Sin cuadrilla"}
-                — ${r.cantidad_paradas} paradas
-                — ${r.estado}
+                — ${r.camion_matricula ? `${traducir("pcam.camion")} ${r.camion_matricula}` : traducir("prut.sinCamion")}
+                — ${r.cuadrilla_nombre ? `${traducir("pcua.cuadrilla")} ${r.cuadrilla_nombre}` : traducir("prut.sinCuadrilla")}
+                — ${r.cantidad_paradas} ${traducir("prut.paradas")}
+                — ${traducirValor("estado", r.estado)}
               </div>
               <div class="ruta-acciones">
                 <button
@@ -642,7 +673,7 @@
                   class="btn-asignar-cuadrilla"
                   onclick="abrirModalCuadrilla(${r.ID_ruta}, '${(r.nombre || "").replace(/'/g, "\\'")}', event)"
                 >
-                  Asignar Cuadrilla
+                  ${traducir("op.asignarCuadrilla")}
                 </button>
                 <button
                   type="button"
@@ -650,7 +681,7 @@
                   style="border: none; border-radius: 8px; padding: 8px 16px; cursor: pointer;"
                   onclick="eliminarRuta(${r.ID_ruta}, event)"
                 >
-                  Eliminar
+                  ${traducir("comun.eliminar")}
                 </button>
               </div>
             </li>`,
@@ -682,7 +713,7 @@
       }
 
       function cargarUsuario() {
-        const nombre = localStorage.getItem("nickname") || "Usuario";
+        const nombre = localStorage.getItem("nickname") || traducir("usuario.porDefecto");
         const inicial = nombre.charAt(0).toUpperCase();
 
         document.getElementById("usuario").innerHTML = `
@@ -692,7 +723,7 @@
           </button>
           <div id="menuUsuario" class="menu-usuario">
               <button onclick="cerrarSesion()">
-                  Cerrar Sesión
+                  ${traducir("usuario.cerrarSesion")}
               </button>
           </div>
         `;
@@ -703,6 +734,13 @@
       }
 
       cargarUsuario();
+
+      function alCambiarIdioma() {
+        cargarUsuario();
+        if (modoCreacion) redibujarParadas();
+        else dibujarContenedores();
+        if (rutas) renderizarListaRutas();
+      }
       obtenerRutas();
       cargarContenedores();
       cargarCuadrillas();
