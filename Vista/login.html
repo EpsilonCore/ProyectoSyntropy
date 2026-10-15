@@ -15,6 +15,9 @@
           <img src="logo.png" alt="Epsilon" style="height: 90px" />
         </a>
       </div>
+      <div id="loginError" class="login-error"></div>
+
+      <form id="loginForm">
 
       <form id="loginForm">
         <input type="text" name="mail" id="mail" placeholder="Mail" data-placeholder="login.mail" required />
@@ -38,44 +41,58 @@
     </div>
 
     <script>
-      document
-        .getElementById("loginForm")
-        .addEventListener("submit", async function (e) {
-          e.preventDefault();
+  const loginError = document.getElementById("loginError");
 
-          const formData = new FormData(e.target);
-          const data = Object.fromEntries(formData.entries());
+  function mostrarError(mensaje) {
+    loginError.textContent = mensaje;
+    loginError.classList.add("activo");
+  }
 
-          try {
-            const response = await fetch(
-              "http://localhost/Proyecto/ProyectoSyntropy/Usuarios/miApi/Login",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-              },
-            );
+  document
+    .getElementById("loginForm")
+    .addEventListener("submit", async function (e) {
+      e.preventDefault();
+      loginError.classList.remove("activo");
 
-            const result = await response.json();
-            if (response.ok && result.status === "ok") {
-              localStorage.setItem("logueado", "si");
-              localStorage.setItem("rol", result.usuario.rol);
-              localStorage.setItem("nickname", result.usuario.nickname);
-              localStorage.setItem("mail", data.mail);
-              window.location.href = "index.html";
-            } else {
-              localStorage.removeItem("logueado");
-              localStorage.removeItem("rol");
-              localStorage.removeItem("nickname");
-              localStorage.removeItem("mail");
-              window.location.href = "login.html";
-            }
-          } catch (error) {
-            console.error("Detalle exacto del error:", error);
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+
+      try {
+        const response = await fetch(
+          "http://localhost/Proyecto/ProyectoSyntropy/Usuarios/miApi/Login",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          },
+        );
+
+        const result = await response.json();
+        if (response.ok && result.status === "ok") {
+          localStorage.setItem("logueado", "si");
+          localStorage.setItem("rol", result.usuario.rol);
+          localStorage.setItem("nickname", result.usuario.nickname);
+          localStorage.setItem("mail", data.mail);
+          window.location.href = "index.html";
+        } else {
+          localStorage.removeItem("logueado");
+          localStorage.removeItem("rol");
+          localStorage.removeItem("nickname");
+          localStorage.removeItem("mail");
+
+          if (result.status === "no_autorizado") {
+            mostrarError("Mail o contraseña incorrectos.");
+          } else {
+            mostrarError(result.mensaje || "No se pudo iniciar sesión.");
           }
-        });
-    </script>
+        }
+      } catch (error) {
+        console.error("Detalle exacto del error:", error);
+        mostrarError("No se pudo conectar con el servidor.");
+      }
+    });
+</script>
   </body>
 </html>

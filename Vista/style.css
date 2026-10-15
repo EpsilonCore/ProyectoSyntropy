@@ -401,6 +401,21 @@ nav button:not(.link-button):hover {
 .login-links a:hover {
   text-decoration: underline;
 }
+.login-error {
+  display: none;
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  border-left: 4px solid var(--oxido);
+  border-radius: 8px;
+  background: rgba(166, 71, 43, 0.1);
+  color: var(--oxido);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.login-error.activo {
+  display: block;
+}
 
 /* =========================
    PAGINAS INTERNAS
