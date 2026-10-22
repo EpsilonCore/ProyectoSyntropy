@@ -1,6 +1,6 @@
 $kind: http-request
 name: Listar Contenedores (pública/cualquier logueado)
-url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Gestion/miApi/Contenedores"
+url: "{{baseUrl}}/api/gestion/Contenedores"
 method: GET
 scripts:
   - type: afterResponse

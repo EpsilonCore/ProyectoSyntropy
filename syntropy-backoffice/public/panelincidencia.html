@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title data-texto="pagina.panelincidencia">Panel de Incidencias - Epsilon</title>
+
+    <link rel="stylesheet" href="style.css" />
+    <script src="idiomas.js"></script>
+  </head>
+
+  <body>
+    <script>
+      if (localStorage.getItem("logueado") !== "si") {
+        window.location.href = "login.html";
+      }
+      if ((localStorage.getItem("rol") || "").trim() !== "Administrador") {
+        window.location.href = "index.html";
+      }
+    </script>
+
+    <header>
+      <div class="logo">
+        <a href="index.html">
+          <img src="logo.png" alt="Epsilon" />
+        </a>
+      </div>
+
+      <div class="header-actions">
+        <div id="usuario" class="usuario"></div>
+
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+      </div>
+
+      <nav id="menu">
+        <ul>
+          <li>
+            <button
+              data-rol="Administrador"
+              class="link-button"
+              data-texto="menu.gestion"
+              onclick="window.location.href = 'gestion.html'"
+            >
+              Gestión
+            </button>
+          </li>
+
+          <li>
+            <button
+              data-rol="Administrador"
+              class="link-button"
+              data-texto="menu.panelRegistro"
+              onclick="window.location.href = 'panelregistro.html'"
+            >
+              Panel Registro
+            </button>
+          </li>
+
+          <li>
+            <button
+              data-rol="Administrador"
+              class="link-button"
+              data-texto="menu.contenedores"
+              onclick="window.location.href = 'panelcontenedor.html'"
+            >
+              Contenedores
+            </button>
+          </li>
+
+          <li>
+            <button
+              data-rol="Administrador"
+              class="link-button"
+              data-texto="menu.camiones"
+              onclick="window.location.href = 'panelcamion.html'"
+            >
+              Camiones
+            </button>
+          </li>
+
+          <li>
+            <button
+              data-rol="Administrador"
+              class="link-button"
+              data-texto="menu.panelUsuario"
+              onclick="window.location.href = 'panelusuario.html'"
+            >
+              Panel de Usuario
+            </button>
+          </li>
+
+          <li>
+            <button
+              data-rol="Administrador"
+              class="link-button"
+              data-texto="menu.cuadrillas"
+              onclick="window.location.href = 'panelcuadrilla.html'"
+            >
+              Cuadrillas
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="pagina">
+      <h2 data-texto="pinc.titulo">Panel de Incidencias</h2>
+
+      <p data-texto="pinc.descripcion">
+        Administración de Incidencias del sistema.
+      </p>
+
+      <div class="panel" id="OverlayCrearUsuario">
+        <button data-texto="pinc.crear" onclick="abrirCrearIncidencia()">
+          Crear Incidencia
+        </button>
+      </div>
+
+      <div class="overlay" id="overlayCrearIncidencias">
+        <div class="crear-centro-acopio">
+          <h3 data-texto="pinc.crear">Crear Incidencia</h3>
+          <form id="formCrearIncidencia">
+            <input type="hidden" id="estadoCrear" value="Pendiente" />
+
+            <label data-texto="comun.mail">Mail</label>
+            <input id="mailCrear" type="email" required />
+
+            <label data-texto="comun.tipo">Tipo</label>
+            <select id="tipoCrear" required>
+              <option value="" disabled selected data-texto="comun.seleccioneTipo">
+                Seleccione un tipo
+              </option>
+              <option value="rotura" data-texto="tipoIncidencia.rotura">Contenedor dañado</option>
+              <option value="lleno" data-texto="tipoIncidencia.lleno">Contenedor lleno</option>
+              <option value="desbordado" data-texto="tipoIncidencia.desbordado">Contenedor desbordado</option>
+              <option value="incendiado" data-texto="tipoIncidencia.incendiado">Contenedor incendiado</option>
+            </select>
+
+            <label data-texto="pinc.tipoContenedor">Tipo de contenedor</label>
+            <select id="tipoContenedorCrear" required>
+              <option value="" disabled selected data-texto="comun.seleccioneTipo">
+                Seleccione un tipo
+              </option>
+              <option value="Naranja" data-texto="tipoContenedor.Naranja">Naranja - Reciclables</option>
+              <option value="Metalico" data-texto="tipoContenedor.Metalico">Metalico - Residuos mezclados</option>
+              <option value="Plastico" data-texto="tipoContenedor.Plastico">Plastico - Residuos mezclados</option>
+            </select>
+
+            <label data-texto="pinc.imagen">Imagen</label>
+            <input
+              id="imagenCrear"
+              type="file"
+              accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+            />
+
+            <div id="previewImagenCrear" class="preview-imagen">
+              <img
+                id="imgPreviewCrear"
+                src=""
+                alt="Vista previa de la imagen"
+                data-titulo="pinc.vistaPrevia"
+              />
+            </div>
+
+            <label data-texto="comun.calle">Calle</label>
+            <input id="calleCrear" required />
+
+            <label data-texto="comun.barrio">Barrio</label>
+            <input id="barrioCrear" required />
+
+            <label data-texto="comun.numero">Número</label>
+            <input id="numeroCrear" required />
+
+            <button
+              class="btn-crear-centro-acopio"
+              type="submit"
+              data-texto="pinc.crear"
+            >
+              Crear Incidencia
+            </button>
+            <button
+              class="btn-cancelar-centro-acopio"
+              type="button"
+            data-texto="comun.cancelar"
+              onclick="
+                document
+                  .getElementById('overlayCrearIncidencias')
+                  .classList.remove('activo')
+              "
+            >
+              Cancelar
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="lista-panel">
+        <h3 data-texto="pinc.listaTitulo">Lista de Incidencias</h3>
+        <ul id="listaIncidencias">
+          <p data-texto="pinc.cargando">Cargando incidencias...</p>
+        </ul>
+      </div>
+    </div>
+
+    <div
+      class="overlay"
+      id="overlayAsignarCuadrilla"
+      onclick="cerrarModalAsignarCuadrilla(event)"
+    >
+      <div class="modal-usuarios">
+        <h3 data-texto="op.modalCuadrilla">Asignar cuadrilla</h3>
+
+        <form id="formAsignarCuadrilla">
+          <input type="hidden" id="idIncidenciaCuadrilla" />
+
+          <label data-texto="op.cuadrilla">Cuadrilla</label>
+          <select id="idCuadrillaAsignar" required>
+            <option value="" disabled selected data-texto="op.seleccioneCuadrilla">
+              Seleccione una cuadrilla
+            </option>
+          </select>
+
+          <button
+            class="btn-guardar-centro-acopio"
+            type="submit"
+            data-texto="comun.guardar"
+          >
+            Guardar cambios
+          </button>
+          <button
+            class="btn-cancelar-centro-acopio"
+            type="button"
+            data-texto="comun.cancelar"
+            onclick="
+              document
+                .getElementById('overlayAsignarCuadrilla')
+                .classList.remove('activo')
+            "
+          >
+            Cancelar
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div
+      class="overlay"
+      id="overlayImagenIncidencia"
+      onclick="cerrarOverlayImagen(event)"
+    >
+      <div class="crear-centro-acopio incidencia-visor">
+        <h3 data-texto="op.fotoIncidencia">Foto de la incidencia</h3>
+        <img
+          id="imgIncidenciaGrande"
+          src=""
+          alt="Foto de la incidencia"
+          data-titulo="op.fotoIncidencia"
+        />
+      </div>
+    </div>
+
+    <script>
+      const API_URL =
+        "/api/gestion/Incidencias/";
+      const API_URL_CUADRILLAS =
+        "/api/gestion/Cuadrillas/";
+      let incidencias = null;
+      let cuadrillas = [];
+
+      document
+        .getElementById("formAsignarCuadrilla")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const datos = {
+            idIncidencia: document.getElementById("idIncidenciaCuadrilla")
+              .value,
+            idCuadrilla: document.getElementById("idCuadrillaAsignar").value,
+          };
+
+          const resp = await fetch(`${API_URL}AsignarCuadrilla`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
+
+          const resultado = await resp.json();
+
+          if (resultado.status === "ok") {
+            document
+              .getElementById("overlayAsignarCuadrilla")
+              .classList.remove("activo");
+            obtenerIncidencias(); // refresca la lista
+          } else {
+            alert(mensajeStatus(resultado));
+          }
+        });
+
+      document
+        .getElementById("formCrearIncidencia")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const datos = {
+            mail: document.getElementById("mailCrear").value,
+            tipo: document.getElementById("tipoCrear").value,
+            estado: document.getElementById("estadoCrear").value,
+            tipoContenedor: document.getElementById("tipoContenedorCrear")
+              .value,
+            imagen: await leerImagenComoBase64(
+              document.getElementById("imagenCrear"),
+            ),
+            calle: document.getElementById("calleCrear").value,
+            barrio: document.getElementById("barrioCrear").value,
+            numero: document.getElementById("numeroCrear").value,
+          };
+
+          const resp = await fetch(`${API_URL}Registrar`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
+
+          const resultado = await resp.json();
+
+          if (resultado.status === "creado") {
+            document
+              .getElementById("overlayCrearIncidencias")
+              .classList.remove("activo");
+            document.getElementById("formCrearIncidencia").reset();
+            document
+              .getElementById("previewImagenCrear")
+              .classList.remove("activo");
+            document.getElementById("imgPreviewCrear").src = "";
+            obtenerIncidencias();
+          } else {
+            alert(mensajeStatus(resultado));
+          }
+        });
+
+      // Tipos de imagen permitidos para adjuntar en una incidencia.
+      const TIPOS_IMAGEN_PERMITIDOS = ["image/jpeg", "image/png"];
+
+      function archivoEsImagenValida(archivo) {
+        return TIPOS_IMAGEN_PERMITIDOS.includes(archivo.type);
+      }
+
+      // Convierte el archivo elegido en el input a un data URL en base64,
+      // para mandarlo dentro del mismo body JSON que ya usa el resto del
+      // formulario.
+      function leerImagenComoBase64(inputFile) {
+        return new Promise((resolve, reject) => {
+          const archivo = inputFile.files[0];
+          if (!archivo) {
+            resolve("");
+            return;
+          }
+          const lector = new FileReader();
+          lector.onload = () => resolve(lector.result);
+          lector.onerror = () =>
+            reject(new Error("No se pudo leer el archivo de imagen."));
+          lector.readAsDataURL(archivo);
+        });
+      }
+
+      document.getElementById("imagenCrear").addEventListener("change", (e) => {
+        const archivo = e.target.files[0];
+        const preview = document.getElementById("previewImagenCrear");
+        const img = document.getElementById("imgPreviewCrear");
+
+        if (!archivo) {
+          preview.classList.remove("activo");
+          img.src = "";
+          return;
+        }
+
+        if (!archivoEsImagenValida(archivo)) {
+          alert(traducir("index.errorImagen"));
+          e.target.value = "";
+          preview.classList.remove("activo");
+          img.src = "";
+          return;
+        }
+
+        const lector = new FileReader();
+        lector.onload = () => {
+          img.src = lector.result;
+          preview.classList.add("activo");
+        };
+        lector.readAsDataURL(archivo);
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const rolUsuario = (localStorage.getItem("rol") || "").trim();
+        document.querySelectorAll("[data-rol]").forEach((boton) => {
+          const rolesPermitidos = boton.dataset.rol
+            .split(",")
+            .map((rol) => rol.trim());
+          if (!rolesPermitidos.includes(rolUsuario)) {
+            boton.style.display = "none";
+          }
+        });
+      });
+
+      function toggleMenu() {
+        document.getElementById("menu").classList.toggle("activo");
+      }
+
+      function cerrarSesion() {
+        localStorage.removeItem("logueado");
+        localStorage.removeItem("nickname");
+
+        window.location.href = "index.html";
+      }
+
+      function cargarUsuario() {
+        const nombre = localStorage.getItem("nickname") || traducir("usuario.porDefecto");
+        const inicial = nombre.charAt(0).toUpperCase();
+
+        document.getElementById("usuario").innerHTML = `
+
+      <span class="nombre-usuario">${nombre}</span>
+
+      <button class="usuario-btn" onclick="abrirUsuario()">
+          ${inicial}
+      </button>
+
+      <div id="menuUsuario" class="menu-usuario">
+
+          <button onclick="cerrarSesion()">
+              ${traducir("usuario.cerrarSesion")}
+          </button>
+
+      </div>
+
+      `;
+      }
+
+      function abrirUsuario() {
+        document.getElementById("menuUsuario").classList.toggle("activo");
+      }
+
+      cargarUsuario();
+
+      function alCambiarIdioma() {
+        cargarUsuario();
+        if (incidencias) renderizarLista();
+      }
+
+      function abrirCrearIncidencia() {
+        document
+          .getElementById("overlayCrearIncidencias")
+          .classList.add("activo");
+      }
+
+      async function asignarmeIncidencia(id) {
+        try {
+          const resp = await fetch(`${API_URL}AsignarOperario`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idIncidencia: id }),
+          });
+          const resultado = await resp.json();
+          if (resultado.status === "ok") {
+            obtenerIncidencias(); // refresca la lista
+          } else {
+            alert(mensajeStatus(resultado));
+          }
+        } catch (error) {
+          console.error("Error al asignar incidencia:", error);
+          alert(traducir("comun.conexion"));
+        }
+      }
+
+      function cerrarModalAsignarCuadrilla(evento) {
+        if (evento.target.id === "overlayAsignarCuadrilla") {
+          document
+            .getElementById("overlayAsignarCuadrilla")
+            .classList.remove("activo");
+        }
+      }
+
+      function verImagenIncidencia(id) {
+        const incidencia = incidencias.find((i) => i.ID_incidencia === id);
+        if (!incidencia || !incidencia.imagen) return;
+
+        document.getElementById("imgIncidenciaGrande").src = incidencia.imagen;
+        document
+          .getElementById("overlayImagenIncidencia")
+          .classList.add("activo");
+      }
+
+      function cerrarOverlayImagen(evento) {
+        if (evento.target.id === "overlayImagenIncidencia") {
+          document
+            .getElementById("overlayImagenIncidencia")
+            .classList.remove("activo");
+        }
+      }
+
+      async function obtenerCuadrillas() {
+        try {
+          const resp = await fetch(`${API_URL_CUADRILLAS}Cuadrillas`);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          cuadrillas = Array.isArray(data) ? data : data?.data || [];
+
+          const select = document.getElementById("idCuadrillaAsignar");
+          const opcionesActuales = select.querySelectorAll(
+            "option:not([disabled])",
+          );
+          opcionesActuales.forEach((opcion) => opcion.remove());
+
+          cuadrillas.forEach((cuadrilla) => {
+            const opcion = document.createElement("option");
+            opcion.value = cuadrilla.ID_cuadrilla;
+            opcion.textContent = cuadrilla.nombre;
+            select.appendChild(opcion);
+          });
+        } catch (error) {
+          console.error("Error al obtener cuadrillas:", error);
+        }
+      }
+
+      function abrirModalAsignarCuadrilla(idIncidencia, idCuadrillaActual) {
+        document.getElementById("idIncidenciaCuadrilla").value = idIncidencia;
+        document.getElementById("idCuadrillaAsignar").value =
+          idCuadrillaActual || "";
+        document
+          .getElementById("overlayAsignarCuadrilla")
+          .classList.add("activo");
+      }
+
+      async function obtenerIncidencias() {
+        try {
+          const resp = await fetch(`${API_URL}Incidencias`);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          const todas = Array.isArray(data) ? data : data?.data || [];
+          incidencias = todas;
+          renderizarLista();
+        } catch (error) {
+          console.error("Error al obtener incidencias:", error);
+        }
+      }
+
+      async function eliminarIncidencia(id) {
+        if (confirm(traducir("pinc.confirmarEliminar"))) {
+          const resp = await fetch(`${API_URL}Borrar`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idIncidencia: id }),
+          });
+          try {
+            const resultado = await resp.json();
+            if (resultado.status === "ok") {
+              obtenerIncidencias();
+            } else {
+              alert(mensajeStatus(resultado));
+            }
+          } catch (error) {
+            console.error(error);
+            alert(traducir("comun.conexion"));
+          }
+        }
+      }
+
+      function renderizarLista() {
+        const listaContainer = document.getElementById("listaIncidencias");
+
+        if (incidencias.length === 0) {
+          listaContainer.innerHTML = `<p>${traducir("pinc.vacio")}</p>`;
+          return;
+        }
+
+        let html = '<ul style="list-style: none; padding: 0; margin: 0;">';
+
+        incidencias.forEach((incidencia) => {
+          html += `
+<li class="incidencia-item">
+  <div class="incidencia-cuerpo">
+    ${
+      incidencia.imagen
+        ? `<img
+             src="${incidencia.imagen}"
+             alt="${traducir("op.fotoIncidencia")}"
+             class="incidencia-thumb"
+             onclick="verImagenIncidencia(${incidencia.ID_incidencia})"
+           />`
+        : ""
+    }
+    <div class="incidencia-info">
+      <strong>#${incidencia.ID_incidencia} — ${traducirValor("tipoIncidencia", incidencia.tipo)}</strong>
+      <span class="incidencia-estado">${traducirValor("estado", incidencia.estado)}</span>
+      <p>${incidencia.mail} · ${incidencia.calle} ${incidencia.numero}, ${incidencia.barrio}</p>
+      <p>${traducir("op.operarioAsignado")}: ${incidencia.ID_operario ? incidencia.ID_operario : traducir("comun.sinAsignar")}</p>
+      <p>${traducir("op.cuadrillaAsignada")}: ${incidencia.nombre_cuadrilla ? incidencia.nombre_cuadrilla : traducir("comun.sinAsignar")}</p>
+    </div>
+  </div>
+  <span class="incidencia-acciones">
+    <button class="btn-modificar" onclick="asignarmeIncidencia(${incidencia.ID_incidencia})">
+      ${traducir("op.asignarme")}
+    </button>
+    <button class="btn-modificar" onclick="abrirModalAsignarCuadrilla(${incidencia.ID_incidencia}, ${incidencia.ID_cuadrilla ?? "null"})">
+      ${traducir("op.asignarCuadrilla")}
+    </button>
+    <button
+      class="btn-eliminar"
+      onclick="eliminarIncidencia(${incidencia.ID_incidencia})">
+      ${traducir("comun.eliminar")}
+    </button>
+  </span>
+</li>`;
+        });
+
+        html += "</ul>";
+        listaContainer.innerHTML = html;
+      }
+
+      obtenerIncidencias();
+      obtenerCuadrillas();
+    </script>
+  </body>
+</html>

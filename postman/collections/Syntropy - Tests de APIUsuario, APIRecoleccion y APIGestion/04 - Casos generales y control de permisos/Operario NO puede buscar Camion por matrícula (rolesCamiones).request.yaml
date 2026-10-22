@@ -1,5 +1,5 @@
 $kind: http-request
-url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Camion/{{matriculaPrueba}}"
+url: "{{baseUrl}}/api/recoleccion/Camion/{{matriculaPrueba}}"
 method: GET
 scripts:
   - type: afterResponse

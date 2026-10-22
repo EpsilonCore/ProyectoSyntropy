@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-texto="pagina.panelrutas">Rutas - Epsilon</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="idiomas.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+  </head>
+
+  <body>
+    <script>
+      if (localStorage.getItem("logueado") !== "si") {
+        window.location.href = "login.html";
+      }
+      if (
+        !["Administrador", "Operario"].includes(
+          (localStorage.getItem("rol") || "").trim(),
+        )
+      ) {
+        window.location.href = "index.html";
+      }
+    </script>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <header>
+      <div class="logo">
+        <a href="index.html">
+          <img src="logo.png" alt="Epsilon" />
+        </a>
+      </div>
+
+      <div class="header-actions">
+        <div id="usuario" class="usuario"></div>
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+      </div>
+
+      <nav id="menu">
+        <ul>
+          <li>
+            <button
+              data-rol="Administrador"
+              class="link-button"
+              data-texto="menu.gestion"
+              onclick="window.location.href = 'gestion.html'"
+            >
+              Gestión
+            </button>
+          </li>
+          <li>
+            <button
+              data-rol="Administrador, Operario"
+              class="link-button"
+              data-texto="menu.panelRutas"
+              onclick="window.location.href = 'panelrutas.html'"
+            >
+              Panel Rutas
+            </button>
+          </li>
+          <li>
+            <button
+              class="link-button"
+              data-texto="menu.mapa"
+              onclick="window.location.href = 'mapa.html'"
+            >
+              Mapa
+            </button>
+          </li>
+          <li>
+            <button
+              class="link-button"
+              data-texto="menu.estadisticas"
+              onclick="window.location.href = 'estadisticas.html'"
+            >
+              Estadísticas
+            </button>
+          </li>
+          <li>
+            <button
+              class="link-button"
+              data-texto="menu.documentacion"
+              onclick="window.location.href = 'documentacion.html'"
+            >
+              Documentación
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="pagina">
+      <h2 data-texto="prut.titulo">Rutas</h2>
+      <p data-texto="prut.descripcion">
+        Planificación de recorridos de recolección.
+      </p>
+
+      <div class="panel">
+        <button
+          id="btnCrearRuta"
+          data-texto="prut.crear"
+          onclick="iniciarCreacionRuta()"
+        >
+          Crear Ruta
+        </button>
+      </div>
+
+      <form id="formNuevaRuta" class="form-nueva-ruta">
+        <input
+          id="nombreRuta"
+          data-placeholder="prut.nombre"
+          placeholder="Nombre de la ruta"
+          required
+        />
+
+        <button
+          type="submit"
+          class="btn-crear-centro-acopio"
+          data-texto="prut.guardar"
+        >
+          Guardar Ruta
+        </button>
+        <button
+          type="button"
+          class="btn-cancelar-centro-acopio"
+          data-texto="comun.cancelar"
+          onclick="cancelarCreacionRuta()"
+        >
+          Cancelar
+        </button>
+      </form>
+
+      <p id="instruccionMapa" class="instruccion-mapa" style="display: none">
+        <span data-texto="prut.instruccion">
+          Hacé click sobre los contenedores (color según su estado) para
+          agregarlos como paradas, en el orden en que el camión debe
+          recorrerlos.
+        </span>
+        <span id="resumenRuta"></span>
+      </p>
+
+      <div id="map"></div>
+
+      <ul id="listaParadasRuta"></ul>
+
+      <div class="lista-panel">
+        <h3 data-texto="prut.listaTitulo">Rutas guardadas</h3>
+        <div id="listaRutas">
+          <p data-texto="prut.cargando">Cargando rutas...</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="modalAsignarCuadrilla" class="overlay">
+      <div class="asignar-cuadrilla">
+        <h3 data-texto="prut.modalTitulo">Asignar cuadrilla</h3>
+        <p id="modalCuadrillaRutaNombre"></p>
+        <form id="formAsignarCuadrilla">
+          <select id="selectCuadrilla" required>
+            <option value="" data-texto="prut.seleccioneCuadrilla">
+              Seleccioná una cuadrilla
+            </option>
+          </select>
+          <button
+            type="submit"
+            class="btn-crear-centro-acopio"
+            data-texto="prut.asignar"
+          >
+            Asignar
+          </button>
+          <button
+            type="button"
+            class="btn-cancelar-centro-acopio"
+            data-texto="comun.cancelar"
+            onclick="cerrarModalCuadrilla()"
+          >
+            Cancelar
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const API_URL =
+        "/api/recoleccion/";
+      const API_URL_GESTION =
+        "/api/gestion/";
+
+      let modoCreacion = false;
+      let paradas = [];
+      let contenedoresDisponibles = [];
+      let marcadoresContenedores = [];
+      let lineaRuta = null;
+      let lineaRutaContador = 0;
+      let rutas = null;
+      let rutaSeleccionada = null;
+      let capaRutaSeleccionada = null;
+      let capaRutaSeleccionadaContador = 0;
+      let cuadrillasDisponibles = [];
+      let idRutaParaAsignar = null;
+
+      const map = L.map("map").setView([-34.9011, -56.1645], 13);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors",
+        maxZoom: 19,
+      }).addTo(map);
+
+      async function cargarContenedores() {
+        try {
+          const resp = await fetch(`${API_URL_GESTION}Contenedores`);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          contenedoresDisponibles = (data?.data || []).filter(
+            (c) => c.lat && c.lon,
+          );
+          dibujarContenedores();
+        } catch (error) {
+          console.error("Error al obtener contenedores:", error);
+        }
+      }
+
+      function colorPorEstadoContenedor(estado) {
+        switch (estado) {
+          case "Vacio":
+            return "#23c40e";
+          case "Lleno":
+            return "#ff0000";
+          case "Desbordado":
+            return "#000000";
+          case "Media capacidad":
+            return "#fdd408";
+          default:
+            return "#999999";
+        }
+      }
+
+      function dibujarContenedores() {
+        marcadoresContenedores.forEach((m) => map.removeLayer(m));
+
+        marcadoresContenedores = contenedoresDisponibles.map((cont) => {
+          const indice = paradas.findIndex(
+            (p) => p.idContenedor === cont.ID_contenedor,
+          );
+          const seleccionado = indice !== -1;
+
+          const marker = L.marker([cont.lat, cont.lon], {
+            icon: L.divIcon({
+              className: "",
+              html: seleccionado
+                ? `<div class="numero-parada">${indice + 1}</div>`
+                : `<div class="marcador-contenedor" style="background:${colorPorEstadoContenedor(cont.estado)}"></div>`,
+              iconSize: seleccionado ? [24, 24] : [14, 14],
+              iconAnchor: seleccionado ? [12, 12] : [7, 7],
+            }),
+          }).addTo(map);
+
+          marker.bindTooltip(
+            `${traducir("prut.contenedor")} #${cont.ID_contenedor} — ${cont.calle ?? ""} ${cont.numero ?? ""}, ${cont.barrio ?? ""} — ${cont.estado ? traducirValor("estado", cont.estado) : ""}`,
+          );
+
+          marker.on("click", () => {
+            if (!modoCreacion) return;
+            toggleParadaContenedor(cont);
+          });
+
+          return marker;
+        });
+      }
+
+      function toggleParadaContenedor(cont) {
+        const indice = paradas.findIndex(
+          (p) => p.idContenedor === cont.ID_contenedor,
+        );
+        if (indice !== -1) {
+          paradas.splice(indice, 1);
+        } else {
+          paradas.push({
+            lat: cont.lat,
+            lon: cont.lon,
+            idContenedor: cont.ID_contenedor,
+            calle: cont.calle,
+            numero: cont.numero,
+          });
+        }
+        redibujarParadas();
+      }
+
+      function iniciarCreacionRuta() {
+        modoCreacion = true;
+        paradas = [];
+        rutaSeleccionada = null;
+        limpiarRutaSeleccionada();
+        redibujarParadas();
+
+        document.getElementById("btnCrearRuta").style.display = "none";
+        document.getElementById("formNuevaRuta").classList.add("activo");
+        document.getElementById("instruccionMapa").style.display = "block";
+      }
+
+      function cancelarCreacionRuta() {
+        modoCreacion = false;
+        paradas = [];
+        redibujarParadas();
+
+        document.getElementById("nombreRuta").value = "";
+        document.getElementById("btnCrearRuta").style.display = "inline-block";
+        document.getElementById("formNuevaRuta").classList.remove("activo");
+        document.getElementById("instruccionMapa").style.display = "none";
+      }
+
+      function quitarParada(indice) {
+        paradas.splice(indice, 1);
+        redibujarParadas();
+      }
+
+      function redibujarParadas() {
+        dibujarContenedores();
+        actualizarLineaRuta();
+
+        const contenedor = document.getElementById("listaParadasRuta");
+        if (paradas.length === 0) {
+          contenedor.innerHTML = "";
+          return;
+        }
+        contenedor.innerHTML = paradas
+          .map(
+            (p, i) => `
+          <li>
+            <span>${i + 1}. ${traducir("prut.contenedor")} #${p.idContenedor} — ${p.calle ?? ""} ${p.numero ?? ""}</span>
+            <button type="button" onclick="quitarParada(${i})">${traducir("prut.quitar")}</button>
+          </li>`,
+          )
+          .join("");
+      }
+
+      async function actualizarLineaRuta() {
+        const contador = ++lineaRutaContador;
+
+        if (lineaRuta) {
+          map.removeLayer(lineaRuta);
+          lineaRuta = null;
+        }
+        document.getElementById("resumenRuta").textContent = "";
+
+        if (paradas.length < 2) return;
+
+        const puntos = paradas.map(({ lat, lon }) => ({ lat, lon }));
+
+        try {
+          const resp = await fetch(`${API_URL}Rutas/CalcularCamino`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ paradas: puntos }),
+          });
+          const resultado = await resp.json();
+
+          // Si mientras esperábamos se guardó, canceló o cambió la ruta,
+          // esta respuesta ya está vieja: no la dibujamos.
+          if (contador !== lineaRutaContador) return;
+
+          if (resultado.status === "ok" && resultado.data) {
+            const coordenadas = resultado.data.geometria.map((p) => [
+              p.lat,
+              p.lon,
+            ]);
+            lineaRuta = L.polyline(coordenadas, { color: "#2f8f3a" }).addTo(
+              map,
+            );
+
+            const km = (resultado.data.distanciaMetros / 1000).toFixed(1);
+            const min = Math.round(resultado.data.duracionSegundos / 60);
+            document.getElementById("resumenRuta").textContent =
+              traducir("prut.resumen")
+                .replace("{km}", km)
+                .replace("{min}", min);
+            return;
+          }
+        } catch (error) {
+          console.error("Error al calcular el camino por calles:", error);
+        }
+
+        if (contador !== lineaRutaContador) return;
+
+        // línea recta punteada si OSRM no respondió.
+        lineaRuta = L.polyline(
+          paradas.map((p) => [p.lat, p.lon]),
+          { color: "#2f8f3a", dashArray: "6 6" },
+        ).addTo(map);
+        document.getElementById("resumenRuta").textContent =
+          traducir("prut.resumenRecta");
+      }
+
+      document
+        .getElementById("formNuevaRuta")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          if (paradas.length < 2) {
+            alert(traducir("prut.minimoParadas"));
+            return;
+          }
+
+          const datos = {
+            nombre: document.getElementById("nombreRuta").value,
+            paradas: paradas.map(({ lat, lon, idContenedor }) => ({
+              lat,
+              lon,
+              idContenedor,
+            })),
+          };
+
+          const resp = await fetch(`${API_URL}Rutas/Registrar`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
+
+          const resultado = await resp.json();
+
+          if (resultado.status === "creado") {
+            cancelarCreacionRuta();
+            obtenerRutas();
+          } else {
+            alert(mensajeStatus(resultado));
+          }
+        });
+
+      function limpiarRutaSeleccionada() {
+        capaRutaSeleccionadaContador++;
+        if (capaRutaSeleccionada) {
+          map.removeLayer(capaRutaSeleccionada);
+          capaRutaSeleccionada = null;
+        }
+      }
+
+      async function dibujarRutaSeleccionada(paradasRuta) {
+        limpiarRutaSeleccionada();
+        const contador = capaRutaSeleccionadaContador;
+
+        if (paradasRuta.length === 0) return;
+
+        const puntos = paradasRuta.map((p) => ({
+          lat: parseFloat(p.lat),
+          lon: parseFloat(p.lon),
+        }));
+
+        const capa = L.layerGroup().addTo(map);
+
+        puntos.forEach((p, i) => {
+          L.marker([p.lat, p.lon], {
+            icon: L.divIcon({
+              className: "",
+              html: `<div class="numero-parada">${i + 1}</div>`,
+              iconSize: [24, 24],
+              iconAnchor: [12, 12],
+            }),
+          }).addTo(capa);
+        });
+
+        let coordenadasLinea = puntos.map((p) => [p.lat, p.lon]);
+
+        if (puntos.length >= 2) {
+          try {
+            const resp = await fetch(`${API_URL}Rutas/CalcularCamino`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ paradas: puntos }),
+            });
+            const resultado = await resp.json();
+            if (resultado.status === "ok" && resultado.data) {
+              coordenadasLinea = resultado.data.geometria.map((p) => [
+                p.lat,
+                p.lon,
+              ]);
+            }
+          } catch (error) {
+            console.error("Error al calcular el camino por calles:", error);
+          }
+        }
+
+        // Si mientras esperábamos se seleccionó otra ruta o se canceló,
+        // esta respuesta ya está vieja: descartamos la capa sin mostrarla.
+        if (contador !== capaRutaSeleccionadaContador) {
+          map.removeLayer(capa);
+          return;
+        }
+
+        L.polyline(coordenadasLinea, { color: "#c97a1e", weight: 4 }).addTo(
+          capa,
+        );
+
+        capaRutaSeleccionada = capa;
+
+        map.fitBounds(L.latLngBounds(puntos.map((p) => [p.lat, p.lon])), {
+          padding: [40, 40],
+        });
+      }
+
+      async function verRutaEnMapa(idRuta, event) {
+        if (event) event.stopPropagation();
+        if (modoCreacion) return;
+
+        rutaSeleccionada = idRuta;
+        renderizarListaRutas();
+
+        try {
+          const resp = await fetch(`${API_URL}Rutas/${idRuta}`);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          await dibujarRutaSeleccionada(data?.data || []);
+        } catch (error) {
+          console.error("Error al obtener la ruta:", error);
+          alert(traducir("op.errorRuta"));
+        }
+      }
+
+      async function eliminarRuta(idRuta, event) {
+        if (event) event.stopPropagation();
+
+        if (
+          !confirm(traducir("prut.confirmarEliminar"))
+        ) {
+          return;
+        }
+
+        try {
+          const resp = await fetch(`${API_URL}Rutas/Eliminar`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idRuta }),
+          });
+          const resultado = await resp.json();
+
+          if (resultado.status === "ok") {
+            if (rutaSeleccionada === idRuta) {
+              rutaSeleccionada = null;
+              limpiarRutaSeleccionada();
+            }
+            obtenerRutas();
+          } else {
+            alert(mensajeStatus(resultado));
+          }
+        } catch (error) {
+          console.error("Error al eliminar la ruta:", error);
+          alert(traducir("comun.conexion"));
+        }
+      }
+
+      async function cargarCuadrillas() {
+        try {
+          const resp = await fetch(`${API_URL_GESTION}Cuadrillas/Cuadrillas`);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          // Solo se puede asignar una ruta a cuadrillas que ya tienen un camión asignado.
+          cuadrillasDisponibles = (data?.data || []).filter(
+            (c) => c.camion_matricula,
+          );
+        } catch (error) {
+          console.error("Error al obtener cuadrillas:", error);
+        }
+      }
+
+      function abrirModalCuadrilla(idRuta, nombreRuta, event) {
+        if (event) event.stopPropagation();
+
+        idRutaParaAsignar = idRuta;
+        document.getElementById("modalCuadrillaRutaNombre").textContent =
+          traducir("prut.rutaNombre").replace("{x}", nombreRuta);
+
+        const select = document.getElementById("selectCuadrilla");
+
+        if (cuadrillasDisponibles.length === 0) {
+          select.innerHTML =
+            `<option value="">${traducir("prut.sinCuadrillas")}</option>`;
+        } else {
+          select.innerHTML =
+            `<option value="">${traducir("prut.seleccioneCuadrilla")}</option>` +
+            cuadrillasDisponibles
+              .map(
+                (c) =>
+                  `<option value="${c.ID_cuadrilla}">${c.nombre || `${traducir("pcua.cuadrilla")} #${c.ID_cuadrilla}`} — ${traducir("pcam.camion")} ${c.camion_matricula}</option>`,
+              )
+              .join("");
+        }
+
+        document
+          .getElementById("modalAsignarCuadrilla")
+          .classList.add("activo");
+      }
+
+      function cerrarModalCuadrilla() {
+        idRutaParaAsignar = null;
+        document
+          .getElementById("modalAsignarCuadrilla")
+          .classList.remove("activo");
+        document.getElementById("formAsignarCuadrilla").reset();
+      }
+
+      document
+        .getElementById("formAsignarCuadrilla")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const idCuadrilla = document.getElementById("selectCuadrilla").value;
+          if (!idCuadrilla || !idRutaParaAsignar) return;
+
+          try {
+            const resp = await fetch(`${API_URL}Rutas/AsignarCuadrilla`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                idRuta: idRutaParaAsignar,
+                idCuadrilla,
+              }),
+            });
+            const resultado = await resp.json();
+
+            if (resultado.status === "ok") {
+              cerrarModalCuadrilla();
+              obtenerRutas();
+            } else if (resultado.status === "sin_camion") {
+              alert(traducir("prut.cuadrillaSinCamion"));
+            } else {
+              alert(mensajeStatus(resultado));
+            }
+          } catch (error) {
+            console.error("Error al asignar cuadrilla:", error);
+            alert(traducir("comun.conexion"));
+          }
+        });
+
+      async function obtenerRutas() {
+        try {
+          const resp = await fetch(`${API_URL}Rutas`);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          rutas = data?.data || [];
+          renderizarListaRutas();
+        } catch (error) {
+          console.error("Error al obtener rutas:", error);
+          document.getElementById("listaRutas").innerHTML =
+            `<p>${traducir("prut.errorRutas")}</p>`;
+        }
+      }
+
+      function renderizarListaRutas() {
+        const contenedor = document.getElementById("listaRutas");
+        if (rutas.length === 0) {
+          contenedor.innerHTML = `<p>${traducir("prut.vacio")}</p>`;
+          return;
+        }
+        contenedor.innerHTML =
+          '<ul style="list-style: none; padding: 0; margin: 0;">' +
+          rutas
+            .map(
+              (r) => `
+            <li class="ruta-item${r.ID_ruta === rutaSeleccionada ? " seleccionada" : ""}"
+                onclick="verRutaEnMapa(${r.ID_ruta}, event)">
+              <div class="ruta-info">
+                <strong>${r.nombre}</strong>
+                — ${r.camion_matricula ? `${traducir("pcam.camion")} ${r.camion_matricula}` : traducir("prut.sinCamion")}
+                — ${r.cuadrilla_nombre ? `${traducir("pcua.cuadrilla")} ${r.cuadrilla_nombre}` : traducir("prut.sinCuadrilla")}
+                — ${r.cantidad_paradas} ${traducir("prut.paradas")}
+                — ${traducirValor("estado", r.estado)}
+              </div>
+              <div class="ruta-acciones">
+                <button
+                  type="button"
+                  class="btn-asignar-cuadrilla"
+                  onclick="abrirModalCuadrilla(${r.ID_ruta}, '${(r.nombre || "").replace(/'/g, "\\'")}', event)"
+                >
+                  ${traducir("op.asignarCuadrilla")}
+                </button>
+                <button
+                  type="button"
+                  class="btn-eliminar"
+                  style="border: none; border-radius: 8px; padding: 8px 16px; cursor: pointer;"
+                  onclick="eliminarRuta(${r.ID_ruta}, event)"
+                >
+                  ${traducir("comun.eliminar")}
+                </button>
+              </div>
+            </li>`,
+            )
+            .join("") +
+          "</ul>";
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const rolUsuario = (localStorage.getItem("rol") || "").trim();
+        document.querySelectorAll("[data-rol]").forEach((boton) => {
+          const rolesPermitidos = boton.dataset.rol
+            .split(",")
+            .map((rol) => rol.trim());
+          if (!rolesPermitidos.includes(rolUsuario)) {
+            boton.style.display = "none";
+          }
+        });
+      });
+
+      function toggleMenu() {
+        document.getElementById("menu").classList.toggle("activo");
+      }
+
+      function cerrarSesion() {
+        localStorage.removeItem("logueado");
+        localStorage.removeItem("nickname");
+        window.location.href = "index.html";
+      }
+
+      function cargarUsuario() {
+        const nombre = localStorage.getItem("nickname") || traducir("usuario.porDefecto");
+        const inicial = nombre.charAt(0).toUpperCase();
+
+        document.getElementById("usuario").innerHTML = `
+          <span class="nombre-usuario">${nombre}</span>
+          <button class="usuario-btn" onclick="abrirUsuario()">
+              ${inicial}
+          </button>
+          <div id="menuUsuario" class="menu-usuario">
+              <button onclick="cerrarSesion()">
+                  ${traducir("usuario.cerrarSesion")}
+              </button>
+          </div>
+        `;
+      }
+
+      function abrirUsuario() {
+        document.getElementById("menuUsuario").classList.toggle("activo");
+      }
+
+      cargarUsuario();
+
+      function alCambiarIdioma() {
+        cargarUsuario();
+        if (modoCreacion) redibujarParadas();
+        else dibujarContenedores();
+        if (rutas) renderizarListaRutas();
+      }
+      obtenerRutas();
+      cargarContenedores();
+      cargarCuadrillas();
+    </script>
+  </body>
+</html>

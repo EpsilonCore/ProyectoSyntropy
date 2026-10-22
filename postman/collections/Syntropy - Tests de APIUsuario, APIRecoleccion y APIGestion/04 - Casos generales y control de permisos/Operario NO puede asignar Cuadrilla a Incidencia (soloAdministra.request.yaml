@@ -1,6 +1,6 @@
 $kind: http-request
 name: Operario NO puede asignar Cuadrilla a Incidencia (soloAdministrador)
-url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/AsignarCuadrilla"
+url: "{{baseUrl}}/api/gestion/Incidencias/AsignarCuadrilla"
 method: PATCH
 headers:
   Content-Type: application/json

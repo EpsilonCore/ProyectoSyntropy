@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-texto="pagina.mapa">Mapa - Epsilon</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="idiomas.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+  </head>
+
+  <body>
+    <script>
+      if (localStorage.getItem("logueado") !== "si") {
+        window.location.href = "login.html";
+      }
+    </script>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <header>
+      <div class="logo">
+        <a href="index.html">
+          <img src="logo.png" alt="Epsilon" />
+        </a>
+      </div>
+
+      <div class="header-actions">
+        <div id="usuario" class="usuario"></div>
+
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+      </div>
+
+      <nav id="menu">
+        <ul>
+          <li>
+            <button
+              data-rol="Administrador"
+              class="link-button"
+              data-texto="menu.gestion"
+              onclick="window.location.href = 'gestion.html'"
+            >
+              Gestión
+            </button>
+          </li>
+
+          <li>
+            <button
+              data-rol="Administrador, Operario"
+              class="link-button"
+              data-texto="menu.rutas"
+              onclick="window.location.href = 'panelrutas.html'"
+            >
+              Rutas
+            </button>
+          </li>
+
+          <li>
+            <button
+              class="link-button"
+              data-texto="menu.mapa"
+              onclick="window.location.href = 'mapa.html'"
+            >
+              Mapa
+            </button>
+          </li>
+
+          <li>
+            <button
+              class="link-button"
+              data-texto="menu.estadisticas"
+              onclick="window.location.href = 'estadisticas.html'"
+            >
+              Estadísticas
+            </button>
+          </li>
+
+          <li>
+            <button
+              class="link-button"
+              data-texto="menu.documentacion"
+              onclick="window.location.href = 'documentacion.html'"
+            >
+              Documentación
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="pagina">
+      <h2 data-texto="mapa.titulo">Mapa de Contenedores</h2>
+
+      <p data-texto="mapa.descripcion">
+        Visualización geográfica de la ciudad.
+      </p>
+
+      <div class="panel">
+        <button data-texto="mapa.verTodo" onclick="vertodo()">Ver todo</button>
+        <button data-texto="mapa.verContenedores" onclick="soloContenedores()">
+          Ver Contenedores
+        </button>
+        <button data-texto="mapa.verIncidencias" onclick="soloIncidencias()">
+          Ver Incidencias
+        </button>
+        <button data-texto="mapa.verCentros" onclick="soloCentrosAcopio()">
+          Ver Centros de Acopio
+        </button>
+        <button data-texto="mapa.actualizar">Actualizar Mapa</button>
+      </div>
+
+      <div id="map"></div>
+    </div>
+
+    <script>
+      // ---------- Textos de los popups ----------
+      function textoPopupIncidencia(inc) {
+        return `<strong>${traducirValor("tipoIncidencia", inc.tipo)}</strong><br>${inc.calle} ${inc.numero}, ${inc.barrio}<br>${traducir("mapa.estado")}: ${traducirValor("estado", inc.estado)}`;
+      }
+
+      function textoPopupContenedor(cont) {
+        return `<strong>${traducir("mapa.contenedor")}</strong><br>${cont.calle} ${cont.numero}, ${cont.barrio}<br>${traducir("mapa.capacidad")}: ${cont.capacidadCarga}<br>${traducir("mapa.tipo")}: ${traducirValor("tipoContenedor", cont.tipo)}<br>${traducir("mapa.estado")}: ${traducirValor("estado", cont.estado)}`;
+      }
+
+      function textoPopupCentro(centro) {
+        return `<strong>${traducir("mapa.centroAcopio")}</strong><br>${centro.calle} ${centro.numero}, ${centro.barrio}<br>${traducir("mapa.capacidad")}: ${centro.capacidadCarga}<br>${traducir("mapa.tipo")}: ${centro.tipo}<br>${traducir("mapa.estado")}: ${traducirValor("estado", centro.estado)}`;
+      }
+
+      // ---------- Carga de capas ----------
+      async function CargarIncidenciasMapa() {
+        try {
+          const respuesta = await fetch(
+            "/api/gestion/Incidencias/Incidencias",
+          );
+          const respuestaJson = await respuesta.json();
+          const incidencias = Array.isArray(respuestaJson)
+            ? respuestaJson
+            : respuestaJson?.data || [];
+          console.log("Incidencias cargadas:", incidencias);
+
+          incidencias.forEach((inc) => {
+            if (!inc.lat || !inc.lon) return;
+            if (inc.tipo === "desbordado") {
+              L.circleMarker([inc.lat, inc.lon], {
+                radius: 3,
+                color: "#936c01",
+                fillColor: "#936c01",
+                fillOpacity: 1,
+              })
+                .addTo(map)
+                .bindPopup(textoPopupIncidencia(inc));
+            }
+            if (inc.tipo === "rotura") {
+              L.circleMarker([inc.lat, inc.lon], {
+                radius: 3,
+                color: "#000000",
+                fillColor: "#000000",
+                fillOpacity: 1,
+              })
+                .addTo(map)
+                .bindPopup(textoPopupIncidencia(inc));
+            }
+            if (inc.tipo === "incendiado") {
+              L.circleMarker([inc.lat, inc.lon], {
+                radius: 3,
+                color: "#ffa200",
+                fillColor: "#ffa200",
+                fillOpacity: 1,
+              })
+                .addTo(map)
+                .bindPopup(textoPopupIncidencia(inc));
+            }
+            if (inc.tipo === "lleno") {
+              L.circleMarker([inc.lat, inc.lon], {
+                radius: 3,
+                color: "#861313",
+                fillColor: "#861313",
+                fillOpacity: 1,
+              })
+                .addTo(map)
+                .bindPopup(textoPopupIncidencia(inc));
+            }
+          });
+        } catch (err) {
+          console.error("Error al cargar las incidencias:", err);
+        }
+      }
+      async function CargarContenedoresMapa() {
+        try {
+          const respuesta = await fetch(
+            "/api/gestion/Contenedores",
+          );
+          const respuestaJson = await respuesta.json();
+          const contenedores = Array.isArray(respuestaJson)
+            ? respuestaJson
+            : respuestaJson?.data || [];
+          console.log("Contenedores cargados:", contenedores);
+
+          contenedores.forEach((cont) => {
+            if (!cont.lat || !cont.lon) return;
+            if (cont.estado === "Vacio") {
+              L.circleMarker([cont.lat, cont.lon], {
+                radius: 3,
+                color: "#23c40e",
+                fillColor: "#23c40e",
+                fillOpacity: 1,
+              })
+                .addTo(map)
+                .bindPopup(textoPopupContenedor(cont));
+            } else if (cont.estado === "Lleno") {
+              L.circleMarker([cont.lat, cont.lon], {
+                radius: 3,
+                color: "#ff0000",
+                fillColor: "#ff0000",
+                fillOpacity: 1,
+              })
+                .addTo(map)
+                .bindPopup(textoPopupContenedor(cont));
+            } else if (cont.estado === "Desbordado") {
+              L.circleMarker([cont.lat, cont.lon], {
+                radius: 3,
+                color: "#000000",
+                fillColor: "#000000",
+                fillOpacity: 1,
+              })
+                .addTo(map)
+                .bindPopup(textoPopupContenedor(cont));
+            } else if (cont.estado === "Media capacidad") {
+              L.circleMarker([cont.lat, cont.lon], {
+                radius: 3,
+                color: "#fdd408",
+                fillColor: "#fdd408",
+                fillOpacity: 1,
+              })
+                .addTo(map)
+                .bindPopup(textoPopupContenedor(cont));
+            }
+          });
+        } catch (err) {
+          console.error("Error al cargar los contenedores:", err);
+        }
+      }
+
+      async function CargarCentrosAcopioMapa() {
+        try {
+          const respuesta = await fetch(
+            "/api/gestion/CentrosAcopio/CentrosAcopio",
+          );
+          const respuestaJson = await respuesta.json();
+
+          if (
+            respuestaJson &&
+            respuestaJson.status &&
+            respuestaJson.status !== "ok"
+          ) {
+            console.error(
+              "Error al cargar los centros de acopio:",
+              respuestaJson.message,
+            );
+            return;
+          }
+          const centrosAcopio = Array.isArray(respuestaJson)
+            ? respuestaJson
+            : respuestaJson?.data || [];
+          console.log("Centros de acopio cargados:", centrosAcopio);
+
+          centrosAcopio.forEach((centro) => {
+            if (!centro.lat || !centro.lon) return;
+            L.circleMarker([centro.lat, centro.lon], {
+              radius: 3,
+              color: "#0000ff",
+              fillColor: "#0000ff",
+              fillOpacity: 1,
+            })
+              .addTo(map)
+              .bindPopup(textoPopupCentro(centro));
+          });
+        } catch (err) {
+          console.error("Error al cargar los centros de acopio:", err);
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const rolUsuario = (localStorage.getItem("rol") || "").trim();
+        document.querySelectorAll("[data-rol]").forEach((boton) => {
+          const rolesPermitidos = boton.dataset.rol
+            .split(",")
+            .map((rol) => rol.trim());
+          if (!rolesPermitidos.includes(rolUsuario)) {
+            boton.style.display = "none";
+          }
+        });
+      });
+
+      function toggleMenu() {
+        document.getElementById("menu").classList.toggle("activo");
+      }
+
+      function cerrarSesion() {
+        localStorage.removeItem("logueado");
+        localStorage.removeItem("nickname");
+        window.location.href = "index.html";
+      }
+
+      function cargarUsuario() {
+        const nombre =
+          localStorage.getItem("nickname") || traducir("usuario.porDefecto");
+        const inicial = nombre.charAt(0).toUpperCase();
+
+        document.getElementById("usuario").innerHTML = `
+
+          <span class="nombre-usuario">${nombre}</span>
+
+          <button class="usuario-btn" onclick="abrirUsuario()">
+              ${inicial}
+          </button>
+
+          <div id="menuUsuario" class="menu-usuario">
+
+              <button onclick="cerrarSesion()">
+                  ${traducir("usuario.cerrarSesion")}
+              </button>
+
+          </div>
+
+          `;
+      }
+
+      function abrirUsuario() {
+        document.getElementById("menuUsuario").classList.toggle("activo");
+      }
+
+      cargarUsuario();
+
+      var map = L.map("map").setView([-34.9011, -56.1645], 13);
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors",
+        maxZoom: 19,
+      }).addTo(map);
+
+      function limpiarMapa() {
+        map.eachLayer(function (layer) {
+          if (layer instanceof L.CircleMarker) {
+            map.removeLayer(layer);
+          }
+        });
+      }
+      function vistaInicial() {
+        CargarIncidenciasMapa();
+        CargarContenedoresMapa();
+      }
+
+      let vistaActual = vistaInicial;
+
+      function alCambiarIdioma() {
+        cargarUsuario();
+        limpiarMapa();
+        vistaActual();
+      }
+
+      function soloContenedores() {
+        vistaActual = soloContenedores;
+        limpiarMapa();
+        CargarContenedoresMapa();
+      }
+      function soloIncidencias() {
+        vistaActual = soloIncidencias;
+        limpiarMapa();
+        CargarIncidenciasMapa();
+      }
+      function soloCentrosAcopio() {
+        vistaActual = soloCentrosAcopio;
+        limpiarMapa();
+        CargarCentrosAcopioMapa();
+      }
+      function vertodo() {
+        vistaActual = vertodo;
+        limpiarMapa();
+        CargarContenedoresMapa();
+        CargarIncidenciasMapa();
+        CargarCentrosAcopioMapa();
+      }
+
+      vistaInicial();
+    </script>
+  </body>
+</html>

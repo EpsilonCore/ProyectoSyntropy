@@ -1,5 +1,5 @@
 $kind: http-request
-url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/AsignarOperario"
+url: "{{baseUrl}}/api/gestion/Incidencias/AsignarOperario"
 method: PATCH
 headers:
   Content-Type: application/json

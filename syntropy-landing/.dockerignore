@@ -1,0 +1,9 @@
+.git 
+.env 
+.idea 
+.vscode 
+vendor 
+tests 
+*.log 
+Dockerfile 
+.dockerignore 

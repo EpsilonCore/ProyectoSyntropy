@@ -1,6 +1,6 @@
 $kind: http-request
 name: "Sin sesión (Vecino por defecto): NO puede listar Usuarios"
-url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Usuarios/miApi/Usuarios"
+url: "{{baseUrl}}/api/usuarios/Usuarios"
 method: GET
 scripts:
   - type: beforeRequest

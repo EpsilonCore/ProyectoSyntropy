@@ -1,6 +1,6 @@
 $kind: http-request
 name: "Gestion: preflight OPTIONS -> 200 + CORS"
-url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Gestion/miApi/Contenedores"
+url: "{{baseUrl}}/api/gestion/Contenedores"
 method: OPTIONS
 scripts:
   - type: afterResponse

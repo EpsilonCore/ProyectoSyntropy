@@ -1,6 +1,6 @@
 $kind: http-request
 name: "Sin sesión: Contenedores sigue siendo público"
-url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Gestion/miApi/Contenedores"
+url: "{{baseUrl}}/api/gestion/Contenedores"
 method: GET
 scripts:
   - type: beforeRequest

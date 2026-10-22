@@ -1,5 +1,5 @@
 $kind: http-request
-url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas/Eliminar"
+url: "{{baseUrl}}/api/recoleccion/Rutas/Eliminar"
 method: DELETE
 headers:
   Content-Type: application/json

@@ -1,6 +1,6 @@
 $kind: http-request
 name: Responder Solicitud (aprobar/rechazar cuenta)
-url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Usuarios/miApi/Actualizar"
+url: "{{baseUrl}}/api/usuarios/Actualizar"
 method: PATCH
 headers:
   Content-Type: application/json

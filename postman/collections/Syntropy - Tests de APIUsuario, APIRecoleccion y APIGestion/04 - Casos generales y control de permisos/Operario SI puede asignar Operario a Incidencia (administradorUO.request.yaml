@@ -1,6 +1,6 @@
 $kind: http-request
 name: Operario SI puede asignar Operario a Incidencia (administradorUOperario)
-url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/AsignarOperario"
+url: "{{baseUrl}}/api/gestion/Incidencias/AsignarOperario"
 method: PATCH
 headers:
   Content-Type: application/json

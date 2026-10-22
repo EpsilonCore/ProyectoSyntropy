@@ -1,6 +1,6 @@
 $kind: http-request
 name: "Sin sesión: Registrar Incidencia sigue siendo público"
-url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/Registrar"
+url: "{{baseUrl}}/api/gestion/Incidencias/Registrar"
 method: POST
 headers:
   Content-Type: application/json

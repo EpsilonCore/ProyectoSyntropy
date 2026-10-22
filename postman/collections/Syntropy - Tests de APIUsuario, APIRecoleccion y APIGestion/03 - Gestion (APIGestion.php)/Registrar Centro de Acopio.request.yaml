@@ -1,5 +1,5 @@
 $kind: http-request
-url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Gestion/miApi/CentrosAcopio/Registrar"
+url: "{{baseUrl}}/api/gestion/CentrosAcopio/Registrar"
 method: POST
 headers:
   Content-Type: application/json

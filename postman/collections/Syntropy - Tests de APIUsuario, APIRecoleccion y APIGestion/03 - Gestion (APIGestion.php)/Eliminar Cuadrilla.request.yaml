@@ -1,5 +1,5 @@
 $kind: http-request
-url: "{{baseUrl}}/Proyecto/ProyectoSyntropy/Gestion/miApi/Cuadrillas/Borrar"
+url: "{{baseUrl}}/api/gestion/Cuadrillas/Borrar"
 method: DELETE
 headers:
   Content-Type: application/json

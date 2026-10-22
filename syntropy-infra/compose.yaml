@@ -1,0 +1,61 @@
+name: sigeru
+
+x-web: &web
+  restart: unless-stopped
+  networks: [sigeru_red]
+
+x-php: &php
+  restart: unless-stopped
+  env_file: .env
+  networks: [sigeru_red]
+  volumes:
+    - sesiones:/sesiones
+
+services:
+  gateway:
+    <<: *web
+    image: nginx:1.27-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./gateway/nginx.conf:/etc/nginx/conf.d/default.conf:ro,Z
+      - ./certs:/etc/nginx/certs:ro,Z
+    depends_on: [landing, frontend, backoffice, api-usuarios, api-gestion, api-recoleccion]
+
+  landing:
+    <<: *web
+    build: ../syntropy-landing
+    image: sigeru/landing:${TAG:-1.0}
+
+  frontend:
+    <<: *web
+    build: ../syntropy-frontend
+    image: sigeru/frontend:${TAG:-1.0}
+
+  backoffice:
+    <<: *php
+    build: ../syntropy-backoffice
+    image: sigeru/backoffice:${TAG:-1.0}
+
+  api-usuarios:
+    <<: *php
+    build: ../syntropy-api-usuarios
+    image: sigeru/api-usuarios:${TAG:-1.0}
+
+  api-gestion:
+    <<: *php
+    build: ../syntropy-api-gestion
+    image: sigeru/api-gestion:${TAG:-1.0}
+
+  api-recoleccion:
+    <<: *php
+    build: ../syntropy-api-recoleccion
+    image: sigeru/api-recoleccion:${TAG:-1.0}
+
+networks:
+  sigeru_red:
+    driver: bridge
+
+volumes:
+  sesiones:
