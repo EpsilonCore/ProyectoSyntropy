@@ -11,6 +11,10 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
     <script src="idiomas.js"></script>
   </head>
 
@@ -32,7 +36,8 @@
           <div id="registro-btn">
             <button
               class="btn-fantasma"
-              onclick="window.location.href = 'registro.html'" data-texto="index.registrar"
+              onclick="window.location.href = 'registro.html'"
+              data-texto="index.registrar"
             >
               Registrar
             </button>
@@ -41,7 +46,8 @@
           <div id="login-btn">
             <button
               class="btn-fantasma"
-              onclick="window.location.href = 'login.html'" data-texto="index.iniciarSesion"
+              onclick="window.location.href = 'login.html'"
+              data-texto="index.iniciarSesion"
             >
               Iniciar Sesión
             </button>
@@ -76,7 +82,8 @@
                 <button
                   type="button"
                   class="btn-link"
-                  onclick="marcarTodasLeidas()" data-texto="index.marcarLeidas"
+                  onclick="marcarTodasLeidas()"
+                  data-texto="index.marcarLeidas"
                 >
                   Marcar todas como leídas
                 </button>
@@ -117,11 +124,32 @@
 
                 <label data-texto="index.tipo">Tipo</label>
                 <select id="tipoCrear" required>
-                  <option value="" disabled selected data-texto="index.seleccioneTipo">Seleccione un tipo</option>
-                  <option value="rotura" data-texto="tipoIncidencia.rotura">Contenedor dañado</option>
-                  <option value="lleno" data-texto="tipoIncidencia.lleno">Contenedor lleno</option>
-                  <option value="desbordado" data-texto="tipoIncidencia.desbordado">Contenedor desbordado</option>
-                  <option value="incendiado" data-texto="tipoIncidencia.incendiado">Contenedor incendiado</option>
+                  <option
+                    value=""
+                    disabled
+                    selected
+                    data-texto="index.seleccioneTipo"
+                  >
+                    Seleccione un tipo
+                  </option>
+                  <option value="rotura" data-texto="tipoIncidencia.rotura">
+                    Contenedor dañado
+                  </option>
+                  <option value="lleno" data-texto="tipoIncidencia.lleno">
+                    Contenedor lleno
+                  </option>
+                  <option
+                    value="desbordado"
+                    data-texto="tipoIncidencia.desbordado"
+                  >
+                    Contenedor desbordado
+                  </option>
+                  <option
+                    value="incendiado"
+                    data-texto="tipoIncidencia.incendiado"
+                  >
+                    Contenedor incendiado
+                  </option>
                 </select>
 
                 <label data-texto="index.imagen">Imagen</label>
@@ -140,14 +168,32 @@
                 </div>
 
                 <label data-texto="index.contenedor">Contenedor:</label>
-                <input
-                  id="buscadorContenedores"
-                  type="search"
-                  placeholder="Buscar por calle, número o barrio" data-placeholder="index.buscar"
-                  autocomplete="off"
-                  oninput="filtrarContenedores()"
-                />
-                <div id="listaContenedores" class="lista-contenedores"></div>
+
+                <div id="bloqueContenedores">
+                  <div id="mapaContenedores" class="inc-mapa"></div>
+                  <p class="inc-titulo-lista" data-texto="index.mapaAyuda">
+                    Tocá un contenedor del mapa para seleccionarlo.
+                  </p>
+                  <div id="contenedorElegido" class="inc-elegido"></div>
+                  <p
+                    id="tituloCercanos"
+                    class="inc-titulo-lista"
+                    style="display: none"
+                    data-texto="index.masCercanos"
+                  >
+                    Los 5 contenedores más cercanos a vos:
+                  </p>
+                  <input
+                    id="buscadorContenedores"
+                    type="search"
+                    placeholder="Buscar por calle, número o barrio"
+                    data-placeholder="index.buscar"
+                    autocomplete="off"
+                    style="display: none"
+                    oninput="filtrarContenedores()"
+                  />
+                  <div id="listaContenedores" class="lista-contenedores"></div>
+                </div>
 
                 <input
                   type="hidden"
@@ -180,30 +226,69 @@
                   value=""
                 />
 
-                <button type="button" id="btnDireccionNueva" class="btn-link" data-texto="index.direccionNueva">
+                <button
+                  type="button"
+                  id="btnDireccionNueva"
+                  class="btn-link"
+                  data-texto="index.direccionNueva"
+                >
                   ¿No está en la lista? Ingresar dirección nueva
                 </button>
 
                 <div id="camposDireccionNueva" style="display: none">
-                  <input type="text" id="calleCrear" placeholder="Calle" data-placeholder="index.calle" />
-                  <input type="text" id="numeroCrear" placeholder="Número" data-placeholder="index.numero" />
-                  <input type="text" id="barrioCrear" placeholder="Barrio" data-placeholder="index.barrio" />
+                  <input
+                    type="text"
+                    id="calleCrear"
+                    placeholder="Calle"
+                    data-placeholder="index.calle"
+                  />
+                  <input
+                    type="text"
+                    id="numeroCrear"
+                    placeholder="Número"
+                    data-placeholder="index.numero"
+                  />
+                  <input
+                    type="text"
+                    id="barrioCrear"
+                    placeholder="Barrio"
+                    data-placeholder="index.barrio"
+                  />
 
                   <label
-                    ><span data-texto="index.tipoContenedor">Tipo de contenedor:</span>
+                    ><span data-texto="index.tipoContenedor"
+                      >Tipo de contenedor:</span
+                    >
                     <select id="tipoContenedorCrear">
-                      <option value="Naranja" data-texto="tipoContenedor.Naranja">Reciclables</option>
-                      <option value="Metalico" data-texto="tipoContenedor.Metalico">
+                      <option
+                        value="Naranja"
+                        data-texto="tipoContenedor.Naranja"
+                      >
+                        Reciclables
+                      </option>
+                      <option
+                        value="Metalico"
+                        data-texto="tipoContenedor.Metalico"
+                      >
                         Metalico - Residuos mezclados
                       </option>
-                      <option value="Plastico" data-texto="tipoContenedor.Plastico">
+                      <option
+                        value="Plastico"
+                        data-texto="tipoContenedor.Plastico"
+                      >
                         Plástico - Residuos mezclados
                       </option>
                     </select>
                   </label>
                 </div>
 
-                <button class="btn-crear-centro-acopio" type="submit" data-texto="index.crearIncidencia">
+                <div id="avisoIncidencia" class="inc-aviso" role="alert"></div>
+
+                <button
+                  class="btn-crear-centro-acopio"
+                  type="submit"
+                  data-texto="index.crearIncidencia"
+                >
                   Crear Incidencia
                 </button>
                 <button
@@ -213,7 +298,8 @@
                     document
                       .getElementById('overlayCrearIncidencias')
                       .classList.remove('activo')
-                  " data-texto="comun.cancelar"
+                  "
+                  data-texto="comun.cancelar"
                 >
                   Cancelar
                 </button>
@@ -230,7 +316,8 @@
               <button
                 data-rol="Administrador"
                 class="link-button"
-                onclick="verificarAcceso('gestion.html')" data-texto="menu.gestion"
+                onclick="verificarAcceso('gestion.html')"
+                data-texto="menu.gestion"
               >
                 Gestión
               </button>
@@ -239,7 +326,8 @@
               <button
                 data-rol="Recolector"
                 class="link-button"
-                onclick="verificarAcceso('misincidencias.html')" data-texto="menu.misIncidencias"
+                onclick="verificarAcceso('misincidencias.html')"
+                data-texto="menu.misIncidencias"
               >
                 Mis Incidencias
               </button>
@@ -249,7 +337,8 @@
               <button
                 data-rol="Operario"
                 class="link-button"
-                onclick="verificarAcceso('paneloperario.html')" data-texto="menu.panelOperario"
+                onclick="verificarAcceso('paneloperario.html')"
+                data-texto="menu.panelOperario"
               >
                 Panel Operario
               </button>
@@ -258,7 +347,8 @@
             <li>
               <button
                 class="link-button"
-                onclick="verificarAcceso('mapa.html')" data-texto="menu.mapa"
+                onclick="verificarAcceso('mapa.html')"
+                data-texto="menu.mapa"
               >
                 Mapa
               </button>
@@ -267,7 +357,8 @@
             <li>
               <button
                 class="link-button"
-                onclick="verificarAcceso('estadisticas.html')" data-texto="menu.estadisticas"
+                onclick="verificarAcceso('estadisticas.html')"
+                data-texto="menu.estadisticas"
               >
                 Estadísticas
               </button>
@@ -276,7 +367,8 @@
             <li>
               <button
                 class="link-button"
-                onclick="verificarAcceso('documentacion.html')" data-texto="menu.documentacion"
+                onclick="verificarAcceso('documentacion.html')"
+                data-texto="menu.documentacion"
               >
                 Documentación
               </button>
@@ -304,14 +396,16 @@
           <div class="botones">
             <button
               class="btn-pill btn-pill-solido"
-              onclick="verificarAcceso('mapa.html')" data-texto="index.explorarMapa"
+              onclick="verificarAcceso('mapa.html')"
+              data-texto="index.explorarMapa"
             >
               Explorar Mapa
             </button>
 
             <button
               class="btn-pill btn-pill-fantasma"
-              onclick="verificarAcceso('documentacion.html')" data-texto="menu.documentacion"
+              onclick="verificarAcceso('documentacion.html')"
+              data-texto="menu.documentacion"
             >
               Documentación
             </button>
@@ -323,19 +417,27 @@
     <section class="franja-datos">
       <div class="dato-item">
         <span class="dato-numero">+1.200</span>
-        <span class="dato-label" data-texto="index.datoContenedores">Contenedores monitoreados</span>
+        <span class="dato-label" data-texto="index.datoContenedores"
+          >Contenedores monitoreados</span
+        >
       </div>
       <div class="dato-item">
         <span class="dato-numero">7</span>
-        <span class="dato-label" data-texto="index.datoResiduos">Tipos de residuo clasificados</span>
+        <span class="dato-label" data-texto="index.datoResiduos"
+          >Tipos de residuo clasificados</span
+        >
       </div>
       <div class="dato-item">
         <span class="dato-numero">24/7</span>
-        <span class="dato-label" data-texto="index.datoSeguimiento">Seguimiento en tiempo real</span>
+        <span class="dato-label" data-texto="index.datoSeguimiento"
+          >Seguimiento en tiempo real</span
+        >
       </div>
       <div class="dato-item">
         <span class="dato-numero" data-texto="index.datoMin">Min.</span>
-        <span class="dato-label" data-texto="index.datoRutas">Rutas optimizadas por incidencia</span>
+        <span class="dato-label" data-texto="index.datoRutas"
+          >Rutas optimizadas por incidencia</span
+        >
       </div>
     </section>
 
@@ -404,7 +506,9 @@
             </svg>
           </span>
           <h3 data-texto="menu.mapa">Mapa</h3>
-          <p data-texto="index.servicioMapa">Ubicación en vivo de contenedores, camiones e incidencias.</p>
+          <p data-texto="index.servicioMapa">
+            Ubicación en vivo de contenedores, camiones e incidencias.
+          </p>
         </button>
 
         <button
@@ -427,7 +531,9 @@
             </svg>
           </span>
           <h3 data-texto="menu.estadisticas">Estadísticas</h3>
-          <p data-texto="index.servicioEstadisticas">Indicadores de recolección, incidencias y desempeño por zona.</p>
+          <p data-texto="index.servicioEstadisticas">
+            Indicadores de recolección, incidencias y desempeño por zona.
+          </p>
         </button>
 
         <button
@@ -450,7 +556,9 @@
             </svg>
           </span>
           <h3 data-texto="menu.documentacion">Documentación</h3>
-          <p data-texto="index.servicioDocumentacion">Guías del sistema, tipos de residuo y buenas prácticas de uso.</p>
+          <p data-texto="index.servicioDocumentacion">
+            Guías del sistema, tipos de residuo y buenas prácticas de uso.
+          </p>
         </button>
       </div>
     </section>
@@ -458,22 +566,29 @@
     <footer class="pie-epsilon">
       <div class="pie-marca">
         <img src="logo.png" alt="Epsilon" />
-        <p data-texto="pie.descripcion">Gestión integral de residuos urbanos, en tiempo real.</p>
+        <p data-texto="pie.descripcion">
+          Gestión integral de residuos urbanos, en tiempo real.
+        </p>
       </div>
 
       <div class="pie-columna">
         <h4 data-texto="pie.plataforma">Plataforma</h4>
-        <a href="javascript:void(0)" onclick="verificarAcceso('mapa.html')" data-texto="menu.mapa"
+        <a
+          href="javascript:void(0)"
+          onclick="verificarAcceso('mapa.html')"
+          data-texto="menu.mapa"
           >Mapa</a
         >
         <a
           href="javascript:void(0)"
-          onclick="verificarAcceso('estadisticas.html')" data-texto="menu.estadisticas"
+          onclick="verificarAcceso('estadisticas.html')"
+          data-texto="menu.estadisticas"
           >Estadísticas</a
         >
         <a
           href="javascript:void(0)"
-          onclick="verificarAcceso('documentacion.html')" data-texto="menu.documentacion"
+          onclick="verificarAcceso('documentacion.html')"
+          data-texto="menu.documentacion"
           >Documentación</a
         >
       </div>
@@ -484,14 +599,29 @@
         <a href="login.html" data-texto="pie.iniciar">Iniciar sesión</a>
       </div>
 
-      <div class="pie-copy" data-texto="pie.copy">© 2026 Epsilon. Todos los derechos reservados.</div>
+      <div class="pie-copy" data-texto="pie.copy">
+        © 2026 Epsilon. Todos los derechos reservados.
+      </div>
     </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
       const API_URL =
         "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/";
       const NOTIFICACIONES_URL =
         "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/Notificaciones/";
+      const ICON_URL = "https://unpkg.com/lucide-static@latest/icons/";
+
+      const ICONOS_CONTENEDOR = {
+        Vacio: { url: ICON_URL + "trash-2.svg", color: "#6fcf97" },
+        "Media capacidad": { url: ICON_URL + "trash-2.svg", color: "#f2c94c" },
+        Lleno: { url: ICON_URL + "trash-2.svg", color: "#eb5757" },
+        Desbordado: { url: ICON_URL + "trash-2.svg", color: "#a77fd6" },
+        default: { url: ICON_URL + "trash-2.svg", color: "#999999" },
+      };
+
+      const ICONO_UBICACION = { url: ICON_URL + "user.svg", color: "#6fa8dc" };
 
       document.addEventListener("DOMContentLoaded", () => {
         const rolUsuario = (localStorage.getItem("rol") || "").trim();
@@ -506,10 +636,140 @@
         });
       });
 
+      // ===== MAPA DE CONTENEDORES =====
+
       let contenedoresCargados = [];
+      let contenedoresListos = false;
+      let mapaContenedores = null;
+      let marcadoresContenedores = {};
+      let marcadorUsuario = null;
+      let ubicacionUsuario = null;
+      let permisoUbicacion = "pendiente";
+
+      function normalizar(texto) {
+        return String(texto || "")
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/\s+/g, " ")
+          .trim()
+          .toLowerCase();
+      }
+
+      function distanciaMetros(lat1, lon1, lat2, lon2) {
+        const metrosPorGradoLat = 111000;
+        const metrosPorGradoLon = 91000;
+        const difLat = (lat2 - lat1) * metrosPorGradoLat;
+        const difLon = (lon2 - lon1) * metrosPorGradoLon;
+        return Math.sqrt(difLat * difLat + difLon * difLon);
+      }
+
+      function textoDistancia(metros) {
+        if (metros < 1000) {
+          return `${Math.round(metros)} m`;
+        }
+        return `${(metros / 1000).toFixed(1)} km`;
+      }
+
+      function crearIcono({ url, color }, seleccionado = false) {
+        const tamano = seleccionado ? 38 : 28;
+        const borde = seleccionado ? "3px solid #c97a1e" : "2px solid #fff";
+        return L.divIcon({
+          html: `<div style="width:${tamano}px;height:${tamano}px;border-radius:50%;background:${color};border:${borde};box-shadow:0 1px 3px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;box-sizing:border-box;"><img src="${url}" width="16" height="16" style="display:block;" alt="" /></div>`,
+          className: "",
+          iconSize: [tamano, tamano],
+          iconAnchor: [tamano / 2, tamano / 2],
+          popupAnchor: [0, -tamano / 2],
+        });
+      }
+
+      function iconoContenedor(cont) {
+        return ICONOS_CONTENEDOR[cont.estado] || ICONOS_CONTENEDOR.default;
+      }
+
+      function prepararMapa() {
+        if (mapaContenedores === null) {
+          mapaContenedores = L.map("mapaContenedores").setView(
+            [-34.9011, -56.1645],
+            12,
+          );
+          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "&copy; OpenStreetMap contributors",
+            maxZoom: 19,
+          }).addTo(mapaContenedores);
+        }
+        setTimeout(() => mapaContenedores.invalidateSize(), 50);
+      }
+
+      function dibujarMarcadores() {
+        Object.values(marcadoresContenedores).forEach((marcador) =>
+          mapaContenedores.removeLayer(marcador),
+        );
+        marcadoresContenedores = {};
+
+        contenedoresCargados.forEach((cont) => {
+          if (!cont.lat || !cont.lon) return;
+
+          const marcador = L.marker([cont.lat, cont.lon], {
+            icon: crearIcono(iconoContenedor(cont)),
+          }).addTo(mapaContenedores);
+
+          marcador.bindTooltip(`${cont.calle} ${cont.numero}, ${cont.barrio}`);
+          marcador.on("click", () => seleccionarContenedor(cont));
+          marcadoresContenedores[cont.ID_contenedor] = marcador;
+        });
+
+        resaltarSeleccion();
+      }
+
+      function dibujarUbicacionUsuario() {
+        if (marcadorUsuario) {
+          mapaContenedores.removeLayer(marcadorUsuario);
+        }
+        marcadorUsuario = L.marker(
+          [ubicacionUsuario.lat, ubicacionUsuario.lon],
+          {
+            icon: crearIcono(ICONO_UBICACION),
+          },
+        ).addTo(mapaContenedores);
+        marcadorUsuario.bindTooltip(traducir("index.tuUbicacion"));
+        mapaContenedores.setView(
+          [ubicacionUsuario.lat, ubicacionUsuario.lon],
+          15,
+        );
+      }
+
+      function pedirUbicacion() {
+        permisoUbicacion = "pendiente";
+        ubicacionUsuario = null;
+        actualizarLista();
+
+        if (!navigator.geolocation) {
+          permisoUbicacion = "denegado";
+          actualizarLista();
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          (posicion) => {
+            ubicacionUsuario = {
+              lat: posicion.coords.latitude,
+              lon: posicion.coords.longitude,
+            };
+            permisoUbicacion = "permitido";
+            dibujarUbicacionUsuario();
+            actualizarLista();
+          },
+          () => {
+            permisoUbicacion = "denegado";
+            actualizarLista();
+          },
+          { timeout: 10000 },
+        );
+      }
 
       async function cargarListaContenedores() {
         const contenedores = document.getElementById("listaContenedores");
+        contenedoresListos = false;
         contenedores.innerHTML = traducir("index.cargandoContenedores");
         document.getElementById("buscadorContenedores").value = "";
         try {
@@ -523,18 +783,55 @@
             contenedores.innerHTML = traducir("index.sinContenedores");
             return;
           }
-          renderizarContenedores(contenedoresCargados);
+          contenedoresListos = true;
+          dibujarMarcadores();
+          actualizarLista();
         } catch (error) {
           console.error("Error al cargar la lista de contenedores:", error);
           contenedores.innerHTML = traducir("index.errorContenedores");
         }
       }
 
+      function contenedoresCercanos() {
+        return contenedoresCargados
+          .filter((cont) => cont.lat && cont.lon)
+          .map((cont) => ({
+            ...cont,
+            distancia: distanciaMetros(
+              ubicacionUsuario.lat,
+              ubicacionUsuario.lon,
+              cont.lat,
+              cont.lon,
+            ),
+          }))
+          .sort((a, b) => a.distancia - b.distancia)
+          .slice(0, 5);
+      }
+
+      function actualizarLista() {
+        if (!contenedoresListos) return;
+
+        const lista = document.getElementById("listaContenedores");
+        const buscador = document.getElementById("buscadorContenedores");
+        const titulo = document.getElementById("tituloCercanos");
+
+        if (permisoUbicacion === "pendiente") {
+          buscador.style.display = "none";
+          titulo.style.display = "none";
+          lista.innerHTML = traducir("index.obteniendoUbicacion");
+        } else if (permisoUbicacion === "permitido") {
+          buscador.style.display = "none";
+          titulo.style.display = "block";
+          renderizarContenedores(contenedoresCercanos());
+        } else {
+          buscador.style.display = "block";
+          titulo.style.display = "none";
+          filtrarContenedores();
+        }
+      }
+
       function renderizarContenedores(datos) {
         const contenedores = document.getElementById("listaContenedores");
-        const idSeleccionado = document.getElementById(
-          "idContenedorSeleccionado",
-        ).value;
         contenedores.innerHTML = "";
 
         if (datos.length === 0) {
@@ -545,22 +842,28 @@
         datos.forEach(function (cont) {
           const item = document.createElement("div");
           item.classList.add("item-contenedores");
-          if (String(cont.ID_contenedor) === idSeleccionado) {
-            item.classList.add("seleccionado");
-          }
+          item.dataset.id = cont.ID_contenedor;
           item.innerHTML = `<strong>ID:</strong> ${cont.ID_contenedor} - ${cont.calle} ${cont.numero}, ${cont.barrio}`;
-          item.addEventListener("click", function (event) {
-            seleccionarContenedor(cont, event);
+
+          if (cont.distancia !== undefined) {
+            const distancia = document.createElement("span");
+            distancia.classList.add("inc-distancia");
+            distancia.textContent = textoDistancia(cont.distancia);
+            item.appendChild(distancia);
+          }
+
+          item.addEventListener("click", function () {
+            seleccionarContenedor(cont);
           });
           contenedores.appendChild(item);
         });
+
+        resaltarSeleccion();
       }
 
       function filtrarContenedores() {
-        const normalizar = (texto) =>
-          texto.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
         const busqueda = normalizar(
-          document.getElementById("buscadorContenedores").value.trim(),
+          document.getElementById("buscadorContenedores").value,
         );
 
         const filtrados = contenedoresCargados.filter((cont) =>
@@ -571,7 +874,7 @@
         renderizarContenedores(filtrados);
       }
 
-      function seleccionarContenedor(cont, event) {
+      function seleccionarContenedor(cont) {
         document.getElementById("idContenedorSeleccionado").value =
           cont.ID_contenedor;
         document.getElementById("calleSeleccionada").value = cont.calle;
@@ -579,10 +882,109 @@
         document.getElementById("barrioSeleccionada").value = cont.barrio;
         document.getElementById("tipoSeleccionado").value = cont.tipo;
 
-        document
-          .querySelectorAll(".item-contenedores")
-          .forEach((el) => el.classList.remove("seleccionado"));
-        event.currentTarget.classList.add("seleccionado");
+        ocultarAvisoIncidencia();
+        resaltarSeleccion();
+
+        if (cont.lat && cont.lon) {
+          mapaContenedores.panTo([cont.lat, cont.lon]);
+        }
+      }
+
+      function limpiarSeleccion() {
+        document.getElementById("idContenedorSeleccionado").value = "";
+        document.getElementById("calleSeleccionada").value = "";
+        document.getElementById("numeroSeleccionada").value = "";
+        document.getElementById("barrioSeleccionada").value = "";
+        document.getElementById("tipoSeleccionado").value = "";
+        resaltarSeleccion();
+      }
+
+      function resaltarSeleccion() {
+        const idSeleccionado = document.getElementById(
+          "idContenedorSeleccionado",
+        ).value;
+
+        contenedoresCargados.forEach((cont) => {
+          const marcador = marcadoresContenedores[cont.ID_contenedor];
+          if (marcador) {
+            marcador.setIcon(
+              crearIcono(
+                iconoContenedor(cont),
+                String(cont.ID_contenedor) === idSeleccionado,
+              ),
+            );
+          }
+        });
+
+        document.querySelectorAll(".item-contenedores").forEach((item) => {
+          item.classList.toggle(
+            "seleccionado",
+            item.dataset.id === idSeleccionado,
+          );
+        });
+
+        const elegido = document.getElementById("contenedorElegido");
+        const contSeleccionado = contenedoresCargados.find(
+          (cont) => String(cont.ID_contenedor) === idSeleccionado,
+        );
+
+        if (contSeleccionado) {
+          elegido.textContent = `${traducir("index.seleccionado")} ${contSeleccionado.calle} ${contSeleccionado.numero}, ${contSeleccionado.barrio}`;
+          elegido.style.display = "block";
+        } else {
+          elegido.style.display = "none";
+        }
+      }
+
+      function buscarContenedorPorDireccion(calle, numero, barrio) {
+        const clave = `${normalizar(calle)}|${parseInt(numero)}|${normalizar(barrio)}`;
+        return contenedoresCargados.find(
+          (cont) =>
+            `${normalizar(cont.calle)}|${parseInt(cont.numero)}|${normalizar(cont.barrio)}` ===
+            clave,
+        );
+      }
+
+      function preseleccionarExistente(cont) {
+        volverAlMapa();
+        seleccionarContenedor(cont);
+        mostrarAvisoIncidencia(traducir("index.contenedorExistente"), "info");
+      }
+
+      async function preseleccionarDesdeServidor(contenedor) {
+        await cargarListaContenedores();
+        const cont =
+          contenedoresCargados.find(
+            (c) => String(c.ID_contenedor) === String(contenedor.ID_contenedor),
+          ) || contenedor;
+        preseleccionarExistente(cont);
+      }
+
+      function mostrarAvisoIncidencia(texto, tipo) {
+        const aviso = document.getElementById("avisoIncidencia");
+        aviso.textContent = texto;
+        aviso.className = `inc-aviso inc-aviso-${tipo} activo`;
+      }
+
+      function ocultarAvisoIncidencia() {
+        document.getElementById("avisoIncidencia").classList.remove("activo");
+      }
+
+      function mostrarCamposDireccionNueva() {
+        const boton = document.getElementById("btnDireccionNueva");
+        document.getElementById("camposDireccionNueva").style.display = "block";
+        document.getElementById("bloqueContenedores").style.display = "none";
+        boton.dataset.texto = "index.volverLista";
+        boton.textContent = traducir("index.volverLista");
+      }
+
+      function volverAlMapa() {
+        const boton = document.getElementById("btnDireccionNueva");
+        document.getElementById("camposDireccionNueva").style.display = "none";
+        document.getElementById("bloqueContenedores").style.display = "block";
+        boton.dataset.texto = "index.direccionNueva";
+        boton.textContent = traducir("index.direccionNueva");
+        setTimeout(() => mapaContenedores.invalidateSize(), 50);
       }
 
       function toggleMenu() {
@@ -653,6 +1055,8 @@
       function alCambiarIdioma() {
         cargarUsuario();
         renderizarNotificaciones(ultimasNotificaciones);
+        actualizarLista();
+        resaltarSeleccion();
       }
 
       // ===== AVISO Y REPORTE =====
@@ -672,7 +1076,10 @@
         document
           .getElementById("overlayCrearIncidencias")
           .classList.add("activo");
+        ocultarAvisoIncidencia();
+        prepararMapa();
         cargarListaContenedores();
+        pedirUbicacion();
       }
 
       // ===== NOTIFICACIONES =====
@@ -706,8 +1113,7 @@
         lista.innerHTML = "";
 
         if (notificaciones.length === 0) {
-          lista.innerHTML =
-            `<p class="notificaciones-vacio">${traducir("index.sinNotificaciones")}</p>`;
+          lista.innerHTML = `<p class="notificaciones-vacio">${traducir("index.sinNotificaciones")}</p>`;
         }
 
         notificaciones.forEach((n) => {
@@ -762,41 +1168,67 @@
         }
       }
 
+      // ===== ENVIO DEL FORMULARIO =====
+
       document
         .getElementById("formCrearIncidencia")
         .addEventListener("submit", async (event) => {
           event.preventDefault();
+          ocultarAvisoIncidencia();
 
           const idContenedor = document.getElementById(
             "idContenedorSeleccionado",
           ).value;
+          const nuevaDireccion =
+            document.getElementById("camposDireccionNueva").style.display ===
+            "block";
 
           const datos = {
             mail: localStorage.getItem("mail"),
             tipo: document.getElementById("tipoCrear").value,
             estado: document.getElementById("estadoCrear").value,
-            imagen: await leerImagenComoBase64(
-              document.getElementById("imagenCrear"),
-            ),
           };
 
           if (idContenedor) {
-            // Se eligió un contenedor existente de la lista
             datos.idContenedor = idContenedor;
             datos.calle = document.getElementById("calleSeleccionada").value;
             datos.numero = document.getElementById("numeroSeleccionada").value;
             datos.barrio = document.getElementById("barrioSeleccionada").value;
             datos.tipoContenedor =
               document.getElementById("tipoSeleccionado").value;
-          } else {
-            // No hay contenedor seleccionado: se ingresó una dirección nueva
-            datos.calle = document.getElementById("calleCrear").value;
-            datos.numero = document.getElementById("numeroCrear").value;
-            datos.barrio = document.getElementById("barrioCrear").value;
+          } else if (nuevaDireccion) {
+            datos.calle = document.getElementById("calleCrear").value.trim();
+            datos.numero = document.getElementById("numeroCrear").value.trim();
+            datos.barrio = document.getElementById("barrioCrear").value.trim();
             datos.tipoContenedor = document.getElementById(
               "tipoContenedorCrear",
             ).value;
+
+            if (!datos.calle || !datos.numero || !datos.barrio) {
+              mostrarAvisoIncidencia(
+                traducir("index.completarDireccion"),
+                "error",
+              );
+              return;
+            }
+
+            const existente = buscarContenedorPorDireccion(
+              datos.calle,
+              datos.numero,
+              datos.barrio,
+            );
+            if (existente) {
+              preseleccionarExistente(existente);
+              return;
+            }
+          } else {
+            mostrarAvisoIncidencia(traducir("index.elegirContenedor"), "error");
+            return;
           }
+
+          datos.imagen = await leerImagenComoBase64(
+            document.getElementById("imagenCrear"),
+          );
 
           try {
             const resp = await fetch(`${API_URL}Registrar`, {
@@ -812,17 +1244,20 @@
                 .getElementById("overlayCrearIncidencias")
                 .classList.remove("activo");
               document.getElementById("formCrearIncidencia").reset();
-              document.getElementById("idContenedorSeleccionado").value = "";
+              limpiarSeleccion();
+              volverAlMapa();
               document
                 .getElementById("previewImagenCrear")
                 .classList.remove("activo");
               document.getElementById("imgPreviewCrear").src = "";
+            } else if (resultado.status === "no_disponible" && resultado.data) {
+              await preseleccionarDesdeServidor(resultado.data);
             } else {
-              alert(mensajeStatus(resultado));
+              mostrarAvisoIncidencia(mensajeStatus(resultado), "error");
             }
           } catch (error) {
             console.error("Error al registrar la incidencia:", error);
-            alert(traducir("index.errorRegistrar"));
+            mostrarAvisoIncidencia(traducir("index.errorRegistrar"), "error");
           }
         });
 
@@ -878,37 +1313,17 @@
       document
         .getElementById("btnDireccionNueva")
         .addEventListener("click", () => {
-          const listaDiv = document.getElementById("listaContenedores");
-          const camposDiv = document.getElementById("camposDireccionNueva");
-          const boton = document.getElementById("btnDireccionNueva");
-          const buscador = document.getElementById("buscadorContenedores");
+          const mostrandoDireccionNueva =
+            document.getElementById("camposDireccionNueva").style.display ===
+            "block";
 
-          const mostrandoDireccionNueva = camposDiv.style.display === "block";
+          limpiarSeleccion();
+          ocultarAvisoIncidencia();
 
           if (mostrandoDireccionNueva) {
-            // Volver a la lista de contenedores
-            camposDiv.style.display = "none";
-            listaDiv.style.display = "block";
-            buscador.style.display = "block";
-            document.getElementById("idContenedorSeleccionado").value = "";
-            document.getElementById("calleSeleccionada").value = "";
-            document.getElementById("numeroSeleccionada").value = "";
-            document.getElementById("barrioSeleccionada").value = "";
-            document.getElementById("tipoSeleccionado").value = "";
-            boton.dataset.texto = "index.direccionNueva";
-            boton.textContent = traducir("index.direccionNueva");
+            volverAlMapa();
           } else {
-            // Mostrar campos de dirección nueva y limpiar el contenedor elegido
-            camposDiv.style.display = "block";
-            listaDiv.style.display = "none";
-            buscador.style.display = "none";
-            document.getElementById("idContenedorSeleccionado").value = "";
-            document.getElementById("calleSeleccionada").value = "";
-            document.getElementById("numeroSeleccionada").value = "";
-            document.getElementById("barrioSeleccionada").value = "";
-            document.getElementById("tipoSeleccionado").value = "";
-            boton.dataset.texto = "index.volverLista";
-            boton.textContent = traducir("index.volverLista");
+            mostrarCamposDireccionNueva();
           }
         });
     </script>

@@ -3237,4 +3237,68 @@ nav button:not(.link-button):hover {
   .selector-idioma {
     display: none;
   }
-}
+  }
+
+  /* =========================
+   MAPA EN REPORTE DE INCIDENCIA
+========================= */
+
+  .inc-mapa {
+    height: 240px;
+    margin-top: 6px;
+    border: 1px solid var(--borde);
+    border-radius: 8px;
+    z-index: 1;
+  }
+  
+  .inc-titulo-lista {
+    margin: 8px 0 2px;
+    color: var(--tinta-suave);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .inc-elegido {
+    display: none;
+    margin-top: 6px;
+    padding: 8px 12px;
+    border-left: 4px solid var(--verde);
+    border-radius: 8px;
+    background: var(--verde-tinte);
+    color: var(--verde-bosque);
+    font-size: 0.88rem;
+    font-weight: 600;
+  }
+
+  .inc-distancia {
+    margin-left: 8px;
+    color: var(--tinta-suave);
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+
+  .inc-aviso {
+    display: none;
+    padding: 10px 14px;
+    border-left: 4px solid;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .inc-aviso.activo {
+    display: block;
+  }
+
+  .inc-aviso-error {
+    border-left-color: var(--oxido);
+    background: rgba(166, 71, 43, 0.1);
+    color: var(--oxido);
+  }
+
+  .inc-aviso-info {
+    border-left-color: var(--acero);
+    background: rgba(62, 98, 116, 0.12);
+    color: var(--acero-hover);
+  }
+

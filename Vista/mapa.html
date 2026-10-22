@@ -94,7 +94,9 @@
     <div class="pagina">
       <h2 data-texto="mapa.titulo">Mapa de Contenedores</h2>
 
-      <p data-texto="mapa.descripcion">Visualización geográfica de la ciudad.</p>
+      <p data-texto="mapa.descripcion">
+        Visualización geográfica de la ciudad.
+      </p>
 
       <div class="panel">
         <button data-texto="mapa.verTodo" onclick="vertodo()">Ver todo</button>
@@ -107,7 +109,6 @@
         <button data-texto="mapa.verCentros" onclick="soloCentrosAcopio()">
           Ver Centros de Acopio
         </button>
-        <button data-texto="mapa.verCamiones">Ver Camiones</button>
         <button data-texto="mapa.actualizar">Actualizar Mapa</button>
       </div>
 
@@ -150,9 +151,7 @@
                 fillOpacity: 1,
               })
                 .addTo(map)
-                .bindPopup(
-                  textoPopupIncidencia(inc),
-                );
+                .bindPopup(textoPopupIncidencia(inc));
             }
             if (inc.tipo === "rotura") {
               L.circleMarker([inc.lat, inc.lon], {
@@ -162,9 +161,7 @@
                 fillOpacity: 1,
               })
                 .addTo(map)
-                .bindPopup(
-                  textoPopupIncidencia(inc),
-                );
+                .bindPopup(textoPopupIncidencia(inc));
             }
             if (inc.tipo === "incendiado") {
               L.circleMarker([inc.lat, inc.lon], {
@@ -174,9 +171,7 @@
                 fillOpacity: 1,
               })
                 .addTo(map)
-                .bindPopup(
-                  textoPopupIncidencia(inc),
-                );
+                .bindPopup(textoPopupIncidencia(inc));
             }
             if (inc.tipo === "lleno") {
               L.circleMarker([inc.lat, inc.lon], {
@@ -186,9 +181,7 @@
                 fillOpacity: 1,
               })
                 .addTo(map)
-                .bindPopup(
-                  textoPopupIncidencia(inc),
-                );
+                .bindPopup(textoPopupIncidencia(inc));
             }
           });
         } catch (err) {
@@ -216,9 +209,7 @@
                 fillOpacity: 1,
               })
                 .addTo(map)
-                .bindPopup(
-                  textoPopupContenedor(cont),
-                );
+                .bindPopup(textoPopupContenedor(cont));
             } else if (cont.estado === "Lleno") {
               L.circleMarker([cont.lat, cont.lon], {
                 radius: 3,
@@ -227,9 +218,7 @@
                 fillOpacity: 1,
               })
                 .addTo(map)
-                .bindPopup(
-                  textoPopupContenedor(cont),
-                );
+                .bindPopup(textoPopupContenedor(cont));
             } else if (cont.estado === "Desbordado") {
               L.circleMarker([cont.lat, cont.lon], {
                 radius: 3,
@@ -238,9 +227,7 @@
                 fillOpacity: 1,
               })
                 .addTo(map)
-                .bindPopup(
-                  textoPopupContenedor(cont),
-                );
+                .bindPopup(textoPopupContenedor(cont));
             } else if (cont.estado === "Media capacidad") {
               L.circleMarker([cont.lat, cont.lon], {
                 radius: 3,
@@ -249,9 +236,7 @@
                 fillOpacity: 1,
               })
                 .addTo(map)
-                .bindPopup(
-                  textoPopupContenedor(cont),
-                );
+                .bindPopup(textoPopupContenedor(cont));
             }
           });
         } catch (err) {
@@ -291,9 +276,7 @@
               fillOpacity: 1,
             })
               .addTo(map)
-              .bindPopup(
-                textoPopupCentro(centro),
-              );
+              .bindPopup(textoPopupCentro(centro));
           });
         } catch (err) {
           console.error("Error al cargar los centros de acopio:", err);

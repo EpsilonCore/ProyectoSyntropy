@@ -19,7 +19,8 @@ const TEXTOS = {
     "pinc.listaTitulo": "Lista de Incidencias",
     "pinc.cargando": "Cargando incidencias...",
     "pinc.vacio": "No hay incidencias disponibles.",
-    "pinc.confirmarEliminar": "¿Está seguro de que desea eliminar esta incidencia?",
+    "pinc.confirmarEliminar":
+      "¿Está seguro de que desea eliminar esta incidencia?",
     "pusu.titulo": "Panel de Usuario",
     "pusu.descripcion": "Administración de usuarios del sistema.",
     "pusu.crear": "Crear Usuario",
@@ -31,11 +32,13 @@ const TEXTOS = {
     "pusu.cargando": "Cargando usuarios...",
     "pusu.modificarTitulo": "Modificar usuario",
     "pusu.vacio": "No hay usuarios disponibles.",
-    "pusu.confirmarEliminar": "¿Está seguro de que desea eliminar este usuario?",
+    "pusu.confirmarEliminar":
+      "¿Está seguro de que desea eliminar este usuario?",
     "pusu.sinNickname": "Sin nickname",
     "pusu.sinRol": "Sin rol",
     "preg.titulo": "Panel Registro",
-    "preg.descripcion": "Administración de usuarios pendientes de confirmación.",
+    "preg.descripcion":
+      "Administración de usuarios pendientes de confirmación.",
     "preg.pendientes": "Usuarios pendientes",
     "preg.cargando": "Cargando usuarios...",
     "preg.errorCargar": "Error al cargar usuarios.",
@@ -48,7 +51,8 @@ const TEXTOS = {
     "prut.crear": "Crear Ruta",
     "prut.nombre": "Nombre de la ruta",
     "prut.guardar": "Guardar Ruta",
-    "prut.instruccion": "Hacé click sobre los contenedores (color según su estado) para agregarlos como paradas, en el orden en que el camión debe recorrerlos.",
+    "prut.instruccion":
+      "Hacé click sobre los contenedores (color según su estado) para agregarlos como paradas, en el orden en que el camión debe recorrerlos.",
     "prut.listaTitulo": "Rutas guardadas",
     "prut.cargando": "Cargando rutas...",
     "prut.errorRutas": "Error al cargar rutas.",
@@ -64,11 +68,14 @@ const TEXTOS = {
     "prut.sinCamion": "Sin camión",
     "prut.sinCuadrilla": "Sin cuadrilla",
     "prut.resumen": "({km} km · {min} min por calle)",
-    "prut.resumenRecta": "(no se pudo calcular el camino por calle, se muestra en línea recta)",
-    "prut.minimoParadas": "Agregá al menos 2 paradas en el mapa antes de guardar.",
-    "prut.confirmarEliminar": "¿Seguro que querés eliminar esta ruta? Esta acción no se puede deshacer.",
-    "prut.cuadrillaSinCamion": "Esa cuadrilla todavía no tiene un camión asignado. Asignale uno primero desde el panel de Cuadrillas.",
-
+    "prut.resumenRecta":
+      "(no se pudo calcular el camino por calle, se muestra en línea recta)",
+    "prut.minimoParadas":
+      "Agregá al menos 2 paradas en el mapa antes de guardar.",
+    "prut.confirmarEliminar":
+      "¿Seguro que querés eliminar esta ruta? Esta acción no se puede deshacer.",
+    "prut.cuadrillaSinCamion":
+      "Esa cuadrilla todavía no tiene un camión asignado. Asignale uno primero desde el panel de Cuadrillas.",
 
     "menu.panelRegistro": "Panel Registro",
     "menu.contenedores": "Contenedores",
@@ -120,7 +127,8 @@ const TEXTOS = {
     "pcon.cargando": "Cargando contenedores...",
     "pcon.modificarTitulo": "Modificar contenedor",
     "pcon.vacio": "No hay contenedores disponibles.",
-    "pcon.confirmarEliminar": "¿Está seguro de que desea eliminar este contenedor?",
+    "pcon.confirmarEliminar":
+      "¿Está seguro de que desea eliminar este contenedor?",
     "pcon.contenedor": "Contenedor",
     "pcen.titulo": "Panel de Centros de Acopio",
     "pcen.descripcion": "Administración de centros de acopio del sistema.",
@@ -129,7 +137,8 @@ const TEXTOS = {
     "pcen.cargando": "Cargando centros de acopio...",
     "pcen.modificarTitulo": "Modificar centro de acopio",
     "pcen.vacio": "No hay centros de acopio disponibles.",
-    "pcen.confirmarEliminar": "¿Está seguro de que desea eliminar este centro de acopio?",
+    "pcen.confirmarEliminar":
+      "¿Está seguro de que desea eliminar este centro de acopio?",
     "pcen.tipoResiduo": "Tipo de residuo",
     "pcua.titulo": "Cuadrillas",
     "pcua.descripcion": "Formá y administrá los equipos de recolectores.",
@@ -160,8 +169,9 @@ const TEXTOS = {
     "pcua.okCrear": "Cuadrilla creada correctamente.",
     "pcua.okEliminar": "Cuadrilla eliminada correctamente.",
     "pcua.faltaCamion": "Seleccioná un camión disponible.",
-    "pcua.faltaDatos": "Ingresá un nombre y elegí al menos un miembro Recolector.",
-    "pcua.confirmarEliminar": "¿Eliminar la cuadrilla \"{x}\"?",
+    "pcua.faltaDatos":
+      "Ingresá un nombre y elegí al menos un miembro Recolector.",
+    "pcua.confirmarEliminar": '¿Eliminar la cuadrilla "{x}"?',
     "pcua.tituloCamion": "Cuadrilla: {x}",
 
     "pagina.misincidencias": "Mi cuadrilla - Epsilon",
@@ -209,8 +219,10 @@ const TEXTOS = {
     "mapa.estado": "Estado",
     "op.eyebrow": "Operario",
     "op.titulo": "Panel Operario",
-    "op.descripcion": "Toda la información operativa de Epsilon, en un solo lugar.",
-    "op.saludo": "Bienvenido/a, {nombre}. Toda la operación de Epsilon a un click.",
+    "op.descripcion":
+      "Toda la información operativa de Epsilon, en un solo lugar.",
+    "op.saludo":
+      "Bienvenido/a, {nombre}. Toda la operación de Epsilon a un click.",
     "op.res.contenedores": "Contenedores",
     "op.res.camiones": "Camiones disponibles",
     "op.res.acopio": "Centros de acopio",
@@ -239,18 +251,23 @@ const TEXTOS = {
     "op.cargandoCuadrillas": "Cargando cuadrillas…",
     "op.cargandoIncidencias": "Cargando incidencias…",
     "op.cargandoRutas": "Cargando rutas…",
-    "op.notaCamiones": "Para asignar un camión a una cuadrilla, hacelo desde la pestaña \"Cuadrillas\".",
-    "op.notaCuadrillas": "Para asignar una ruta o una incidencia a una cuadrilla, hacelo desde la pestaña correspondiente con el botón \"Asignar Cuadrilla\".",
-    "op.notaRutas": "Tocá una ruta de la lista (fuera de los botones) para verla dibujada en el mapa.",
+    "op.notaCamiones":
+      'Para asignar un camión a una cuadrilla, hacelo desde la pestaña "Cuadrillas".',
+    "op.notaCuadrillas":
+      'Para asignar una ruta o una incidencia a una cuadrilla, hacelo desde la pestaña correspondiente con el botón "Asignar Cuadrilla".',
+    "op.notaRutas":
+      "Tocá una ruta de la lista (fuera de los botones) para verla dibujada en el mapa.",
     "op.unidad.contenedores": "contenedor(es)",
     "op.unidad.camiones": "camión(es)",
     "op.unidad.centros": "centro(s) de acopio",
     "op.unidad.cuadrillas": "cuadrilla(s)",
     "op.unidad.incidencias": "incidencia(s)",
     "op.unidad.rutas": "ruta(s)",
-    "op.vacio.contenedores": "No hay contenedores que coincidan con la búsqueda.",
+    "op.vacio.contenedores":
+      "No hay contenedores que coincidan con la búsqueda.",
     "op.vacio.camiones": "No hay camiones que coincidan con la búsqueda.",
-    "op.vacio.centros": "No hay centros de acopio que coincidan con la búsqueda.",
+    "op.vacio.centros":
+      "No hay centros de acopio que coincidan con la búsqueda.",
     "op.vacio.cuadrillas": "No hay cuadrillas que coincidan con la búsqueda.",
     "op.vacio.incidencias": "No hay incidencias que coincidan con la búsqueda.",
     "op.vacio.rutas": "No hay rutas que coincidan con la búsqueda.",
@@ -407,7 +424,8 @@ const TEXTOS = {
     "gestion.usuarios": "Usuarios",
     "gestion.usuariosDesc": "Cuentas, roles y permisos del personal.",
     "gestion.centros": "Centros de Acopio",
-    "gestion.centrosDesc": "Puntos de acopio, capacidad y estado de cada centro.",
+    "gestion.centrosDesc":
+      "Puntos de acopio, capacidad y estado de cada centro.",
     "gestion.rutas": "Rutas",
     "gestion.rutasDesc": "Trazado y ajuste de las rutas de recolección.",
     "gestion.cuadrillas": "Cuadrillas",
@@ -461,7 +479,8 @@ const TEXTOS = {
     "form.errorContenedores": "Error al cargar los contenedores.",
     "form.noEncontrados": "No se encontraron contenedores.",
     "form.errorRegistrar": "No se pudo registrar la incidencia.",
-    "form.soloImagenes": "Solo se permiten imágenes en formato JPG, JPEG o PNG.",
+    "form.soloImagenes":
+      "Solo se permiten imágenes en formato JPG, JPEG o PNG.",
     "form.necesitasLogin":
       "Necesitás iniciar sesión para reportar una incidencia.",
 
@@ -496,7 +515,8 @@ const TEXTOS = {
     "serv.titulo": "Explorá la plataforma",
     "serv.subtitulo":
       "Todo lo que necesitás para seguir la gestión de residuos de la ciudad.",
-    "serv.mapaDesc": "Ubicación en vivo de contenedores, camiones e incidencias.",
+    "serv.mapaDesc":
+      "Ubicación en vivo de contenedores, camiones e incidencias.",
     "serv.estadisticasDesc":
       "Indicadores de recolección, incidencias y desempeño por zona.",
     "serv.documentacionDesc":
@@ -515,7 +535,6 @@ const TEXTOS = {
     "doc.faq": "Preguntas Frecuentes",
 
     "pagina.index": "Epsilon",
-
 
     "login.mail": "Mail",
     "login.contrasenia": "Contraseña",
@@ -536,7 +555,8 @@ const TEXTOS = {
     "index.notificaciones": "Notificaciones",
     "index.marcarLeidas": "Marcar todas como leídas",
     "index.sinNotificaciones": "No tenés notificaciones.",
-    "notificacion.incidencia_asignada": "Tu incidencia #{id} fue asignada a una cuadrilla.",
+    "notificacion.incidencia_asignada":
+      "Tu incidencia #{id} fue asignada a una cuadrilla.",
     "notificacion.incidencia_resuelta": "Tu incidencia #{id} fue resuelta.",
     "index.reportar": "Reportar incidencia",
     "index.crearIncidencia": "Crear Incidencia",
@@ -557,8 +577,19 @@ const TEXTOS = {
     "index.errorContenedores": "Error al cargar los contenedores.",
     "index.necesitaLogin":
       "Necesitás iniciar sesión para reportar una incidencia.",
-    "index.errorImagen": "Solo se permiten imágenes en formato JPG, JPEG o PNG.",
+    "index.errorImagen":
+      "Solo se permiten imágenes en formato JPG, JPEG o PNG.",
     "index.errorRegistrar": "No se pudo registrar la incidencia.",
+    "index.mapaAyuda": "Tap a container on the map to select it.",
+    "index.masCercanos": "The 5 containers closest to you:",
+    "index.obteniendoUbicacion": "Getting your location...",
+    "index.tuUbicacion": "Your location",
+    "index.seleccionado": "Selected:",
+    "index.elegirContenedor":
+      "Pick a container on the map or enter a new address.",
+    "index.completarDireccion": "Fill in street, number and neighborhood.",
+    "index.contenedorExistente":
+      "There is already a container at that address. We selected it for you: confirm to create the incident.",
     "index.overline": "Plataforma de gestión ambiental urbana",
     "index.titulo":
       "Transformando la <span class='acento'>gestión urbana</span> de residuos en algo más simple y sostenible",
@@ -644,7 +675,8 @@ const TEXTOS = {
     "prut.crear": "Create Route",
     "prut.nombre": "Route name",
     "prut.guardar": "Save Route",
-    "prut.instruccion": "Click on the containers (color based on their status) to add them as stops, in the order the truck must visit them.",
+    "prut.instruccion":
+      "Click on the containers (color based on their status) to add them as stops, in the order the truck must visit them.",
     "prut.listaTitulo": "Saved routes",
     "prut.cargando": "Loading routes...",
     "prut.errorRutas": "Error loading routes.",
@@ -660,11 +692,13 @@ const TEXTOS = {
     "prut.sinCamion": "No truck",
     "prut.sinCuadrilla": "No crew",
     "prut.resumen": "({km} km · {min} min by road)",
-    "prut.resumenRecta": "(the road route could not be calculated, showing a straight line)",
+    "prut.resumenRecta":
+      "(the road route could not be calculated, showing a straight line)",
     "prut.minimoParadas": "Add at least 2 stops on the map before saving.",
-    "prut.confirmarEliminar": "Are you sure you want to delete this route? This action cannot be undone.",
-    "prut.cuadrillaSinCamion": "That crew does not have an assigned truck yet. Assign one first from the Crews panel.",
-
+    "prut.confirmarEliminar":
+      "Are you sure you want to delete this route? This action cannot be undone.",
+    "prut.cuadrillaSinCamion":
+      "That crew does not have an assigned truck yet. Assign one first from the Crews panel.",
 
     "menu.panelRegistro": "Registration Panel",
     "menu.contenedores": "Containers",
@@ -710,7 +744,8 @@ const TEXTOS = {
     "pcam.confirmarEliminar": "Are you sure you want to delete this truck?",
     "pcam.camion": "Truck",
     "pcon.titulo": "Containers Panel",
-    "pcon.descripcion": "Management of the containers registered in the system.",
+    "pcon.descripcion":
+      "Management of the containers registered in the system.",
     "pcon.crear": "Create Container",
     "pcon.listaTitulo": "Container List",
     "pcon.cargando": "Loading containers...",
@@ -725,7 +760,8 @@ const TEXTOS = {
     "pcen.cargando": "Loading collection centers...",
     "pcen.modificarTitulo": "Edit collection center",
     "pcen.vacio": "There are no collection centers available.",
-    "pcen.confirmarEliminar": "Are you sure you want to delete this collection center?",
+    "pcen.confirmarEliminar":
+      "Are you sure you want to delete this collection center?",
     "pcen.tipoResiduo": "Waste type",
     "pcua.titulo": "Crews",
     "pcua.descripcion": "Form and manage the collector teams.",
@@ -757,7 +793,7 @@ const TEXTOS = {
     "pcua.okEliminar": "Crew deleted successfully.",
     "pcua.faltaCamion": "Select an available truck.",
     "pcua.faltaDatos": "Enter a name and choose at least one Collector member.",
-    "pcua.confirmarEliminar": "Delete the crew \"{x}\"?",
+    "pcua.confirmarEliminar": 'Delete the crew "{x}"?',
     "pcua.tituloCamion": "Crew: {x}",
 
     "pagina.misincidencias": "My crew - Epsilon",
@@ -806,7 +842,8 @@ const TEXTOS = {
     "op.eyebrow": "Operator",
     "op.titulo": "Operator Panel",
     "op.descripcion": "All of Epsilon's operational information in one place.",
-    "op.saludo": "Welcome, {nombre}. All of Epsilon's operations one click away.",
+    "op.saludo":
+      "Welcome, {nombre}. All of Epsilon's operations one click away.",
     "op.res.contenedores": "Containers",
     "op.res.camiones": "Available trucks",
     "op.res.acopio": "Collection centers",
@@ -835,9 +872,12 @@ const TEXTOS = {
     "op.cargandoCuadrillas": "Loading crews…",
     "op.cargandoIncidencias": "Loading incidents…",
     "op.cargandoRutas": "Loading routes…",
-    "op.notaCamiones": "To assign a truck to a crew, do it from the \"Crews\" tab.",
-    "op.notaCuadrillas": "To assign a route or an incident to a crew, use the \"Assign Crew\" button in the corresponding tab.",
-    "op.notaRutas": "Tap a route in the list (outside the buttons) to see it drawn on the map.",
+    "op.notaCamiones":
+      'To assign a truck to a crew, do it from the "Crews" tab.',
+    "op.notaCuadrillas":
+      'To assign a route or an incident to a crew, use the "Assign Crew" button in the corresponding tab.',
+    "op.notaRutas":
+      "Tap a route in the list (outside the buttons) to see it drawn on the map.",
     "op.unidad.contenedores": "container(s)",
     "op.unidad.camiones": "truck(s)",
     "op.unidad.centros": "collection center(s)",
@@ -1002,7 +1042,8 @@ const TEXTOS = {
     "gestion.usuarios": "Users",
     "gestion.usuariosDesc": "Staff accounts, roles and permissions.",
     "gestion.centros": "Collection Centers",
-    "gestion.centrosDesc": "Collection points, capacity and status of each center.",
+    "gestion.centrosDesc":
+      "Collection points, capacity and status of each center.",
     "gestion.rutas": "Routes",
     "gestion.rutasDesc": "Layout and adjustment of collection routes.",
     "gestion.cuadrillas": "Crews",
@@ -1091,8 +1132,7 @@ const TEXTOS = {
     "serv.mapaDesc": "Live location of containers, trucks and incidents.",
     "serv.estadisticasDesc":
       "Collection, incident and performance indicators by area.",
-    "serv.documentacionDesc":
-      "System guides, waste types and good practices.",
+    "serv.documentacionDesc": "System guides, waste types and good practices.",
 
     "pie.tagline": "Integrated urban waste management, in real time.",
     "pie.plataforma": "Platform",
@@ -1107,7 +1147,6 @@ const TEXTOS = {
     "doc.faq": "Frequently Asked Questions",
 
     "pagina.index": "Epsilon",
-
 
     "login.mail": "Email",
     "login.contrasenia": "Password",
@@ -1128,8 +1167,10 @@ const TEXTOS = {
     "index.notificaciones": "Notifications",
     "index.marcarLeidas": "Mark all as read",
     "index.sinNotificaciones": "You have no notifications.",
-    "notificacion.incidencia_asignada": "Your incident #{id} was assigned to a crew.",
-    "notificacion.incidencia_resuelta": "Your incident #{id} has been resolved.",
+    "notificacion.incidencia_asignada":
+      "Your incident #{id} was assigned to a crew.",
+    "notificacion.incidencia_resuelta":
+      "Your incident #{id} has been resolved.",
     "index.reportar": "Report incident",
     "index.crearIncidencia": "Create Incident",
     "index.tipo": "Type",
@@ -1150,6 +1191,16 @@ const TEXTOS = {
     "index.necesitaLogin": "You need to log in to report an incident.",
     "index.errorImagen": "Only JPG, JPEG or PNG images are allowed.",
     "index.errorRegistrar": "The incident could not be registered.",
+    "index.mapaAyuda": "Tap a container on the map to select it.",
+    "index.masCercanos": "The 5 containers closest to you:",
+    "index.obteniendoUbicacion": "Getting your location...",
+    "index.tuUbicacion": "Your location",
+    "index.seleccionado": "Selected:",
+    "index.elegirContenedor":
+      "Pick a container on the map or enter a new address.",
+    "index.completarDireccion": "Fill in street, number and neighborhood.",
+    "index.contenedorExistente":
+      "There is already a container at that address. We selected it for you: confirm to create the incident.",
     "index.overline": "Urban environmental management platform",
     "index.titulo":
       "Turning urban waste <span class='acento'>management</span> into something simpler and more sustainable",
@@ -1176,8 +1227,7 @@ const TEXTOS = {
     "index.explora": "Explore the platform",
     "index.exploraDesc":
       "Everything you need to follow the city's waste management.",
-    "index.servicioMapa":
-      "Live location of containers, trucks and incidents.",
+    "index.servicioMapa": "Live location of containers, trucks and incidents.",
     "index.servicioEstadisticas":
       "Collection, incident and performance indicators by zone.",
     "index.servicioDocumentacion":
@@ -1206,7 +1256,8 @@ const TEXTOS = {
     "pinc.listaTitulo": "Lista de Ocorrências",
     "pinc.cargando": "Carregando ocorrências...",
     "pinc.vacio": "Não há ocorrências disponíveis.",
-    "pinc.confirmarEliminar": "Tem certeza de que deseja excluir esta ocorrência?",
+    "pinc.confirmarEliminar":
+      "Tem certeza de que deseja excluir esta ocorrência?",
     "pusu.titulo": "Painel de Usuário",
     "pusu.descripcion": "Administração dos usuários do sistema.",
     "pusu.crear": "Criar Usuário",
@@ -1235,7 +1286,8 @@ const TEXTOS = {
     "prut.crear": "Criar Rota",
     "prut.nombre": "Nome da rota",
     "prut.guardar": "Salvar Rota",
-    "prut.instruccion": "Clique nos contêineres (cor conforme o status) para adicioná-los como paradas, na ordem em que o caminhão deve percorrê-los.",
+    "prut.instruccion":
+      "Clique nos contêineres (cor conforme o status) para adicioná-los como paradas, na ordem em que o caminhão deve percorrê-los.",
     "prut.listaTitulo": "Rotas salvas",
     "prut.cargando": "Carregando rotas...",
     "prut.errorRutas": "Erro ao carregar rotas.",
@@ -1251,11 +1303,14 @@ const TEXTOS = {
     "prut.sinCamion": "Sem caminhão",
     "prut.sinCuadrilla": "Sem equipe",
     "prut.resumen": "({km} km · {min} min por estrada)",
-    "prut.resumenRecta": "(não foi possível calcular o caminho por estrada, exibindo linha reta)",
-    "prut.minimoParadas": "Adicione pelo menos 2 paradas no mapa antes de salvar.",
-    "prut.confirmarEliminar": "Tem certeza de que deseja excluir esta rota? Esta ação não pode ser desfeita.",
-    "prut.cuadrillaSinCamion": "Essa equipe ainda não tem um caminhão atribuído. Atribua um primeiro no painel de Equipes.",
-
+    "prut.resumenRecta":
+      "(não foi possível calcular o caminho por estrada, exibindo linha reta)",
+    "prut.minimoParadas":
+      "Adicione pelo menos 2 paradas no mapa antes de salvar.",
+    "prut.confirmarEliminar":
+      "Tem certeza de que deseja excluir esta rota? Esta ação não pode ser desfeita.",
+    "prut.cuadrillaSinCamion":
+      "Essa equipe ainda não tem um caminhão atribuído. Atribua um primeiro no painel de Equipes.",
 
     "menu.panelRegistro": "Painel de Registro",
     "menu.contenedores": "Contêineres",
@@ -1298,7 +1353,8 @@ const TEXTOS = {
     "pcam.cargando": "Carregando caminhões...",
     "pcam.modificarTitulo": "Editar caminhão",
     "pcam.vacio": "Não há caminhões disponíveis.",
-    "pcam.confirmarEliminar": "Tem certeza de que deseja excluir este caminhão?",
+    "pcam.confirmarEliminar":
+      "Tem certeza de que deseja excluir este caminhão?",
     "pcam.camion": "Caminhão",
     "pcon.titulo": "Painel de Contêineres",
     "pcon.descripcion": "Gestão dos contêineres registrados no sistema.",
@@ -1307,7 +1363,8 @@ const TEXTOS = {
     "pcon.cargando": "Carregando contêineres...",
     "pcon.modificarTitulo": "Editar contêiner",
     "pcon.vacio": "Não há contêineres disponíveis.",
-    "pcon.confirmarEliminar": "Tem certeza de que deseja excluir este contêiner?",
+    "pcon.confirmarEliminar":
+      "Tem certeza de que deseja excluir este contêiner?",
     "pcon.contenedor": "Contêiner",
     "pcen.titulo": "Painel de Centros de Coleta",
     "pcen.descripcion": "Administração dos centros de coleta do sistema.",
@@ -1316,7 +1373,8 @@ const TEXTOS = {
     "pcen.cargando": "Carregando centros de coleta...",
     "pcen.modificarTitulo": "Editar centro de coleta",
     "pcen.vacio": "Não há centros de coleta disponíveis.",
-    "pcen.confirmarEliminar": "Tem certeza de que deseja excluir este centro de coleta?",
+    "pcen.confirmarEliminar":
+      "Tem certeza de que deseja excluir este centro de coleta?",
     "pcen.tipoResiduo": "Tipo de resíduo",
     "pcua.titulo": "Equipes",
     "pcua.descripcion": "Forme e administre as equipes de coletores.",
@@ -1347,8 +1405,9 @@ const TEXTOS = {
     "pcua.okCrear": "Equipe criada com sucesso.",
     "pcua.okEliminar": "Equipe excluída com sucesso.",
     "pcua.faltaCamion": "Selecione um caminhão disponível.",
-    "pcua.faltaDatos": "Informe um nome e escolha pelo menos um membro Coletor.",
-    "pcua.confirmarEliminar": "Excluir a equipe \"{x}\"?",
+    "pcua.faltaDatos":
+      "Informe um nome e escolha pelo menos um membro Coletor.",
+    "pcua.confirmarEliminar": 'Excluir a equipe "{x}"?',
     "pcua.tituloCamion": "Equipe: {x}",
 
     "pagina.misincidencias": "Minha equipe - Epsilon",
@@ -1396,8 +1455,10 @@ const TEXTOS = {
     "mapa.estado": "Status",
     "op.eyebrow": "Operador",
     "op.titulo": "Painel do Operador",
-    "op.descripcion": "Todas as informações operacionais da Epsilon em um só lugar.",
-    "op.saludo": "Bem-vindo(a), {nombre}. Toda a operação da Epsilon a um clique.",
+    "op.descripcion":
+      "Todas as informações operacionais da Epsilon em um só lugar.",
+    "op.saludo":
+      "Bem-vindo(a), {nombre}. Toda a operação da Epsilon a um clique.",
     "op.res.contenedores": "Contêineres",
     "op.res.camiones": "Caminhões disponíveis",
     "op.res.acopio": "Centros de coleta",
@@ -1426,9 +1487,12 @@ const TEXTOS = {
     "op.cargandoCuadrillas": "Carregando equipes…",
     "op.cargandoIncidencias": "Carregando ocorrências…",
     "op.cargandoRutas": "Carregando rotas…",
-    "op.notaCamiones": "Para atribuir um caminhão a uma equipe, faça isso na aba \"Equipes\".",
-    "op.notaCuadrillas": "Para atribuir uma rota ou uma ocorrência a uma equipe, use o botão \"Atribuir Equipe\" na aba correspondente.",
-    "op.notaRutas": "Toque em uma rota da lista (fora dos botões) para vê-la desenhada no mapa.",
+    "op.notaCamiones":
+      'Para atribuir um caminhão a uma equipe, faça isso na aba "Equipes".',
+    "op.notaCuadrillas":
+      'Para atribuir uma rota ou uma ocorrência a uma equipe, use o botão "Atribuir Equipe" na aba correspondente.',
+    "op.notaRutas":
+      "Toque em uma rota da lista (fora dos botões) para vê-la desenhada no mapa.",
     "op.unidad.contenedores": "contêiner(es)",
     "op.unidad.camiones": "caminhão(ões)",
     "op.unidad.centros": "centro(s) de coleta",
@@ -1558,7 +1622,8 @@ const TEXTOS = {
     "est.informe": "Exportar histórico de incidências",
     "est.actualizar": "Atualizar métricas",
     "est.sinIncidencias": "Não há incidências para exportar.",
-    "est.errorIncidencias": "Não foi possível obter o histórico de incidências.",
+    "est.errorIncidencias":
+      "Não foi possível obter o histórico de incidências.",
 
     "csv.metrica": "Métrica",
     "csv.valor": "Valor",
@@ -1681,7 +1746,8 @@ const TEXTOS = {
     "serv.titulo": "Explore a plataforma",
     "serv.subtitulo":
       "Tudo o que você precisa para acompanhar a gestão de resíduos da cidade.",
-    "serv.mapaDesc": "Localização ao vivo de contêineres, caminhões e incidências.",
+    "serv.mapaDesc":
+      "Localização ao vivo de contêineres, caminhões e incidências.",
     "serv.estadisticasDesc":
       "Indicadores de coleta, incidências e desempenho por zona.",
     "serv.documentacionDesc":
@@ -1700,7 +1766,6 @@ const TEXTOS = {
     "doc.faq": "Perguntas Frequentes",
 
     "pagina.index": "Epsilon",
-
 
     "login.mail": "E-mail",
     "login.contrasenia": "Senha",
@@ -1721,7 +1786,8 @@ const TEXTOS = {
     "index.notificaciones": "Notificações",
     "index.marcarLeidas": "Marcar todas como lidas",
     "index.sinNotificaciones": "Você não tem notificações.",
-    "notificacion.incidencia_asignada": "Sua ocorrência #{id} foi atribuída a uma equipe.",
+    "notificacion.incidencia_asignada":
+      "Sua ocorrência #{id} foi atribuída a uma equipe.",
     "notificacion.incidencia_resuelta": "Sua ocorrência #{id} foi resolvida.",
     "index.reportar": "Reportar incidência",
     "index.crearIncidencia": "Criar Incidência",
@@ -1744,6 +1810,16 @@ const TEXTOS = {
     "index.errorImagen":
       "Somente imagens nos formatos JPG, JPEG ou PNG são permitidas.",
     "index.errorRegistrar": "Não foi possível registrar a incidência.",
+    "index.mapaAyuda": "Toque em um contêiner no mapa para selecioná-lo.",
+    "index.masCercanos": "Os 5 contêineres mais próximos de você:",
+    "index.obteniendoUbicacion": "Obtendo sua localização...",
+    "index.tuUbicacion": "Sua localização",
+    "index.seleccionado": "Selecionado:",
+    "index.elegirContenedor":
+      "Escolha um contêiner no mapa ou informe um novo endereço.",
+    "index.completarDireccion": "Preencha rua, número e bairro.",
+    "index.contenedorExistente":
+      "Já existe um contêiner nesse endereço. Nós o selecionamos para você: confirme para criar a incidência.",
     "index.overline": "Plataforma de gestão ambiental urbana",
     "index.titulo":
       "Transformando a <span class='acento'>gestão urbana</span> de resíduos em algo mais simples e sustentável",

@@ -32,23 +32,25 @@ class IncidenciaController
 		return ["status" => "no_encontrado", "mensaje" => "No se encontró la incidencia.", "data" => null];
 	}
 
-	public function crearIncidencia()
+		public function crearIncidencia()
 	{
 		$json = file_get_contents('php://input');
 		$datos = json_decode($json);
-		// Se agregó tipoContenedor a la validación: antes se usaba sin chequear si venía en el body.
 		if (!$datos || !isset($datos->mail) || !isset($datos->tipo) || !isset($datos->estado) || !isset($datos->imagen)
 			|| !isset($datos->calle) || !isset($datos->numero) || !isset($datos->barrio) || !isset($datos->tipoContenedor)) {
 			return ["status" => "datos_invalidos", "mensaje" => "Faltan campos obligatorios.", "data" => null];
 		}
+		$idContenedor = !empty($datos->idContenedor) ? (int) $datos->idContenedor : null;
 		try {
 			$resultado = $this->modeloObj->crearIncidencia(
 				$datos->mail, $datos->tipo, $datos->estado, $datos->imagen,
-				$datos->calle, $datos->numero, $datos->barrio, $datos->tipoContenedor
+				$datos->calle, $datos->numero, $datos->barrio, $datos->tipoContenedor, $idContenedor
 			);
 		} catch (Exception $e) {
-			// El Model lanza excepción si la geocodificación falla; sin este catch la API se caía sin responder.
-			return ["status" => "datos_invalidos", "mensaje" => "No se pudo geocodificar la dirección proporcionada.", "data" => null];
+			return ["status" => "datos_invalidos", "mensaje" => $e->getMessage(), "data" => null];
+		}
+		if (is_array($resultado)) {
+			return ["status" => "no_disponible", "mensaje" => "Ya existe un contenedor en esa dirección.", "data" => $resultado];
 		}
 		if ($resultado) {
 			return ["status" => "creado", "mensaje" => "Incidencia creada correctamente.", "data" => null];
