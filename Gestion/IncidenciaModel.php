@@ -61,7 +61,7 @@ class IncidenciaModel{
         return $incidencia;
     }
 
-        public function crearIncidencia($m, $t, $e, $i, $c, $n, $b, $tipoContenedor, $idContenedor = null){
+        public function crearIncidencia($m, $t, $e, $i, $c, $n, $b, $tipoContenedor, $idContenedor = null, $idCuadrilla = null){
         if($idContenedor !== null){
             $contenedor = $this->buscarContenedorPorId($idContenedor);
             if(!$contenedor){
@@ -94,7 +94,7 @@ class IncidenciaModel{
             if($idContenedor === null){
                 $idContenedor = $this->crearContenedorNuevo($t, $tipoContenedor, $c, $n, $b, $lat, $lon);
             }
-            $sql = "INSERT INTO incidencia (mail, tipo, estado, imagen, calle, numero, barrio, lat, lon, fecha_creacion, tipoContenedor, ID_contenedor) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+            $sql = "INSERT INTO incidencia (mail, tipo, estado, imagen, calle, numero, barrio, lat, lon, fecha_creacion, tipoContenedor, ID_contenedor, ID_cuadrilla) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
             $stmt = mysqli_prepare($this->conexion, $sql);
             if($stmt === false){
                 throw new Exception("Error al preparar la consulta: " . mysqli_error($this->conexion));
@@ -108,7 +108,7 @@ class IncidenciaModel{
             $this->barrio = $b;
             $this->tipoContenedor = $tipoContenedor;
 
-            $stmt->bind_param('sssssisddssi', $this->mail, $this->tipo, $this->estado, $this->imagen, $this->calle, $this->numero, $this->barrio, $lat, $lon, $this->fecha, $this->tipoContenedor, $idContenedor);
+            $stmt->bind_param('sssssisddssii', $this->mail, $this->tipo, $this->estado, $this->imagen, $this->calle, $this->numero, $this->barrio, $lat, $lon, $this->fecha, $this->tipoContenedor, $idContenedor, $idCuadrilla);
             if(!$stmt->execute()){
                 throw new Exception("Error al crear la incidencia: " . $stmt->error);
             }

@@ -12,11 +12,14 @@
 
   <body>
     <script>
-      if (localStorage.getItem("logueado") !== "si") {
-        window.location.href = "login.html";
-      }
-      if ((localStorage.getItem("rol") || "").trim() !== "Administrador") {
-        window.location.href = "index.html";
+      {
+        const rol = (localStorage.getItem("rol") || "").trim();
+        const sinSesion = localStorage.getItem("logueado") !== "si";
+
+        if (sinSesion || !["Administrador"].includes(rol)) {
+          document.documentElement.style.display = "none";
+          window.location.replace(sinSesion ? "login.html" : "index.html");
+        }
       }
     </script>
 
@@ -89,6 +92,16 @@
               Panel de Usuario
             </button>
           </li>
+          <li>
+            <button
+              class="link-button"
+              data-rol="Administrador"
+              data-texto="menu.cuadrillas"
+              onclick="window.location.href = 'panelcuadrilla.html'"
+            >
+              Cuadrillas
+            </button>
+          </li>
         </ul>
       </nav>
     </header>
@@ -110,7 +123,14 @@
           <h3 data-texto="pcen.crear">Crear Centro de Acopio</h3>
           <form id="formCrearCentroAcopio">
             <label data-texto="pcen.tipoResiduo">Tipo de residuo</label>
-            <input id="tipoResiduoCrear" required />
+            <select id="tipoResiduoCrear" required>
+              <option value="" disabled selected data-texto="comun.seleccioneTipo">
+                Seleccione un tipo
+              </option>
+              <option value="Naranja" data-texto="tipoContenedor.Naranja">Naranja - Reciclables</option>
+              <option value="Metalico" data-texto="tipoContenedor.Metalico">Metalico - Residuos mezclados</option>
+              <option value="Plastico" data-texto="tipoContenedor.Plastico">Plastico - Residuos mezclados</option>
+            </select>
 
             <label data-texto="comun.capacidad">Capacidad</label>
             <input id="capacidadCrear" required />
@@ -167,11 +187,14 @@
           <input type="hidden" id="idOriginal" />
 
           <label data-texto="pcen.tipoResiduo">Tipo de residuo</label>
-          <input
-            id="tipoResiduoEditar"
-            data-placeholder="comun.noModificar"
-            placeholder="Dejar vacío para no modificar"
-          />
+          <select id="tipoResiduoEditar" required>
+            <option value="" disabled selected data-texto="comun.seleccioneTipo">
+              Seleccione un tipo
+            </option>
+            <option value="Naranja" data-texto="tipoContenedor.Naranja">Naranja - Reciclables</option>
+            <option value="Metalico" data-texto="tipoContenedor.Metalico">Metalico - Residuos mezclados</option>
+            <option value="Plastico" data-texto="tipoContenedor.Plastico">Plastico - Residuos mezclados</option>
+          </select>
 
           <label data-texto="comun.capacidad">Capacidad</label>
           <input
@@ -304,7 +327,9 @@
 
       function cerrarSesion() {
         localStorage.removeItem("logueado");
+        localStorage.removeItem("rol");
         localStorage.removeItem("nickname");
+        localStorage.removeItem("mail");
 
         window.location.href = "index.html";
       }

@@ -14,15 +14,14 @@
 
   <body>
     <script>
-      if (localStorage.getItem("logueado") !== "si") {
-        window.location.href = "login.html";
-      }
-      if (
-        !["Administrador", "Operario"].includes(
-          (localStorage.getItem("rol") || "").trim(),
-        )
-      ) {
-        window.location.href = "index.html";
+      {
+        const rol = (localStorage.getItem("rol") || "").trim();
+        const sinSesion = localStorage.getItem("logueado") !== "si";
+
+        if (sinSesion || !["Administrador", "Operario"].includes(rol)) {
+          document.documentElement.style.display = "none";
+          window.location.replace(sinSesion ? "login.html" : "index.html");
+        }
       }
     </script>
 
@@ -54,14 +53,15 @@
           </li>
           <li>
             <button
-              data-rol="Administrador, Operario"
               class="link-button"
-              data-texto="menu.panelRutas"
-              onclick="window.location.href = 'panelrutas.html'"
+              data-rol="Operario"
+              data-texto="menu.panelOperario"
+              onclick="window.location.href = 'paneloperario.html'"
             >
-              Panel Rutas
+              Panel Operario
             </button>
           </li>
+
           <li>
             <button
               class="link-button"
@@ -117,6 +117,38 @@
           required
         />
 
+        <select id="tipoRuta" required onchange="cambiarTipoRuta()">
+          <option value="" disabled selected data-texto="comun.seleccioneTipo">
+            Seleccione un tipo
+          </option>
+          <option value="Naranja" data-texto="tipoContenedor.Naranja">
+            Naranja - Reciclables
+          </option>
+          <option value="Metalico" data-texto="tipoContenedor.Metalico">
+            Metalico - Residuos mezclados
+          </option>
+          <option value="Plastico" data-texto="tipoContenedor.Plastico">
+            Plastico - Residuos mezclados
+          </option>
+        </select>
+
+        <select
+          id="centroInicio"
+          required
+          onchange="redibujarParadas()"
+        ></select>
+
+        <select id="centroFin" required onchange="redibujarParadas()"></select>
+
+        <button
+          type="button"
+          class="btn-crear-centro-acopio"
+          data-texto="prut.sugerir"
+          onclick="sugerirRuta()"
+        >
+          Sugerir ruta
+        </button>
+
         <button
           type="submit"
           class="btn-crear-centro-acopio"
@@ -143,9 +175,17 @@
         <span id="resumenRuta"></span>
       </p>
 
+      <p id="avisoSugerencia" class="instruccion-mapa"></p>
+
       <div id="map"></div>
 
       <ul id="listaParadasRuta"></ul>
+
+      <div
+        id="camionesCompatibles"
+        class="lista-panel"
+        style="display: none"
+      ></div>
 
       <div class="lista-panel">
         <h3 data-texto="prut.listaTitulo">Rutas guardadas</h3>
@@ -202,6 +242,9 @@
       let capaRutaSeleccionadaContador = 0;
       let cuadrillasDisponibles = [];
       let idRutaParaAsignar = null;
+      let centrosAcopio = [];
+      let marcadoresCentros = [];
+      let camionesDisponibles = [];
 
       const map = L.map("map").setView([-34.9011, -56.1645], 13);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -223,6 +266,35 @@
         }
       }
 
+      async function cargarCentros() {
+        try {
+          const resp = await fetch(
+            `${API_URL_GESTION}CentrosAcopio/CentrosAcopio`,
+          );
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          centrosAcopio = (data?.data || []).filter((c) => c.lat && c.lon);
+          llenarSelectCentros();
+          if (modoCreacion) redibujarParadas();
+        } catch (error) {
+          console.error("Error al obtener centros de acopio:", error);
+        }
+      }
+
+      async function cargarCamiones() {
+        try {
+          const resp = await fetch(
+            `${API_URL_GESTION}Cuadrillas/CamionesDisponibles`,
+          );
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          camionesDisponibles = data?.data || [];
+          renderizarCamionesCompatibles();
+        } catch (error) {
+          console.error("Error al obtener camiones disponibles:", error);
+        }
+      }
+
       function colorPorEstadoContenedor(estado) {
         switch (estado) {
           case "Vacio":
@@ -241,7 +313,12 @@
       function dibujarContenedores() {
         marcadoresContenedores.forEach((m) => map.removeLayer(m));
 
-        marcadoresContenedores = contenedoresDisponibles.map((cont) => {
+        const tipoRuta = document.getElementById("tipoRuta").value;
+        const contenedoresVisibles = modoCreacion
+          ? contenedoresDisponibles.filter((c) => c.tipo === tipoRuta)
+          : contenedoresDisponibles;
+
+        marcadoresContenedores = contenedoresVisibles.map((cont) => {
           const indice = paradas.findIndex(
             (p) => p.idContenedor === cont.ID_contenedor,
           );
@@ -284,6 +361,7 @@
             idContenedor: cont.ID_contenedor,
             calle: cont.calle,
             numero: cont.numero,
+            capacidadCarga: cont.capacidadCarga,
           });
         }
         redibujarParadas();
@@ -294,7 +372,11 @@
         paradas = [];
         rutaSeleccionada = null;
         limpiarRutaSeleccionada();
+        llenarSelectCentros();
         redibujarParadas();
+        cargarContenedores();
+        cargarCentros();
+        cargarCamiones();
 
         document.getElementById("btnCrearRuta").style.display = "none";
         document.getElementById("formNuevaRuta").classList.add("activo");
@@ -304,12 +386,83 @@
       function cancelarCreacionRuta() {
         modoCreacion = false;
         paradas = [];
+        document.getElementById("formNuevaRuta").reset();
+        document.getElementById("avisoSugerencia").textContent = "";
+        llenarSelectCentros();
         redibujarParadas();
 
-        document.getElementById("nombreRuta").value = "";
         document.getElementById("btnCrearRuta").style.display = "inline-block";
         document.getElementById("formNuevaRuta").classList.remove("activo");
         document.getElementById("instruccionMapa").style.display = "none";
+      }
+
+      function cambiarTipoRuta() {
+        paradas = [];
+        document.getElementById("avisoSugerencia").textContent = "";
+        llenarSelectCentros();
+        redibujarParadas();
+      }
+
+      function mismoTipo(tipoCentro, tipoRuta) {
+        return (
+          String(tipoCentro || "")
+            .trim()
+            .toLowerCase() ===
+          String(tipoRuta || "")
+            .trim()
+            .toLowerCase()
+        );
+      }
+
+      function llenarSelectCentros() {
+        const tipo = document.getElementById("tipoRuta").value;
+        const centros = centrosAcopio.filter((c) =>
+          mismoTipo(c.tipoResiduo, tipo),
+        );
+
+        [
+          { id: "centroInicio", clave: "prut.centroInicio" },
+          { id: "centroFin", clave: "prut.centroFin" },
+        ].forEach(({ id, clave }) => {
+          const select = document.getElementById(id);
+          const anterior = select.value;
+          const textoVacio = !tipo
+            ? "comun.seleccioneTipo"
+            : centros.length === 0
+              ? "prut.sinCentros"
+              : clave;
+
+          select.innerHTML =
+            `<option value="" disabled selected>${traducir(textoVacio)}</option>` +
+            centros
+              .map(
+                (c) =>
+                  `<option value="${c.ID_acopio}">#${c.ID_acopio} — ${c.calle} ${c.numero}, ${c.barrio}</option>`,
+              )
+              .join("");
+          select.value = anterior;
+        });
+      }
+
+      function centroSeleccionado(idSelect) {
+        const idCentro = document.getElementById(idSelect).value;
+        return centrosAcopio.find((c) => String(c.ID_acopio) === idCentro);
+      }
+
+      function puntosDeRuta() {
+        const inicio = centroSeleccionado("centroInicio");
+        const fin = centroSeleccionado("centroFin");
+        const aParada = (c) => ({
+          lat: c.lat,
+          lon: c.lon,
+          idAcopio: c.ID_acopio,
+        });
+
+        return [
+          ...(inicio ? [aParada(inicio)] : []),
+          ...paradas,
+          ...(fin ? [aParada(fin)] : []),
+        ];
       }
 
       function quitarParada(indice) {
@@ -317,24 +470,162 @@
         redibujarParadas();
       }
 
-      function redibujarParadas() {
-        dibujarContenedores();
-        actualizarLineaRuta();
+      function dibujarCentros() {
+        marcadoresCentros.forEach((m) => map.removeLayer(m));
+        marcadoresCentros = [];
 
-        const contenedor = document.getElementById("listaParadasRuta");
+        if (!modoCreacion) return;
+
+        const tipo = document.getElementById("tipoRuta").value;
+        const inicio = centroSeleccionado("centroInicio");
+        const fin = centroSeleccionado("centroFin");
+        const centrosVisibles = tipo
+          ? centrosAcopio.filter((c) => mismoTipo(c.tipoResiduo, tipo))
+          : centrosAcopio;
+
+        centrosVisibles.forEach((centro) => {
+          const esInicio = inicio && inicio.ID_acopio === centro.ID_acopio;
+          const esFin = fin && fin.ID_acopio === centro.ID_acopio;
+          const etiqueta =
+            esInicio && esFin ? "I/F" : esInicio ? "I" : esFin ? "F" : "";
+
+          const marker = L.marker([centro.lat, centro.lon], {
+            icon: L.divIcon({
+              className: "",
+              html: `<div class="numero-parada" style="background:#c97a1e">${etiqueta}</div>`,
+              iconSize: [24, 24],
+              iconAnchor: [12, 12],
+            }),
+          }).addTo(map);
+          marker.bindTooltip(
+            `${traducir("prut.centroAcopio")} #${centro.ID_acopio} — ${centro.calle} ${centro.numero}, ${centro.barrio} — ${centro.tipoResiduo}`,
+          );
+          marker.on("click", () => elegirCentroEnMapa(centro));
+          marcadoresCentros.push(marker);
+        });
+      }
+
+      function elegirCentroEnMapa(centro) {
+        const tipo = document.getElementById("tipoRuta").value;
+        if (!tipo || !mismoTipo(centro.tipoResiduo, tipo)) {
+          alert(traducir("prut.faltanCentros"));
+          return;
+        }
+
+        const selectInicio = document.getElementById("centroInicio");
+        const selectFin = document.getElementById("centroFin");
+
+        if (!selectInicio.value) selectInicio.value = centro.ID_acopio;
+        else selectFin.value = centro.ID_acopio;
+
+        redibujarParadas();
+      }
+
+      function textoCentro(etiqueta, centro) {
+        if (!centro) return "";
+        return `<li><span>${traducir(etiqueta)}: ${traducir("prut.centroAcopio")} #${centro.ID_acopio} — ${centro.calle} ${centro.numero}</span></li>`;
+      }
+
+      function renderizarCamionesCompatibles() {
+        const contenedor = document.getElementById("camionesCompatibles");
+
         if (paradas.length === 0) {
+          contenedor.style.display = "none";
           contenedor.innerHTML = "";
           return;
         }
-        contenedor.innerHTML = paradas
-          .map(
-            (p, i) => `
+
+        const carga = paradas.reduce(
+          (suma, p) => suma + Number(p.capacidadCarga),
+          0,
+        );
+        const compatibles = camionesDisponibles.filter(
+          (c) => Number(c.capacidadCarga) >= carga,
+        );
+
+        contenedor.style.display = "block";
+        contenedor.innerHTML =
+          `<h3>${traducir("prut.camionesTitulo")}</h3>` +
+          `<p>${traducir("prut.cargaRuta").replace("{kg}", carga)}</p>` +
+          (compatibles.length === 0
+            ? `<p>${traducir("prut.sinCamionesCompatibles")}</p>`
+            : "<ul>" +
+              compatibles
+                .map(
+                  (c) =>
+                    `<li>${c.matricula} — ${c.tipo} — ${c.capacidadCarga} kg</li>`,
+                )
+                .join("") +
+              "</ul>");
+      }
+
+      function redibujarParadas() {
+        dibujarContenedores();
+        dibujarCentros();
+        actualizarLineaRuta();
+        renderizarCamionesCompatibles();
+
+        document.getElementById("listaParadasRuta").innerHTML = modoCreacion
+          ? textoCentro("prut.inicio", centroSeleccionado("centroInicio")) +
+            paradas
+              .map(
+                (p, i) => `
           <li>
             <span>${i + 1}. ${traducir("prut.contenedor")} #${p.idContenedor} — ${p.calle ?? ""} ${p.numero ?? ""}</span>
             <button type="button" onclick="quitarParada(${i})">${traducir("prut.quitar")}</button>
           </li>`,
-          )
-          .join("");
+              )
+              .join("") +
+            textoCentro("prut.fin", centroSeleccionado("centroFin"))
+          : "";
+      }
+
+      async function sugerirRuta() {
+        const datos = {
+          tipo: document.getElementById("tipoRuta").value,
+          idAcopioInicio: document.getElementById("centroInicio").value,
+          idAcopioFin: document.getElementById("centroFin").value,
+        };
+
+        if (!datos.tipo || !datos.idAcopioInicio || !datos.idAcopioFin) {
+          alert(traducir("prut.faltanCentros"));
+          return;
+        }
+
+        try {
+          const resp = await fetch(`${API_URL}Rutas/Sugerir`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
+          const resultado = await resp.json();
+
+          if (resultado.status === "ok") {
+            paradas = resultado.data.contenedores.map((c) => ({
+              lat: c.lat,
+              lon: c.lon,
+              idContenedor: c.ID_contenedor,
+              calle: c.calle,
+              numero: c.numero,
+              capacidadCarga: c.capacidadCarga,
+            }));
+            document.getElementById("avisoSugerencia").textContent =
+              resultado.data.dejadosFuera > 0
+                ? traducir("prut.sugerenciaRecortada").replace(
+                    "{n}",
+                    resultado.data.dejadosFuera,
+                  )
+                : "";
+            redibujarParadas();
+          } else if (resultado.status === "sin_contenedores") {
+            alert(traducir("prut.sinContenedores"));
+          } else {
+            alert(mensajeStatus(resultado));
+          }
+        } catch (error) {
+          console.error("Error al sugerir la ruta:", error);
+          alert(traducir("comun.conexion"));
+        }
       }
 
       async function actualizarLineaRuta() {
@@ -346,9 +637,9 @@
         }
         document.getElementById("resumenRuta").textContent = "";
 
-        if (paradas.length < 2) return;
+        const puntos = puntosDeRuta().map(({ lat, lon }) => ({ lat, lon }));
 
-        const puntos = paradas.map(({ lat, lon }) => ({ lat, lon }));
+        if (paradas.length === 0 || puntos.length < 2) return;
 
         try {
           const resp = await fetch(`${API_URL}Rutas/CalcularCamino`, {
@@ -373,10 +664,11 @@
 
             const km = (resultado.data.distanciaMetros / 1000).toFixed(1);
             const min = Math.round(resultado.data.duracionSegundos / 60);
-            document.getElementById("resumenRuta").textContent =
-              traducir("prut.resumen")
-                .replace("{km}", km)
-                .replace("{min}", min);
+            document.getElementById("resumenRuta").textContent = traducir(
+              "prut.resumen",
+            )
+              .replace("{km}", km)
+              .replace("{min}", min);
             return;
           }
         } catch (error) {
@@ -387,7 +679,7 @@
 
         // línea recta punteada si OSRM no respondió.
         lineaRuta = L.polyline(
-          paradas.map((p) => [p.lat, p.lon]),
+          puntos.map((p) => [p.lat, p.lon]),
           { color: "#2f8f3a", dashArray: "6 6" },
         ).addTo(map);
         document.getElementById("resumenRuta").textContent =
@@ -399,18 +691,21 @@
         .addEventListener("submit", async (event) => {
           event.preventDefault();
 
-          if (paradas.length < 2) {
+          if (paradas.length < 1) {
             alert(traducir("prut.minimoParadas"));
             return;
           }
 
           const datos = {
             nombre: document.getElementById("nombreRuta").value,
-            paradas: paradas.map(({ lat, lon, idContenedor }) => ({
-              lat,
-              lon,
-              idContenedor,
-            })),
+            paradas: puntosDeRuta().map(
+              ({ lat, lon, idContenedor, idAcopio }) => ({
+                lat,
+                lon,
+                idContenedor,
+                idAcopio,
+              }),
+            ),
           };
 
           const resp = await fetch(`${API_URL}Rutas/Registrar`, {
@@ -521,9 +816,7 @@
       async function eliminarRuta(idRuta, event) {
         if (event) event.stopPropagation();
 
-        if (
-          !confirm(traducir("prut.confirmarEliminar"))
-        ) {
+        if (!confirm(traducir("prut.confirmarEliminar"))) {
           return;
         }
 
@@ -574,8 +867,7 @@
         const select = document.getElementById("selectCuadrilla");
 
         if (cuadrillasDisponibles.length === 0) {
-          select.innerHTML =
-            `<option value="">${traducir("prut.sinCuadrillas")}</option>`;
+          select.innerHTML = `<option value="">${traducir("prut.sinCuadrillas")}</option>`;
         } else {
           select.innerHTML =
             `<option value="">${traducir("prut.seleccioneCuadrilla")}</option>` +
@@ -708,12 +1000,16 @@
 
       function cerrarSesion() {
         localStorage.removeItem("logueado");
+        localStorage.removeItem("rol");
         localStorage.removeItem("nickname");
+        localStorage.removeItem("mail");
+
         window.location.href = "index.html";
       }
 
       function cargarUsuario() {
-        const nombre = localStorage.getItem("nickname") || traducir("usuario.porDefecto");
+        const nombre =
+          localStorage.getItem("nickname") || traducir("usuario.porDefecto");
         const inicial = nombre.charAt(0).toUpperCase();
 
         document.getElementById("usuario").innerHTML = `
@@ -737,13 +1033,17 @@
 
       function alCambiarIdioma() {
         cargarUsuario();
-        if (modoCreacion) redibujarParadas();
-        else dibujarContenedores();
+        if (modoCreacion) {
+          llenarSelectCentros();
+          redibujarParadas();
+        } else dibujarContenedores();
         if (rutas) renderizarListaRutas();
       }
       obtenerRutas();
       cargarContenedores();
       cargarCuadrillas();
+      cargarCentros();
+      cargarCamiones();
     </script>
   </body>
 </html>

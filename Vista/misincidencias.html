@@ -12,14 +12,16 @@
 
   <body>
     <script>
-      if (localStorage.getItem("logueado") !== "si") {
-        window.location.href = "login.html";
-      }
-      if ((localStorage.getItem("rol") || "").trim() !== "Recolector") {
-        window.location.href = "index.html";
-      }
-      if (!localStorage.getItem("mail")) {
-        window.location.href = "login.html";
+      {
+        const rol = (localStorage.getItem("rol") || "").trim();
+        const sinSesion =
+          localStorage.getItem("logueado") !== "si" ||
+          !localStorage.getItem("mail");
+
+        if (sinSesion || !["Recolector"].includes(rol)) {
+          document.documentElement.style.display = "none";
+          window.location.replace(sinSesion ? "login.html" : "index.html");
+        }
       }
     </script>
 
@@ -48,6 +50,33 @@
               Inicio
             </button>
           </li>
+          <li>
+            <button
+              class="link-button"
+              data-texto="menu.mapa"
+              onclick="window.location.href = 'mapa.html'"
+            >
+              Mapa
+            </button>
+          </li>
+          <li>
+            <button
+              class="link-button"
+              data-texto="menu.estadisticas"
+              onclick="window.location.href = 'estadisticas.html'"
+            >
+              Estadísticas
+            </button>
+          </li>
+          <li>
+            <button
+              class="link-button"
+              data-texto="menu.documentacion"
+              onclick="window.location.href = 'documentacion.html'"
+            >
+              Documentación
+            </button>
+          </li>
         </ul>
       </nav>
     </header>
@@ -74,6 +103,52 @@
       </div>
     </div>
 
+    <div
+      class="overlay"
+      id="overlayNoRecogido"
+      onclick="cerrarNoRecogido(event)"
+    >
+      <div class="asignar-cuadrilla">
+        <h3 data-texto="mis.tituloNoRecogido">Contenedor no recogido</h3>
+
+        <form id="formNoRecogido">
+          <label data-texto="mis.tipoIncidencia">Tipo de incidencia</label>
+          <select id="tipoIncidenciaNoRecogido" required>
+            <option
+              value=""
+              disabled
+              selected
+              data-texto="comun.seleccioneTipo"
+            >
+              Seleccione un tipo
+            </option>
+            <option value="incendiado" data-texto="tipoIncidencia.incendiado">
+              Contenedor incendiado
+            </option>
+            <option value="rotura" data-texto="tipoIncidencia.rotura">
+              Contenedor dañado
+            </option>
+          </select>
+
+          <button
+            class="btn-asignar-cuadrilla"
+            type="submit"
+            data-texto="mis.confirmar"
+          >
+            Confirmar
+          </button>
+          <button
+            class="btn-cancelar-usuario"
+            type="button"
+            data-texto="comun.cancelar"
+            onclick="cerrarNoRecogido()"
+          >
+            Cancelar
+          </button>
+        </form>
+      </div>
+    </div>
+
     <script>
       const API_URL =
         "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/";
@@ -81,6 +156,8 @@
         "http://localhost/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas/";
       let incidencias = null;
       let rutas = null;
+      let paradasPorRuta = {};
+      let paradaNoRecogida = null;
 
       document.addEventListener("DOMContentLoaded", () => {
         const rolUsuario = (localStorage.getItem("rol") || "").trim();
@@ -179,6 +256,7 @@
           if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
           const data = await resp.json();
           rutas = Array.isArray(data) ? data : data?.data || [];
+          await Promise.all(rutas.map((ruta) => obtenerParadas(ruta.ID_ruta)));
           renderizarRutas();
         } catch (error) {
           console.error("Error al obtener rutas:", error);
@@ -307,7 +385,7 @@
           }
 
           html += `
-<li class="incidencia-item">
+<li class="incidencia-item rc-ruta-item">
   <div class="incidencia-cuerpo">
     <div class="incidencia-info">
       <strong>${ruta.nombre ? ruta.nombre : `${traducir("mis.ruta")} #${ruta.ID_ruta}`}</strong>
@@ -317,11 +395,137 @@
     </div>
   </div>
   <span class="incidencia-acciones">${boton}</span>
+  ${renderizarParadas(ruta)}
 </li>`;
         });
 
         html += "</ul>";
         listaContainer.innerHTML = html;
+      }
+      async function obtenerParadas(idRuta) {
+        try {
+          const datos = {
+            idRuta: idRuta,
+            mail: localStorage.getItem("mail"),
+          };
+
+          const resp = await fetch(`${API_URL_RUTAS}Paradas`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          paradasPorRuta[idRuta] = data?.data || [];
+        } catch (error) {
+          console.error("Error al obtener los contenedores de la ruta:", error);
+          paradasPorRuta[idRuta] = null;
+        }
+      }
+
+      async function marcarParada(idParada, estado, tipoIncidencia = null) {
+        try {
+          const datos = {
+            idParada: idParada,
+            estado: estado,
+            tipoIncidencia: tipoIncidencia,
+            mail: localStorage.getItem("mail"),
+          };
+
+          const resp = await fetch(`${API_URL_RUTAS}MarcarParada`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
+          const resultado = await resp.json();
+          if (resultado.status === "ok") {
+            obtenerRutas();
+            if (estado === "No recogido") obtenerIncidencias();
+          } else {
+            alert(mensajeStatus(resultado));
+          }
+        } catch (error) {
+          console.error("Error al marcar el contenedor:", error);
+          alert(traducir("comun.conexion"));
+        }
+      }
+
+      function marcarRecogida(idParada) {
+        if (!confirm(traducir("mis.confirmarRecogido"))) return;
+        marcarParada(idParada, "Recogido");
+      }
+
+      function abrirNoRecogido(idParada) {
+        paradaNoRecogida = idParada;
+        document.getElementById("formNoRecogido").reset();
+        document.getElementById("overlayNoRecogido").classList.add("activo");
+      }
+
+      function cerrarNoRecogido(evento) {
+        if (!evento || evento.target.id === "overlayNoRecogido") {
+          document
+            .getElementById("overlayNoRecogido")
+            .classList.remove("activo");
+        }
+      }
+
+      document
+        .getElementById("formNoRecogido")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const tipo = document.getElementById(
+            "tipoIncidenciaNoRecogido",
+          ).value;
+          if (!tipo || !paradaNoRecogida) return;
+
+          cerrarNoRecogido();
+          await marcarParada(paradaNoRecogida, "No recogido", tipo);
+        });
+
+      function renderizarParadas(ruta) {
+        const paradasRuta = paradasPorRuta[ruta.ID_ruta];
+
+        if (!paradasRuta) {
+          return `<div class="rc-paradas"><span class="rc-parada-dir">${traducir("mis.errorParadas")}</span></div>`;
+        }
+
+        if (paradasRuta.length === 0) {
+          return `<div class="rc-paradas"><span class="rc-parada-dir">${traducir("mis.sinContenedores")}</span></div>`;
+        }
+
+        const clasesEstado = {
+          Pendiente: "rc-estado-pendiente",
+          Recogido: "rc-estado-ok",
+          "No recogido": "rc-estado-no",
+        };
+
+        let html = '<div class="rc-paradas">';
+
+        paradasRuta.forEach((parada) => {
+          const marcable = ruta.estado === "En Curso" && parada.ID_contenedor;
+          let botones = "";
+
+          if (marcable && parada.estado !== "Recogido") {
+            botones += `<button class="btn-asignar-cuadrilla" onclick="marcarRecogida(${parada.ID_parada})">${traducir("mis.marcarRecogido")}</button>`;
+          }
+          if (marcable && parada.estado !== "No recogido") {
+            botones += `<button class="btn-no-recogido" onclick="abrirNoRecogido(${parada.ID_parada})">${traducir("mis.marcarNoRecogido")}</button>`;
+          }
+
+          html += `
+<div class="rc-parada">
+  <div class="rc-parada-info">
+    <strong>${parada.orden}. ${traducir("mis.contenedor")} #${parada.ID_contenedor ?? "—"}${parada.tipo ? ` — ${traducirValor("tipoContenedor", parada.tipo)}` : ""}</strong>
+    <span class="rc-parada-dir">${parada.calle ?? ""} ${parada.numero ?? ""}, ${parada.barrio ?? ""}</span>
+  </div>
+  <span class="op-badge ${clasesEstado[parada.estado] || "rc-estado-pendiente"}">${traducirValor("estado", parada.estado)}</span>
+  <span class="rc-parada-acciones">${botones}</span>
+</div>`;
+        });
+
+        html += "</div>";
+        return html;
       }
 
       obtenerIncidencias();

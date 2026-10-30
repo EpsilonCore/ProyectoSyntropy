@@ -10,11 +10,14 @@
 
   <body>
     <script>
-      if (localStorage.getItem("logueado") !== "si") {
-        window.location.href = "login.html";
-      }
-      if ((localStorage.getItem("rol") || "").trim() !== "Administrador") {
-        window.location.href = "index.html";
+      {
+        const rol = (localStorage.getItem("rol") || "").trim();
+        const sinSesion = localStorage.getItem("logueado") !== "si";
+
+        if (sinSesion || !["Administrador"].includes(rol)) {
+          document.documentElement.style.display = "none";
+          window.location.replace(sinSesion ? "login.html" : "index.html");
+        }
       }
     </script>
 
@@ -45,32 +48,22 @@
           </li>
           <li>
             <button
-              data-rol="Administrador"
               class="link-button"
-              data-texto="menu.panelRegistro"
-              onclick="window.location.href = 'panelregistro.html'"
+              data-rol="Administrador"
+              data-texto="menu.panelUsuario"
+              onclick="window.location.href = 'panelusuario.html'"
             >
-              Panel Registro
+              Panel de Usuario
             </button>
           </li>
           <li>
             <button
-              data-rol="Administrador"
               class="link-button"
-              data-texto="menu.contenedores"
-              onclick="window.location.href = 'panelcontenedor.html'"
-            >
-              Contenedores
-            </button>
-          </li>
-          <li>
-            <button
               data-rol="Administrador"
-              class="link-button"
-              data-texto="menu.camiones"
-              onclick="window.location.href = 'panelcamion.html'"
+              data-texto="menu.cuadrillas"
+              onclick="window.location.href = 'panelcuadrilla.html'"
             >
-              Camiones
+              Cuadrillas
             </button>
           </li>
         </ul>
@@ -107,6 +100,39 @@
       function toggleMenu() {
         document.getElementById("menu").classList.toggle("activo");
       }
+
+      function cerrarSesion() {
+        localStorage.removeItem("logueado");
+        localStorage.removeItem("rol");
+        localStorage.removeItem("nickname");
+        localStorage.removeItem("mail");
+
+        window.location.href = "index.html";
+      }
+
+      function cargarUsuario() {
+        const nombre =
+          localStorage.getItem("nickname") || traducir("usuario.porDefecto");
+        const inicial = nombre.charAt(0).toUpperCase();
+
+        document.getElementById("usuario").innerHTML = `
+          <span class="nombre-usuario">${nombre}</span>
+          <button class="usuario-btn" onclick="abrirUsuario()">
+              ${inicial}
+          </button>
+          <div id="menuUsuario" class="menu-usuario">
+              <button onclick="cerrarSesion()">
+                  ${traducir("usuario.cerrarSesion")}
+              </button>
+          </div>
+        `;
+      }
+
+      function abrirUsuario() {
+        document.getElementById("menuUsuario").classList.toggle("activo");
+      }
+
+      cargarUsuario();
 
       const API_URL =
         "http://localhost/Proyecto/ProyectoSyntropy/Usuarios/miApi/";
@@ -181,6 +207,7 @@
       }
 
       function alCambiarIdioma() {
+        cargarUsuario();
         if (usuarios) renderizarLista();
       }
 

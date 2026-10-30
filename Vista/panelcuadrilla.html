@@ -12,16 +12,14 @@
 
   <body>
     <script>
-      if (localStorage.getItem("logueado") !== "si") {
-        window.location.href = "login.html";
-      }
+      {
+        const rol = (localStorage.getItem("rol") || "").trim();
+        const sinSesion = localStorage.getItem("logueado") !== "si";
 
-      if (
-        !["Administrador", "Operario"].includes(
-          (localStorage.getItem("rol") || "").trim(),
-        )
-      ) {
-        window.location.href = "index.html";
+        if (sinSesion || !["Administrador", "Operario"].includes(rol)) {
+          document.documentElement.style.display = "none";
+          window.location.replace(sinSesion ? "login.html" : "index.html");
+        }
       }
     </script>
 
@@ -43,7 +41,7 @@
           <li>
             <button
               class="link-button"
-              data-rol="Administrador, Operario"
+              data-rol="Administrador"
               data-texto="menu.gestion"
               onclick="window.location.href = 'gestion.html'"
             >
@@ -59,6 +57,17 @@
               onclick="window.location.href = 'panelrutas.html'"
             >
               Panel Rutas
+            </button>
+          </li>
+
+          <li>
+            <button
+              class="link-button"
+              data-rol="Operario"
+              data-texto="menu.panelOperario"
+              onclick="window.location.href = 'paneloperario.html'"
+            >
+              Panel Operario
             </button>
           </li>
 
@@ -218,7 +227,10 @@
 
       function cerrarSesion() {
         localStorage.removeItem("logueado");
+        localStorage.removeItem("rol");
         localStorage.removeItem("nickname");
+        localStorage.removeItem("mail");
+
         window.location.href = "index.html";
       }
 

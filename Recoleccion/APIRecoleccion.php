@@ -68,6 +68,9 @@ switch ($method) {
         }
         if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas/Registrar') {
             $resultado = verificarRol($rolesRutas) ?? $controladorRuta->crearRuta();
+        }        
+        if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas/Sugerir') {
+            $resultado = verificarRol($rolesRutas) ?? $controladorRuta->sugerirRuta();
         }
         if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas/CalcularCamino') {
             $resultado = verificarRol($rolesRutas) ?? $controladorRuta->calcularCamino();
@@ -75,6 +78,9 @@ switch ($method) {
         if($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas/MisRutas'){
             $resultado = verificarRol($rolRecolector) ?? $controladorRuta->getRutasPorMail();
         }
+        if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas/Paradas') {
+            $resultado = verificarRol($rolRecolector) ?? $controladorRuta->getParadasDeMiRuta();
+}
         break;
 
     case 'PATCH':
@@ -91,6 +97,9 @@ switch ($method) {
         if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas/Finalizar'){
             $resultado = verificarRol($rolRecolector) ?? $controladorRuta->finalizarRuta();
         }
+        if ($uri === '/Proyecto/ProyectoSyntropy/Recoleccion/miApi/Rutas/MarcarParada') {
+            $resultado = verificarRol($rolRecolector) ?? $controladorRuta->marcarParada();
+}
         break;
 
     case 'DELETE':

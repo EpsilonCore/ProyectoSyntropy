@@ -12,10 +12,11 @@
 <body>
 
 <script>
-if(localStorage.getItem("logueado") !== "si"){
-    window.location.href = "login.html";
-}
-</script>
+      if (localStorage.getItem("logueado") !== "si") {
+        document.documentElement.style.display = "none";
+        window.location.replace("login.html");
+      }
+    </script>
 
 <header>
 
@@ -51,6 +52,28 @@ if(localStorage.getItem("logueado") !== "si"){
                 onclick="window.location.href='panelrutas.html'">
                     Panel Rutas
                 </button>
+            </li>
+
+            <li>
+              <button
+                class="link-button"
+                data-rol="Operario"
+                data-texto="menu.panelOperario"
+                onclick="window.location.href = 'paneloperario.html'"
+              >
+                Panel Operario
+              </button>
+            </li>
+
+            <li>
+              <button
+                class="link-button"
+                data-rol="Recolector"
+                data-texto="menu.misIncidencias"
+                onclick="window.location.href = 'misincidencias.html'"
+              >
+                Mis Incidencias
+              </button>
             </li>
 
             <li>
@@ -124,14 +147,13 @@ function toggleMenu(){
     document.getElementById("menu").classList.toggle("activo");
 }
 
-function cerrarSesion(){
+function cerrarSesion() {
+  localStorage.removeItem("logueado");
+  localStorage.removeItem("rol");
+  localStorage.removeItem("nickname");
+  localStorage.removeItem("mail");
 
-    localStorage.removeItem("logueado");
-    localStorage.removeItem("nickname");
-
-    window.location.href =
-    "index.html";
-
+  window.location.href = "index.html";
 }
 
 function cargarUsuario(){

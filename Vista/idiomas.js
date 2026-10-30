@@ -52,7 +52,7 @@ const TEXTOS = {
     "prut.nombre": "Nombre de la ruta",
     "prut.guardar": "Guardar Ruta",
     "prut.instruccion":
-      "Hacé click sobre los contenedores (color según su estado) para agregarlos como paradas, en el orden en que el camión debe recorrerlos.",
+      "Elegí el tipo de residuo y los centros de acopio de inicio y fin. Después usá Sugerir ruta, o hacé click sobre los contenedores (color según su estado) para agregarlos como paradas, en el orden en que el camión debe recorrerlos.",
     "prut.listaTitulo": "Rutas guardadas",
     "prut.cargando": "Cargando rutas...",
     "prut.errorRutas": "Error al cargar rutas.",
@@ -71,11 +71,28 @@ const TEXTOS = {
     "prut.resumenRecta":
       "(no se pudo calcular el camino por calle, se muestra en línea recta)",
     "prut.minimoParadas":
-      "Agregá al menos 2 paradas en el mapa antes de guardar.",
+      "Agregá al menos 1 contenedor en el mapa antes de guardar.",
     "prut.confirmarEliminar":
       "¿Seguro que querés eliminar esta ruta? Esta acción no se puede deshacer.",
     "prut.cuadrillaSinCamion":
       "Esa cuadrilla todavía no tiene un camión asignado. Asignale uno primero desde el panel de Cuadrillas.",
+    "prut.centroInicio": "Centro de acopio de inicio",
+    "prut.centroFin": "Centro de acopio de fin",
+    "prut.sinCentros": "No hay centros de acopio de ese tipo",
+    "prut.sugerir": "Sugerir ruta",
+    "prut.inicio": "Inicio",
+    "prut.fin": "Fin",
+    "prut.centroAcopio": "Centro de acopio",
+    "prut.camionesTitulo": "Camiones compatibles",
+    "prut.cargaRuta": "Carga de la ruta: {kg} kg",
+    "prut.sinCamionesCompatibles":
+      "No hay camiones disponibles con capacidad suficiente para esta carga.",
+    "prut.sinContenedores":
+      "No hay contenedores Llenos o Desbordados de ese tipo para sugerir, o ninguno entra en un camión disponible.",
+    "prut.sugerenciaRecortada":
+      "Se dejaron {n} contenedores fuera porque no entran en el camión disponible de mayor capacidad.",
+    "prut.faltanCentros":
+      "Elegí el tipo de residuo y los centros de acopio de inicio y fin.",
 
     "menu.panelRegistro": "Panel Registro",
     "menu.contenedores": "Contenedores",
@@ -676,7 +693,7 @@ const TEXTOS = {
     "prut.nombre": "Route name",
     "prut.guardar": "Save Route",
     "prut.instruccion":
-      "Click on the containers (color based on their status) to add them as stops, in the order the truck must visit them.",
+      "Choose the waste type and the starting and ending collection centers. Then use Suggest route, or click on the containers (color based on their status) to add them as stops, in the order the truck must visit them.",
     "prut.listaTitulo": "Saved routes",
     "prut.cargando": "Loading routes...",
     "prut.errorRutas": "Error loading routes.",
@@ -694,11 +711,28 @@ const TEXTOS = {
     "prut.resumen": "({km} km · {min} min by road)",
     "prut.resumenRecta":
       "(the road route could not be calculated, showing a straight line)",
-    "prut.minimoParadas": "Add at least 2 stops on the map before saving.",
+    "prut.minimoParadas": "Add at least 1 container on the map before saving.",
     "prut.confirmarEliminar":
       "Are you sure you want to delete this route? This action cannot be undone.",
     "prut.cuadrillaSinCamion":
       "That crew does not have an assigned truck yet. Assign one first from the Crews panel.",
+    "prut.centroInicio": "Starting collection center",
+    "prut.centroFin": "Ending collection center",
+    "prut.sinCentros": "There are no collection centers of that type",
+    "prut.sugerir": "Suggest route",
+    "prut.inicio": "Start",
+    "prut.fin": "End",
+    "prut.centroAcopio": "Collection center",
+    "prut.camionesTitulo": "Compatible trucks",
+    "prut.cargaRuta": "Route load: {kg} kg",
+    "prut.sinCamionesCompatibles":
+      "There are no available trucks with enough capacity for this load.",
+    "prut.sinContenedores":
+      "There are no Full or Overflowing containers of that type to suggest, or none fits in an available truck.",
+    "prut.sugerenciaRecortada":
+      "{n} containers were left out because they do not fit in the available truck with the largest capacity.",
+    "prut.faltanCentros":
+      "Choose the waste type and the starting and ending collection centers.",
 
     "menu.panelRegistro": "Registration Panel",
     "menu.contenedores": "Containers",
@@ -1287,7 +1321,7 @@ const TEXTOS = {
     "prut.nombre": "Nome da rota",
     "prut.guardar": "Salvar Rota",
     "prut.instruccion":
-      "Clique nos contêineres (cor conforme o status) para adicioná-los como paradas, na ordem em que o caminhão deve percorrê-los.",
+      "Escolha o tipo de resíduo e os centros de coleta de início e fim. Depois use Sugerir rota, ou clique nos contêineres (cor conforme o status) para adicioná-los como paradas, na ordem em que o caminhão deve percorrê-los.",
     "prut.listaTitulo": "Rotas salvas",
     "prut.cargando": "Carregando rotas...",
     "prut.errorRutas": "Erro ao carregar rotas.",
@@ -1306,11 +1340,28 @@ const TEXTOS = {
     "prut.resumenRecta":
       "(não foi possível calcular o caminho por estrada, exibindo linha reta)",
     "prut.minimoParadas":
-      "Adicione pelo menos 2 paradas no mapa antes de salvar.",
+      "Adicione pelo menos 1 contêiner no mapa antes de salvar.",
     "prut.confirmarEliminar":
       "Tem certeza de que deseja excluir esta rota? Esta ação não pode ser desfeita.",
     "prut.cuadrillaSinCamion":
       "Essa equipe ainda não tem um caminhão atribuído. Atribua um primeiro no painel de Equipes.",
+    "prut.centroInicio": "Centro de coleta de início",
+    "prut.centroFin": "Centro de coleta de fim",
+    "prut.sinCentros": "Não há centros de coleta desse tipo",
+    "prut.sugerir": "Sugerir rota",
+    "prut.inicio": "Início",
+    "prut.fin": "Fim",
+    "prut.centroAcopio": "Centro de coleta",
+    "prut.camionesTitulo": "Caminhões compatíveis",
+    "prut.cargaRuta": "Carga da rota: {kg} kg",
+    "prut.sinCamionesCompatibles":
+      "Não há caminhões disponíveis com capacidade suficiente para esta carga.",
+    "prut.sinContenedores":
+      "Não há contêineres Cheios ou Transbordando desse tipo para sugerir, ou nenhum cabe em um caminhão disponível.",
+    "prut.sugerenciaRecortada":
+      "{n} contêineres ficaram de fora porque não cabem no caminhão disponível de maior capacidade.",
+    "prut.faltanCentros":
+      "Escolha o tipo de resíduo e os centros de coleta de início e fim.",
 
     "menu.panelRegistro": "Painel de Registro",
     "menu.contenedores": "Contêineres",
