@@ -503,13 +503,14 @@
         let html = '<div class="rc-paradas">';
 
         paradasRuta.forEach((parada) => {
-          const marcable = ruta.estado === "En Curso" && parada.ID_contenedor;
+          const marcable =
+            ruta.estado === "En Curso" &&
+            parada.ID_contenedor &&
+            parada.estado === "Pendiente";
           let botones = "";
 
-          if (marcable && parada.estado !== "Recogido") {
+          if (marcable) {
             botones += `<button class="btn-asignar-cuadrilla" onclick="marcarRecogida(${parada.ID_parada})">${traducir("mis.marcarRecogido")}</button>`;
-          }
-          if (marcable && parada.estado !== "No recogido") {
             botones += `<button class="btn-no-recogido" onclick="abrirNoRecogido(${parada.ID_parada})">${traducir("mis.marcarNoRecogido")}</button>`;
           }
 

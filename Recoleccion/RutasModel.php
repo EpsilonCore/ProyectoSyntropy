@@ -405,8 +405,8 @@ public function marcarParada($idParada, $estado, $mail, $tipoIncidencia){
     if (!$parada['ID_contenedor']) {
         return ["ok" => false, "motivo" => "sin_contenedor"];
     }
-    if ($parada['estado'] === $estado) {
-        return ["ok" => true, "motivo" => null];
+    if ($parada['estado'] !== 'Pendiente') {
+        return ["ok" => false, "motivo" => "ya_marcada"];
     }
 
     if ($estado === 'No recogido') {

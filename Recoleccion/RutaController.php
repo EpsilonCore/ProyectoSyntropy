@@ -268,6 +268,9 @@ public function marcarParada()
     if ($resultado['motivo'] === 'sin_contenedor') {
         return ["status" => "datos_invalidos", "mensaje" => "La parada no tiene un contenedor asociado.", "data" => null];
     }
+    if ($resultado['motivo'] === 'ya_marcada') {
+    return ["status" => "no_disponible", "mensaje" => "El contenedor ya fue marcado.", "data" => null];
+}
     return ["status" => "no_disponible", "mensaje" => "La ruta no está en curso.", "data" => null];
 }
     public function sugerirRuta()
@@ -315,7 +318,7 @@ public function marcarParada()
         ];
     }
 
-    // Distancia en km entre dos puntos (Pitágoras con ajuste de longitud)
+    // Distancia en km entre dos puntos
     private function distanciaKm($latA, $lonA, $latB, $lonB)
     {
         $norteSur = ($latB - $latA) * 110.57;
