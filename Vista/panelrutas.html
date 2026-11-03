@@ -230,6 +230,8 @@
       const API_URL_GESTION =
         "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/";
 
+      const ICON_URL = "https://unpkg.com/lucide-static@latest/icons/";
+
       let modoCreacion = false;
       let paradas = [];
       let contenedoresDisponibles = [];
@@ -298,16 +300,20 @@
       function colorPorEstadoContenedor(estado) {
         switch (estado) {
           case "Vacio":
-            return "#23c40e";
+            return "#6fcf97";
           case "Lleno":
-            return "#ff0000";
+            return "#eb5757";
           case "Desbordado":
-            return "#000000";
+            return "#a77fd6";
           case "Media capacidad":
-            return "#fdd408";
+            return "#f2c94c";
           default:
             return "#999999";
         }
+      }
+
+      function iconoContenedorHtml(estado) {
+        return `<div style="width:24px;height:24px;border-radius:50%;background:${colorPorEstadoContenedor(estado)};border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;box-sizing:border-box;"><img src="${ICON_URL}trash-2.svg" width="14" height="14" style="display:block;" alt="" /></div>`;
       }
 
       function dibujarContenedores() {
@@ -329,9 +335,9 @@
               className: "",
               html: seleccionado
                 ? `<div class="numero-parada">${indice + 1}</div>`
-                : `<div class="marcador-contenedor" style="background:${colorPorEstadoContenedor(cont.estado)}"></div>`,
-              iconSize: seleccionado ? [24, 24] : [14, 14],
-              iconAnchor: seleccionado ? [12, 12] : [7, 7],
+                : iconoContenedorHtml(cont.estado),
+              iconSize: [24, 24],
+              iconAnchor: [12, 12],
             }),
           }).addTo(map);
 
