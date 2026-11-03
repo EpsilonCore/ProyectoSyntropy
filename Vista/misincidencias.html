@@ -502,7 +502,22 @@
 
         let html = '<div class="rc-paradas">';
 
-        paradasRuta.forEach((parada) => {
+        paradasRuta.forEach((parada, indice) => {
+          if (parada.ID_acopio && !parada.ID_contenedor) {
+            let etiqueta = "";
+            if (indice === 0) etiqueta = ` — ${traducir("mis.inicio")}`;
+            else if (indice === paradasRuta.length - 1)
+              etiqueta = ` — ${traducir("mis.fin")}`;
+
+            html += `
+<div class="rc-parada">
+  <div class="rc-parada-info">
+    <strong>${parada.orden}. ${traducir("mis.centroAcopio")} #${parada.ID_acopio}${etiqueta}</strong>
+    <span class="rc-parada-dir">${parada.calle_acopio ?? ""} ${parada.numero_acopio ?? ""}, ${parada.barrio_acopio ?? ""}</span>
+  </div>
+</div>`;
+            return;
+          }
           const marcable =
             ruta.estado === "En Curso" &&
             parada.ID_contenedor &&

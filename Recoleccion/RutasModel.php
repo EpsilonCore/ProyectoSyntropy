@@ -291,12 +291,14 @@ public function finalizarRuta($idRuta, $mail){
 }
 // Contenedores de la ruta del recolector
 public function getParadasPorRutaDeIntegrante($idRuta, $mail){
-    $sql = "SELECT p.ID_parada, p.orden, p.ID_contenedor, p.estado,
-    c.calle, c.numero, c.barrio, c.tipo
+    $sql = "SELECT p.ID_parada, p.orden, p.ID_contenedor, p.ID_acopio, p.estado,
+    c.calle, c.numero, c.barrio, c.tipo,
+    a.calle AS calle_acopio, a.numero AS numero_acopio, a.barrio AS barrio_acopio
     FROM rutaparada p
     INNER JOIN ruta r ON r.ID_ruta = p.ID_ruta
     INNER JOIN integrante_cuadrilla ic ON ic.ID_cuadrilla = r.ID_Cuadrilla
     LEFT JOIN contenedor c ON c.ID_contenedor = p.ID_contenedor
+    LEFT JOIN centro_acopio a ON a.ID_acopio = p.ID_acopio
     WHERE p.ID_ruta = ? AND ic.mail = ?
     ORDER BY p.orden ASC";
     $stmt = mysqli_prepare($this->conexion, $sql);
