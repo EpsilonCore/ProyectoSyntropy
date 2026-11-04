@@ -48,58 +48,33 @@
               Gestión
             </button>
           </li>
-
           <li>
             <button
-              data-rol="Administrador"
               class="link-button"
-              data-texto="menu.panelRegistro"
-              onclick="window.location.href = 'panelregistro.html'"
+              onclick="verificarAcceso('mapa.html')"
+              data-texto="menu.mapa"
             >
-              Panel Registro
+              Mapa
             </button>
           </li>
 
           <li>
             <button
-              data-rol="Administrador"
               class="link-button"
-              data-texto="menu.contenedores"
-              onclick="window.location.href = 'panelcontenedor.html'"
+              onclick="verificarAcceso('estadisticas.html')"
+              data-texto="menu.estadisticas"
             >
-              Contenedores
+              Estadísticas
             </button>
           </li>
 
           <li>
             <button
-              data-rol="Administrador"
               class="link-button"
-              data-texto="menu.camiones"
-              onclick="window.location.href = 'panelcamion.html'"
+              onclick="verificarAcceso('documentacion.html')"
+              data-texto="menu.documentacion"
             >
-              Camiones
-            </button>
-          </li>
-
-          <li>
-            <button
-              data-rol="Administrador"
-              class="link-button"
-              data-texto="menu.panelUsuario"
-              onclick="window.location.href = 'panelusuario.html'"
-            >
-              Panel de Usuario
-            </button>
-          </li>
-          <li>
-            <button
-              class="link-button"
-              data-rol="Administrador"
-              data-texto="menu.cuadrillas"
-              onclick="window.location.href = 'panelcuadrilla.html'"
-            >
-              Cuadrillas
+              Documentación
             </button>
           </li>
         </ul>
@@ -127,13 +102,32 @@
 
             <label data-texto="comun.tipo">Tipo</label>
             <select id="tipoCrear" required>
-              <option value="" disabled selected data-texto="comun.seleccioneTipo">
+              <option
+                value=""
+                disabled
+                selected
+                data-texto="comun.seleccioneTipo"
+              >
                 Seleccione un tipo
               </option>
-              <option value="Levante Lateral" data-texto="tipoCamion.Levante Lateral">Levante Lateral</option>
-              <option value="Levante Trasero" data-texto="tipoCamion.Levante Trasero">Levante Trasero</option>
-              <option value="Caja Abierta" data-texto="tipoCamion.Caja Abierta">Caja Abierta</option>
-              <option value="Caja Cerrada" data-texto="tipoCamion.Caja Cerrada">Caja Cerrada</option>
+              <option
+                value="Levante Lateral"
+                data-texto="tipoCamion.Levante Lateral"
+              >
+                Levante Lateral
+              </option>
+              <option
+                value="Levante Trasero"
+                data-texto="tipoCamion.Levante Trasero"
+              >
+                Levante Trasero
+              </option>
+              <option value="Caja Abierta" data-texto="tipoCamion.Caja Abierta">
+                Caja Abierta
+              </option>
+              <option value="Caja Cerrada" data-texto="tipoCamion.Caja Cerrada">
+                Caja Cerrada
+              </option>
             </select>
 
             <label data-texto="comun.capacidadCarga">Capacidad de carga</label>
@@ -141,13 +135,26 @@
 
             <label data-texto="comun.estado">Estado</label>
             <select id="estadoCrearCamion" required>
-              <option value="" disabled selected data-texto="comun.seleccioneEstado">
+              <option
+                value=""
+                disabled
+                selected
+                data-texto="comun.seleccioneEstado"
+              >
                 Seleccione un estado
               </option>
-              <option value="Disponible" data-texto="estado.Disponible">Disponible</option>
-              <option value="Mantenimiento" data-texto="estado.Mantenimiento">Mantenimiento</option>
-              <option value="En Servicio" data-texto="estado.En Servicio">En Servicio</option>
-              <option value="Averiado" data-texto="estado.Averiado">Averiado</option>
+              <option value="Disponible" data-texto="estado.Disponible">
+                Disponible
+              </option>
+              <option value="Mantenimiento" data-texto="estado.Mantenimiento">
+                Mantenimiento
+              </option>
+              <option value="En Servicio" data-texto="estado.En Servicio">
+                En Servicio
+              </option>
+              <option value="Averiado" data-texto="estado.Averiado">
+                Averiado
+              </option>
             </select>
 
             <label data-texto="comun.ubicacion">Ubicación</label>
@@ -163,7 +170,7 @@
             <button
               class="btn-cancelar-usuario"
               type="button"
-            data-texto="comun.cancelar"
+              data-texto="comun.cancelar"
               onclick="
                 document
                   .getElementById('overlayCrearCamiones')
@@ -197,13 +204,32 @@
 
           <label data-texto="comun.tipo">Tipo</label>
           <select id="tipoEditarCamion" required>
-            <option value="" disabled selected data-texto="comun.seleccioneTipo">
-                Seleccione un tipo
-              </option>
-            <option value="Levante Lateral" data-texto="tipoCamion.Levante Lateral">Levante Lateral</option>
-            <option value="Levante Trasero" data-texto="tipoCamion.Levante Trasero">Levante Trasero</option>
-            <option value="Caja Abierta" data-texto="tipoCamion.Caja Abierta">Caja Abierta</option>
-            <option value="Caja Cerrada" data-texto="tipoCamion.Caja Cerrada">Caja Cerrada</option>
+            <option
+              value=""
+              disabled
+              selected
+              data-texto="comun.seleccioneTipo"
+            >
+              Seleccione un tipo
+            </option>
+            <option
+              value="Levante Lateral"
+              data-texto="tipoCamion.Levante Lateral"
+            >
+              Levante Lateral
+            </option>
+            <option
+              value="Levante Trasero"
+              data-texto="tipoCamion.Levante Trasero"
+            >
+              Levante Trasero
+            </option>
+            <option value="Caja Abierta" data-texto="tipoCamion.Caja Abierta">
+              Caja Abierta
+            </option>
+            <option value="Caja Cerrada" data-texto="tipoCamion.Caja Cerrada">
+              Caja Cerrada
+            </option>
           </select>
 
           <label data-texto="comun.capacidadCarga">Capacidad de carga</label>
@@ -211,13 +237,26 @@
 
           <label data-texto="comun.estado">Estado</label>
           <select id="estadoEditarCamion" required>
-            <option value="" disabled selected data-texto="comun.seleccioneEstado">
-                Seleccione un estado
-              </option>
-            <option value="Disponible" data-texto="estado.Disponible">Disponible</option>
-            <option value="Mantenimiento" data-texto="estado.Mantenimiento">Mantenimiento</option>
-            <option value="En Servicio" data-texto="estado.En Servicio">En Servicio</option>
-            <option value="Averiado" data-texto="estado.Averiado">Averiado</option>
+            <option
+              value=""
+              disabled
+              selected
+              data-texto="comun.seleccioneEstado"
+            >
+              Seleccione un estado
+            </option>
+            <option value="Disponible" data-texto="estado.Disponible">
+              Disponible
+            </option>
+            <option value="Mantenimiento" data-texto="estado.Mantenimiento">
+              Mantenimiento
+            </option>
+            <option value="En Servicio" data-texto="estado.En Servicio">
+              En Servicio
+            </option>
+            <option value="Averiado" data-texto="estado.Averiado">
+              Averiado
+            </option>
           </select>
 
           <label data-texto="comun.ubicacion">Ubicación</label>
@@ -341,7 +380,8 @@
       }
 
       function cargarUsuario() {
-        const nombre = localStorage.getItem("nickname") || traducir("usuario.porDefecto");
+        const nombre =
+          localStorage.getItem("nickname") || traducir("usuario.porDefecto");
         const inicial = nombre.charAt(0).toUpperCase();
 
         document.getElementById("usuario").innerHTML = `
@@ -421,7 +461,7 @@
           });
           try {
             const resultado = await resp.json();
-            
+
             if (resultado.status === "ok") {
               obtenerCamiones();
             } else {

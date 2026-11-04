@@ -4,7 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title data-texto="pagina.panelincidencia">Panel de Incidencias - Epsilon</title>
+    <title data-texto="pagina.panelincidencia">
+      Panel de Incidencias - Epsilon
+    </title>
 
     <link rel="stylesheet" href="style.css" />
     <script src="idiomas.js"></script>
@@ -53,55 +55,40 @@
             <button
               data-rol="Administrador"
               class="link-button"
-              data-texto="menu.panelRegistro"
-              onclick="window.location.href = 'panelregistro.html'"
-            >
-              Panel Registro
-            </button>
-          </li>
-
-          <li>
-            <button
-              data-rol="Administrador"
-              class="link-button"
-              data-texto="menu.contenedores"
-              onclick="window.location.href = 'panelcontenedor.html'"
-            >
-              Contenedores
-            </button>
-          </li>
-
-          <li>
-            <button
-              data-rol="Administrador"
-              class="link-button"
-              data-texto="menu.camiones"
-              onclick="window.location.href = 'panelcamion.html'"
-            >
-              Camiones
-            </button>
-          </li>
-
-          <li>
-            <button
-              data-rol="Administrador"
-              class="link-button"
-              data-texto="menu.panelUsuario"
-              onclick="window.location.href = 'panelusuario.html'"
-            >
-              Panel de Usuario
-            </button>
-          </li>
-
-          <li>
-            <button
-              data-rol="Administrador"
-              class="link-button"
               data-texto="menu.cuadrillas"
               onclick="window.location.href = 'panelcuadrilla.html'"
             >
               Cuadrillas
             </button>
+             <li>
+              <button
+                class="link-button"
+                onclick="verificarAcceso('mapa.html')"
+                data-texto="menu.mapa"
+              >
+                Mapa
+              </button>
+            </li>
+
+            <li>
+              <button
+                class="link-button"
+                onclick="verificarAcceso('estadisticas.html')"
+                data-texto="menu.estadisticas"
+              >
+                Estadísticas
+              </button>
+            </li>
+
+            <li>
+              <button
+                class="link-button"
+                onclick="verificarAcceso('documentacion.html')"
+                data-texto="menu.documentacion"
+              >
+                Documentación
+              </button>
+            </li>
           </li>
         </ul>
       </nav>
@@ -131,23 +118,47 @@
 
             <label data-texto="comun.tipo">Tipo</label>
             <select id="tipoCrear" required>
-              <option value="" disabled selected data-texto="comun.seleccioneTipo">
+              <option
+                value=""
+                disabled
+                selected
+                data-texto="comun.seleccioneTipo"
+              >
                 Seleccione un tipo
               </option>
-              <option value="rotura" data-texto="tipoIncidencia.rotura">Contenedor dañado</option>
-              <option value="lleno" data-texto="tipoIncidencia.lleno">Contenedor lleno</option>
-              <option value="desbordado" data-texto="tipoIncidencia.desbordado">Contenedor desbordado</option>
-              <option value="incendiado" data-texto="tipoIncidencia.incendiado">Contenedor incendiado</option>
+              <option value="rotura" data-texto="tipoIncidencia.rotura">
+                Contenedor dañado
+              </option>
+              <option value="lleno" data-texto="tipoIncidencia.lleno">
+                Contenedor lleno
+              </option>
+              <option value="desbordado" data-texto="tipoIncidencia.desbordado">
+                Contenedor desbordado
+              </option>
+              <option value="incendiado" data-texto="tipoIncidencia.incendiado">
+                Contenedor incendiado
+              </option>
             </select>
 
             <label data-texto="pinc.tipoContenedor">Tipo de contenedor</label>
             <select id="tipoContenedorCrear" required>
-              <option value="" disabled selected data-texto="comun.seleccioneTipo">
+              <option
+                value=""
+                disabled
+                selected
+                data-texto="comun.seleccioneTipo"
+              >
                 Seleccione un tipo
               </option>
-              <option value="Naranja" data-texto="tipoContenedor.Naranja">Naranja - Reciclables</option>
-              <option value="Metalico" data-texto="tipoContenedor.Metalico">Metalico - Residuos mezclados</option>
-              <option value="Plastico" data-texto="tipoContenedor.Plastico">Plastico - Residuos mezclados</option>
+              <option value="Naranja" data-texto="tipoContenedor.Naranja">
+                Naranja - Reciclables
+              </option>
+              <option value="Metalico" data-texto="tipoContenedor.Metalico">
+                Metalico - Residuos mezclados
+              </option>
+              <option value="Plastico" data-texto="tipoContenedor.Plastico">
+                Plastico - Residuos mezclados
+              </option>
             </select>
 
             <label data-texto="pinc.imagen">Imagen</label>
@@ -185,7 +196,7 @@
             <button
               class="btn-cancelar-centro-acopio"
               type="button"
-            data-texto="comun.cancelar"
+              data-texto="comun.cancelar"
               onclick="
                 document
                   .getElementById('overlayCrearIncidencias')
@@ -219,7 +230,12 @@
 
           <label data-texto="op.cuadrilla">Cuadrilla</label>
           <select id="idCuadrillaAsignar" required>
-            <option value="" disabled selected data-texto="op.seleccioneCuadrilla">
+            <option
+              value=""
+              disabled
+              selected
+              data-texto="op.seleccioneCuadrilla"
+            >
               Seleccione una cuadrilla
             </option>
           </select>
@@ -420,7 +436,8 @@
       }
 
       function cargarUsuario() {
-        const nombre = localStorage.getItem("nickname") || traducir("usuario.porDefecto");
+        const nombre =
+          localStorage.getItem("nickname") || traducir("usuario.porDefecto");
         const inicial = nombre.charAt(0).toUpperCase();
 
         document.getElementById("usuario").innerHTML = `

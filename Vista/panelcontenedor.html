@@ -4,7 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title data-texto="pagina.panelcontenedor">Panel Contenedores - Epsilon</title>
+    <title data-texto="pagina.panelcontenedor">
+      Panel Contenedores - Epsilon
+    </title>
 
     <link rel="stylesheet" href="style.css" />
     <script src="idiomas.js"></script>
@@ -48,58 +50,33 @@
               Gestión
             </button>
           </li>
-
           <li>
             <button
-              data-rol="Administrador"
               class="link-button"
-              data-texto="menu.panelRegistro"
-              onclick="window.location.href = 'panelregistro.html'"
+              onclick="verificarAcceso('mapa.html')"
+              data-texto="menu.mapa"
             >
-              Panel Registro
+              Mapa
             </button>
           </li>
 
           <li>
             <button
-              data-rol="Administrador"
               class="link-button"
-              data-texto="menu.contenedores"
-              onclick="window.location.href = 'panelcontenedor.html'"
+              onclick="verificarAcceso('estadisticas.html')"
+              data-texto="menu.estadisticas"
             >
-              Contenedores
+              Estadísticas
             </button>
           </li>
 
           <li>
             <button
-              data-rol="Administrador"
               class="link-button"
-              data-texto="menu.camiones"
-              onclick="window.location.href = 'panelcamion.html'"
+              onclick="verificarAcceso('documentacion.html')"
+              data-texto="menu.documentacion"
             >
-              Camiones
-            </button>
-          </li>
-
-          <li>
-            <button
-              data-rol="Administrador"
-              class="link-button"
-              data-texto="menu.panelUsuario"
-              onclick="window.location.href = 'panelusuario.html'"
-            >
-              Panel de Usuario
-            </button>
-          </li>
-          <li>
-            <button
-              class="link-button"
-              data-rol="Administrador"
-              data-texto="menu.cuadrillas"
-              onclick="window.location.href = 'panelcuadrilla.html'"
-            >
-              Cuadrillas
+              Documentación
             </button>
           </li>
         </ul>
@@ -127,9 +104,15 @@
               <option value="" disabled data-texto="comun.seleccioneTipo">
                 Seleccione un tipo
               </option>
-              <option value="Naranja" data-texto="tipoContenedor.Naranja">Naranja - Reciclables</option>
-              <option value="Metalico" data-texto="tipoContenedor.Metalico">Metalico - Residuos mezclados</option>
-              <option value="Plastico" data-texto="tipoContenedor.Plastico">Plastico - Residuos mezclados</option>
+              <option value="Naranja" data-texto="tipoContenedor.Naranja">
+                Naranja - Reciclables
+              </option>
+              <option value="Metalico" data-texto="tipoContenedor.Metalico">
+                Metalico - Residuos mezclados
+              </option>
+              <option value="Plastico" data-texto="tipoContenedor.Plastico">
+                Plastico - Residuos mezclados
+              </option>
             </select>
 
             <label data-texto="comun.capacidadCarga">Capacidad de carga</label>
@@ -142,8 +125,15 @@
               </option>
               <option value="Lleno" data-texto="estado.Lleno">Lleno</option>
               <option value="Vacio" data-texto="estado.Vacio">Vacio</option>
-              <option value="Desbordado" data-texto="estado.Desbordado">Desbordado</option>
-              <option value="Media capacidad" data-texto="estado.Media capacidad">Media capacidad</option>
+              <option value="Desbordado" data-texto="estado.Desbordado">
+                Desbordado
+              </option>
+              <option
+                value="Media capacidad"
+                data-texto="estado.Media capacidad"
+              >
+                Media capacidad
+              </option>
             </select>
 
             <label data-texto="comun.calle">Calle</label>
@@ -165,7 +155,7 @@
             <button
               class="btn-cancelar-usuario"
               type="button"
-            data-texto="comun.cancelar"
+              data-texto="comun.cancelar"
               onclick="
                 document
                   .getElementById('overlayCrearContenedores')
@@ -199,12 +189,23 @@
 
           <label data-texto="comun.tipo">Tipo</label>
           <select id="tipoEditar" required>
-            <option value="" disabled selected data-texto="comun.seleccioneTipo">
+            <option
+              value=""
+              disabled
+              selected
+              data-texto="comun.seleccioneTipo"
+            >
               Seleccione un tipo
             </option>
-            <option value="Naranja" data-texto="tipoContenedor.Naranja">Naranja - Reciclables</option>
-            <option value="Metalico" data-texto="tipoContenedor.Metalico">Metalico - Residuos mezclados</option>
-            <option value="Plastico" data-texto="tipoContenedor.Plastico">Plastico - Residuos mezclados</option>
+            <option value="Naranja" data-texto="tipoContenedor.Naranja">
+              Naranja - Reciclables
+            </option>
+            <option value="Metalico" data-texto="tipoContenedor.Metalico">
+              Metalico - Residuos mezclados
+            </option>
+            <option value="Plastico" data-texto="tipoContenedor.Plastico">
+              Plastico - Residuos mezclados
+            </option>
           </select>
 
           <label data-texto="comun.capacidadCarga">Capacidad de carga</label>
@@ -213,12 +214,16 @@
           <label data-texto="comun.estado">Estado</label>
           <select id="estadoEditar" required>
             <option value="" disabled data-texto="comun.seleccioneEstado">
-                Seleccione un estado
-              </option>
+              Seleccione un estado
+            </option>
             <option value="Lleno" data-texto="estado.Lleno">Lleno</option>
             <option value="Vacio" data-texto="estado.Vacio">Vacio</option>
-            <option value="Desbordado" data-texto="estado.Desbordado">Desbordado</option>
-            <option value="Media capacidad" data-texto="estado.Media capacidad">Media capacidad</option>
+            <option value="Desbordado" data-texto="estado.Desbordado">
+              Desbordado
+            </option>
+            <option value="Media capacidad" data-texto="estado.Media capacidad">
+              Media capacidad
+            </option>
           </select>
 
           <label data-texto="comun.calle">Calle</label>
@@ -349,7 +354,8 @@
       }
 
       function cargarUsuario() {
-        const nombre = localStorage.getItem("nickname") || traducir("usuario.porDefecto");
+        const nombre =
+          localStorage.getItem("nickname") || traducir("usuario.porDefecto");
         const inicial = nombre.charAt(0).toUpperCase();
 
         document.getElementById("usuario").innerHTML = `

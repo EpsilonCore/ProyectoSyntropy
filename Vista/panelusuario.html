@@ -59,48 +59,33 @@
               Panel Registro
             </button>
           </li>
-
           <li>
             <button
-              data-rol="Administrador"
               class="link-button"
-              data-texto="menu.contenedores"
-              onclick="window.location.href = 'panelcontenedor.html'"
+              onclick="verificarAcceso('mapa.html')"
+              data-texto="menu.mapa"
             >
-              Contenedores
+              Mapa
             </button>
           </li>
 
           <li>
             <button
-              data-rol="Administrador"
               class="link-button"
-              data-texto="menu.camiones"
-              onclick="window.location.href = 'panelcamion.html'"
+              onclick="verificarAcceso('estadisticas.html')"
+              data-texto="menu.estadisticas"
             >
-              Camiones
+              Estadísticas
             </button>
           </li>
 
           <li>
             <button
-              data-rol="Administrador"
               class="link-button"
-              data-texto="menu.panelUsuario"
-              onclick="window.location.href = 'panelusuario.html'"
+              onclick="verificarAcceso('documentacion.html')"
+              data-texto="menu.documentacion"
             >
-              Panel de Usuario
-            </button>
-          </li>
-
-          <li>
-            <button
-              data-rol="Administrador"
-              class="link-button"
-              data-texto="menu.cuadrillas"
-              onclick="window.location.href = 'panelcuadrilla.html'"
-            >
-              Cuadrillas
+              Documentación
             </button>
           </li>
         </ul>
@@ -144,9 +129,15 @@
                 Seleccione un rol
               </option>
               <option value="Vecino" data-texto="rol.Vecino">Vecino</option>
-              <option value="Operario" data-texto="rol.Operario">Operario</option>
-              <option value="Recolector" data-texto="rol.Recolector">Recolector</option>
-              <option value="Administrador" data-texto="rol.Administrador">Administrador</option>
+              <option value="Operario" data-texto="rol.Operario">
+                Operario
+              </option>
+              <option value="Recolector" data-texto="rol.Recolector">
+                Recolector
+              </option>
+              <option value="Administrador" data-texto="rol.Administrador">
+                Administrador
+              </option>
             </select>
 
             <button
@@ -213,12 +204,16 @@
           <label data-texto="pusu.rol">Rol</label>
           <select id="rolEditar" required>
             <option value="" disabled data-texto="pusu.seleccioneRol">
-                Seleccione un rol
-              </option>
+              Seleccione un rol
+            </option>
             <option value="Vecino" data-texto="rol.Vecino">Vecino</option>
             <option value="Operario" data-texto="rol.Operario">Operario</option>
-            <option value="Recolector" data-texto="rol.Recolector">Recolector</option>
-            <option value="Administrador" data-texto="rol.Administrador">Administrador</option>
+            <option value="Recolector" data-texto="rol.Recolector">
+              Recolector
+            </option>
+            <option value="Administrador" data-texto="rol.Administrador">
+              Administrador
+            </option>
           </select>
           <button
             class="btn-guardar-usuario"
@@ -336,7 +331,8 @@
       }
 
       function cargarUsuario() {
-        const nombre = localStorage.getItem("nickname") || traducir("usuario.porDefecto");
+        const nombre =
+          localStorage.getItem("nickname") || traducir("usuario.porDefecto");
         const inicial = nombre.charAt(0).toUpperCase();
 
         document.getElementById("usuario").innerHTML = `

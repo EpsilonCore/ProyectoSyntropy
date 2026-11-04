@@ -56,16 +56,35 @@
               Panel de Usuario
             </button>
           </li>
-          <li>
-            <button
-              class="link-button"
-              data-rol="Administrador"
-              data-texto="menu.cuadrillas"
-              onclick="window.location.href = 'panelcuadrilla.html'"
-            >
-              Cuadrillas
-            </button>
-          </li>
+           <li>
+              <button
+                class="link-button"
+                onclick="verificarAcceso('mapa.html')"
+                data-texto="menu.mapa"
+              >
+                Mapa
+              </button>
+            </li>
+
+            <li>
+              <button
+                class="link-button"
+                onclick="verificarAcceso('estadisticas.html')"
+                data-texto="menu.estadisticas"
+              >
+                Estadísticas
+              </button>
+            </li>
+
+            <li>
+              <button
+                class="link-button"
+                onclick="verificarAcceso('documentacion.html')"
+                data-texto="menu.documentacion"
+              >
+                Documentación
+              </button>
+            </li>
         </ul>
       </nav>
     </header>
