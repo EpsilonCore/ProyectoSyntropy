@@ -2,7 +2,7 @@
    FUENTES Y VARIABLES
 ========================= */
 
-@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Work+Sans:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap");
 
 :root {
   --verde-bosque: #1f4630;
@@ -23,6 +23,7 @@
 
   --fuente-display: "Barlow Condensed", "Arial Narrow", sans-serif;
   --fuente-texto: "Work Sans", Arial, Helvetica, sans-serif;
+  --fuente-hero: "Outfit", Arial, Helvetica, sans-serif;
 }
 
 * {
@@ -2183,7 +2184,7 @@ nav button:not(.link-button):hover {
 }
 
 .hero-portada .texto h2 {
-  font-family: var(--fuente-display);
+  font-family: var(--fuente-hero);
   font-weight: 800;
   font-size: 3.2rem;
   line-height: 1.15;
@@ -2192,6 +2193,7 @@ nav button:not(.link-button):hover {
 }
 
 .hero-portada .texto h2 .acento {
+  font-family: var(--fuente-hero);
   font-style: normal;
   font-weight: 800;
   color: var(--brote);

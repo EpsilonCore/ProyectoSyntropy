@@ -92,8 +92,6 @@
             </div>
           </div>
 
-          <div id="usuario" class="usuario"></div>
-
           <button
             id="btnCrearIncidencia"
             class="btn-crear-incidencia"
@@ -371,6 +369,16 @@
                 data-texto="menu.documentacion"
               >
                 Documentación
+              </button>
+            </li>
+
+            <li id="menuCerrarSesion" style="display: none">
+              <button
+                class="link-button"
+                onclick="cerrarSesion()"
+                data-texto="usuario.cerrarSesion"
+              >
+                Cerrar Sesión
               </button>
             </li>
           </ul>
@@ -1011,8 +1019,6 @@
       }
 
       function cargarUsuario() {
-        const usuario = document.getElementById("usuario");
-
         const registro = document.getElementById("registro-btn");
 
         const login = document.getElementById("login-btn");
@@ -1024,30 +1030,8 @@
           document.getElementById("notificaciones").style.display = "block";
           obtenerNotificaciones();
 
-          const nombre =
-            localStorage.getItem("nickname") || traducir("usuario.porDefecto");
-          const inicial = nombre.charAt(0).toUpperCase();
-
-          usuario.innerHTML = `
-
-            <button class="usuario-btn" onclick="abrirUsuario()">
-                ${inicial}
-            </button>
-
-            <div id="menuUsuario" class="menu-usuario">
-
-                <button onclick="cerrarSesion()">
-                    ${traducir("usuario.cerrarSesion")}
-                </button>
-
-            </div>
-
-            `;
+          document.getElementById("menuCerrarSesion").style.display = "";
         }
-      }
-
-      function abrirUsuario() {
-        document.getElementById("menuUsuario").classList.toggle("activo");
       }
 
       cargarUsuario();

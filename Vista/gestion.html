@@ -85,6 +85,16 @@
               Documentación
             </button>
           </li>
+
+          <li>
+            <button
+              class="link-button"
+              onclick="cerrarSesion()"
+              data-texto="usuario.cerrarSesion"
+            >
+              Cerrar Sesión
+            </button>
+          </li>
         </ul>
       </nav>
     </header>
@@ -387,7 +397,6 @@
       function cargarUsuario() {
         const nombre =
           localStorage.getItem("nickname") || traducir("usuario.porDefecto");
-        const inicial = nombre.charAt(0).toUpperCase();
 
         const saludo = document.getElementById("gestionSaludo");
         if (saludo) {
@@ -401,23 +410,7 @@
 
     <span class="nombre-usuario">${nombre}</span>
 
-    <button class="usuario-btn" onclick="abrirUsuario()">
-        ${inicial}
-    </button>
-
-    <div id="menuUsuario" class="menu-usuario">
-
-        <button onclick="cerrarSesion()">
-            ${traducir("usuario.cerrarSesion")}
-        </button>
-
-    </div>
-
     `;
-      }
-
-      function abrirUsuario() {
-        document.getElementById("menuUsuario").classList.toggle("activo");
       }
 
       cargarUsuario();
