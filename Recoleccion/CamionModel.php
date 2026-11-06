@@ -5,7 +5,6 @@ class CamionModel
     private $CapCarga;
     private $Tipo;
     private $Estado;
-    private $Ubicacion;
     private $conexion;
 
     public function __construct($bd)
@@ -15,7 +14,7 @@ class CamionModel
 
     public function getAllMatriculas()
     {
-        $sql = "SELECT matricula, estado, tipo, capacidadCarga, ubicacion FROM camion";
+        $sql = "SELECT matricula, estado, tipo, capacidadCarga FROM camion";
         $stmt = mysqli_prepare($this->conexion, $sql);
         mysqli_stmt_execute($stmt);
         $resultado = mysqli_stmt_get_result($stmt);
@@ -31,7 +30,7 @@ class CamionModel
 
     public function buscarMatricula($Matricula)
     {
-        $sql = "SELECT matricula, capacidad, tipo, estado, ubicacion FROM camion WHERE matricula = ?";
+        $sql = "SELECT matricula, capacidad, tipo, estado FROM camion WHERE matricula = ?";
         $stmt = mysqli_prepare($this->conexion, $sql);
         mysqli_stmt_bind_param($stmt, "s", $Matricula);
         mysqli_stmt_execute($stmt);
@@ -43,15 +42,14 @@ class CamionModel
     }
 
     public function crearCamion($m, $cap, $t, $e, $u){
-            $sql = "INSERT INTO camion (matricula, tipo, capacidadCarga, estado, ubicacion) VALUES (?,?,?,?,?)";
+            $sql = "INSERT INTO camion (matricula, tipo, capacidadCarga, estado) VALUES (?,?,?,?)";
             $stmt = mysqli_prepare($this->conexion, $sql);
             $this->Matricula = $m;
             $this->CapCarga = $cap;
             $this->Tipo = $t;
             $this->Estado = $e;
-            $this->Ubicacion = $u;
 
-            $stmt->bind_param('ssiss',$this->Matricula,$this->Tipo, $this->CapCarga,  $this->Estado, $this->Ubicacion);
+            $stmt->bind_param('ssiss',$this->Matricula,$this->Tipo, $this->CapCarga,  $this->Estado);
             if($stmt->execute()){
                 $stmt->close();
                 return true;
@@ -62,15 +60,14 @@ class CamionModel
 
         }
         public function actualizarCamion($m, $cap, $t, $e, $u){
-            $sql = "UPDATE camion SET tipo=?, capacidadCarga=?, estado=?, ubicacion=? WHERE matricula=?";
+            $sql = "UPDATE camion SET tipo=?, capacidadCarga=?, estado=? WHERE matricula=?";
             $stmt = mysqli_prepare($this->conexion, $sql);
             $this->Matricula = $m;
             $this->CapCarga = $cap;
             $this->Tipo = $t;
             $this->Estado = $e;
-            $this->Ubicacion = $u;
 
-            $stmt->bind_param('sisss', $this->Tipo, $this->CapCarga,  $this->Estado, $this->Ubicacion,  $this->Matricula);
+            $stmt->bind_param('sisss', $this->Tipo, $this->CapCarga,  $this->Estado,  $this->Matricula);
             if($stmt->execute()){
                 $stmt->close();
                 return true;
