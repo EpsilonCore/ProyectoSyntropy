@@ -4,7 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title data-texto="pagina.panelcentroacopio">Panel de Centros de Acopio - Epsilon</title>
+    <title data-texto="pagina.panelcentroacopio">
+      Panel de Centros de Acopio - Epsilon
+    </title>
 
     <link rel="stylesheet" href="style.css" />
     <script src="idiomas.js"></script>
@@ -12,11 +14,14 @@
 
   <body>
     <script>
-      if (localStorage.getItem("logueado") !== "si") {
-        window.location.href = "login.html";
-      }
-      if ((localStorage.getItem("rol") || "").trim() !== "Administrador") {
-        window.location.href = "index.html";
+      {
+        const rol = (localStorage.getItem("rol") || "").trim();
+        const sinSesion = localStorage.getItem("logueado") !== "si";
+
+        if (sinSesion || !["Administrador"].includes(rol)) {
+          document.documentElement.style.display = "none";
+          window.location.replace(sinSesion ? "login.html" : "index.html");
+        }
       }
     </script>
 
@@ -45,48 +50,33 @@
               Gestión
             </button>
           </li>
-
           <li>
             <button
-              data-rol="Administrador"
               class="link-button"
-              data-texto="menu.panelRegistro"
-              onclick="window.location.href = 'panelregistro.html'"
+              onclick="verificarAcceso('mapa.html')"
+              data-texto="menu.mapa"
             >
-              Panel Registro
+              Mapa
             </button>
           </li>
 
           <li>
             <button
-              data-rol="Administrador"
               class="link-button"
-              data-texto="menu.contenedores"
-              onclick="window.location.href = 'panelcontenedor.html'"
+              onclick="verificarAcceso('estadisticas.html')"
+              data-texto="menu.estadisticas"
             >
-              Contenedores
+              Estadísticas
             </button>
           </li>
 
           <li>
             <button
-              data-rol="Administrador"
               class="link-button"
-              data-texto="menu.camiones"
-              onclick="window.location.href = 'panelcamion.html'"
+              onclick="verificarAcceso('documentacion.html')"
+              data-texto="menu.documentacion"
             >
-              Camiones
-            </button>
-          </li>
-
-          <li>
-            <button
-              data-rol="Administrador"
-              class="link-button"
-              data-texto="menu.panelUsuario"
-              onclick="window.location.href = 'panelusuario.html'"
-            >
-              Panel de Usuario
+              Documentación
             </button>
           </li>
         </ul>
@@ -110,7 +100,25 @@
           <h3 data-texto="pcen.crear">Crear Centro de Acopio</h3>
           <form id="formCrearCentroAcopio">
             <label data-texto="pcen.tipoResiduo">Tipo de residuo</label>
-            <input id="tipoResiduoCrear" required />
+            <select id="tipoResiduoCrear" required>
+              <option
+                value=""
+                disabled
+                selected
+                data-texto="comun.seleccioneTipo"
+              >
+                Seleccione un tipo
+              </option>
+              <option value="Naranja" data-texto="tipoContenedor.Naranja">
+                Naranja - Reciclables
+              </option>
+              <option value="Metalico" data-texto="tipoContenedor.Metalico">
+                Metalico - Residuos mezclados
+              </option>
+              <option value="Plastico" data-texto="tipoContenedor.Plastico">
+                Plastico - Residuos mezclados
+              </option>
+            </select>
 
             <label data-texto="comun.capacidad">Capacidad</label>
             <input id="capacidadCrear" required />
@@ -134,7 +142,7 @@
             <button
               class="btn-cancelar-centro-acopio"
               type="button"
-            data-texto="comun.cancelar"
+              data-texto="comun.cancelar"
               onclick="
                 document
                   .getElementById('overlayCrearCentrosAcopio')
@@ -167,11 +175,25 @@
           <input type="hidden" id="idOriginal" />
 
           <label data-texto="pcen.tipoResiduo">Tipo de residuo</label>
-          <input
-            id="tipoResiduoEditar"
-            data-placeholder="comun.noModificar"
-            placeholder="Dejar vacío para no modificar"
-          />
+          <select id="tipoResiduoEditar" required>
+            <option
+              value=""
+              disabled
+              selected
+              data-texto="comun.seleccioneTipo"
+            >
+              Seleccione un tipo
+            </option>
+            <option value="Naranja" data-texto="tipoContenedor.Naranja">
+              Naranja - Reciclables
+            </option>
+            <option value="Metalico" data-texto="tipoContenedor.Metalico">
+              Metalico - Residuos mezclados
+            </option>
+            <option value="Plastico" data-texto="tipoContenedor.Plastico">
+              Plastico - Residuos mezclados
+            </option>
+          </select>
 
           <label data-texto="comun.capacidad">Capacidad</label>
           <input
@@ -181,8 +203,11 @@
           />
 
           <label data-texto="comun.calle">Calle</label>
-          <input id="calleEditar" data-placeholder="comun.noModificar"
-            placeholder="Dejar vacío para no modificar" />
+          <input
+            id="calleEditar"
+            data-placeholder="comun.noModificar"
+            placeholder="Dejar vacío para no modificar"
+          />
           <label data-texto="comun.barrio">Barrio</label>
           <input
             id="barrioEditar"
@@ -304,13 +329,16 @@
 
       function cerrarSesion() {
         localStorage.removeItem("logueado");
+        localStorage.removeItem("rol");
         localStorage.removeItem("nickname");
+        localStorage.removeItem("mail");
 
         window.location.href = "index.html";
       }
 
       function cargarUsuario() {
-        const nombre = localStorage.getItem("nickname") || traducir("usuario.porDefecto");
+        const nombre =
+          localStorage.getItem("nickname") || traducir("usuario.porDefecto");
         const inicial = nombre.charAt(0).toUpperCase();
 
         document.getElementById("usuario").innerHTML = `
@@ -386,9 +414,7 @@
         }
       }
       async function eliminarCentroAcopio(id) {
-        if (
-          confirm(traducir("pcen.confirmarEliminar"))
-        ) {
+        if (confirm(traducir("pcen.confirmarEliminar"))) {
           const resp = await fetch(`${API_URL}Borrar`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
@@ -411,8 +437,7 @@
         const listaContainer = document.getElementById("listaCentrosAcopio");
 
         if (centros.length === 0) {
-          listaContainer.innerHTML =
-            `<p>${traducir("pcen.vacio")}</p>`;
+          listaContainer.innerHTML = `<p>${traducir("pcen.vacio")}</p>`;
           return;
         }
 

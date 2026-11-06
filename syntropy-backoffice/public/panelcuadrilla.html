@@ -12,16 +12,14 @@
 
   <body>
     <script>
-      if (localStorage.getItem("logueado") !== "si") {
-        window.location.href = "login.html";
-      }
+      {
+        const rol = (localStorage.getItem("rol") || "").trim();
+        const sinSesion = localStorage.getItem("logueado") !== "si";
 
-      if (
-        !["Administrador", "Operario"].includes(
-          (localStorage.getItem("rol") || "").trim(),
-        )
-      ) {
-        window.location.href = "index.html";
+        if (sinSesion || !["Administrador", "Operario"].includes(rol)) {
+          document.documentElement.style.display = "none";
+          window.location.replace(sinSesion ? "login.html" : "index.html");
+        }
       }
     </script>
 
@@ -43,22 +41,11 @@
           <li>
             <button
               class="link-button"
-              data-rol="Administrador, Operario"
+              data-rol="Administrador"
               data-texto="menu.gestion"
               onclick="window.location.href = 'gestion.html'"
             >
               Gestión
-            </button>
-          </li>
-
-          <li>
-            <button
-              class="link-button"
-              data-rol="Administrador, Operario"
-              data-texto="menu.panelRutas"
-              onclick="window.location.href = 'panelrutas.html'"
-            >
-              Panel Rutas
             </button>
           </li>
 
@@ -108,22 +95,41 @@
         </button>
       </div>
 
-      <div id="cuadrillaMensaje" style="display: none; padding: 12px 16px; border-radius: 8px; margin-top: 16px; font-weight: 600;"></div>
+      <div
+        id="cuadrillaMensaje"
+        style="
+          display: none;
+          padding: 12px 16px;
+          border-radius: 8px;
+          margin-top: 16px;
+          font-weight: 600;
+        "
+      ></div>
 
       <div class="lista-panel">
         <h3 data-texto="pcua.listaTitulo">Lista de Cuadrillas</h3>
-        <ul id="cuadrillaGrid" style="list-style: none; padding: 0; margin: 0;">
+        <ul id="cuadrillaGrid" style="list-style: none; padding: 0; margin: 0">
           <p data-texto="pcua.cargando">Cargando cuadrillas...</p>
         </ul>
       </div>
     </div>
 
     <!-- Modal: nueva cuadrilla alineada al estilo overlayCrearUsuarios -->
-    <div class="overlay" id="cuadrillaModalFondo" onclick="cerrarModalCuadrillaFuera(event)">
+    <div
+      class="overlay"
+      id="cuadrillaModalFondo"
+      onclick="cerrarModalCuadrillaFuera(event)"
+    >
       <div class="crear-usuario">
         <h3 data-texto="pcua.nueva">Nueva Cuadrilla</h3>
 
-        <form id="formCrearCuadrilla" onsubmit="event.preventDefault(); crearCuadrilla();">
+        <form
+          id="formCrearCuadrilla"
+          onsubmit="
+            event.preventDefault();
+            crearCuadrilla();
+          "
+        >
           <label for="cuadrillaNombre" data-texto="pcua.nombre">
             Nombre de la cuadrilla
           </label>
@@ -135,9 +141,27 @@
             required
           />
 
-          <label data-texto="pcua.miembros">Miembros (Recolectores activos)</label>
-          <div id="cuadrillaListaRecolectores" style="max-height: 180px; overflow-y: auto; border: 1px solid var(--borde); border-radius: 8px; padding: 10px; margin-top: 6px; background: white;">
-            <p style="color: var(--tinta-suave); font-size: 0.9rem;" data-texto="pcua.cargandoRecolectores">Cargando recolectores...</p>
+          <label data-texto="pcua.miembros"
+            >Miembros (Recolectores activos)</label
+          >
+          <div
+            id="cuadrillaListaRecolectores"
+            style="
+              max-height: 180px;
+              overflow-y: auto;
+              border: 1px solid var(--borde);
+              border-radius: 8px;
+              padding: 10px;
+              margin-top: 6px;
+              background: white;
+            "
+          >
+            <p
+              style="color: var(--tinta-suave); font-size: 0.9rem"
+              data-texto="pcua.cargandoRecolectores"
+            >
+              Cargando recolectores...
+            </p>
           </div>
 
           <button
@@ -161,17 +185,35 @@
     </div>
 
     <!-- Modal: asignar camión a una cuadrilla -->
-    <div class="overlay" id="modalAsignarCamionFondo" onclick="cerrarModalAsignarCamionFuera(event)">
+    <div
+      class="overlay"
+      id="modalAsignarCamionFondo"
+      onclick="cerrarModalAsignarCamionFuera(event)"
+    >
       <div class="crear-usuario">
         <h3 data-texto="pcua.asignarCamion">Asignar Camión</h3>
-        <p id="asignarCamionCuadrillaNombre" style="color: var(--tinta-suave); margin-top: -8px;"></p>
+        <p
+          id="asignarCamionCuadrillaNombre"
+          style="color: var(--tinta-suave); margin-top: -8px"
+        ></p>
 
-        <form id="formAsignarCamion" onsubmit="event.preventDefault(); asignarCamion();">
-          <label for="selectCamionDisponible" data-texto="pcua.camionDisponible">
+        <form
+          id="formAsignarCamion"
+          onsubmit="
+            event.preventDefault();
+            asignarCamion();
+          "
+        >
+          <label
+            for="selectCamionDisponible"
+            data-texto="pcua.camionDisponible"
+          >
             Camión disponible
           </label>
           <select id="selectCamionDisponible" required>
-            <option value="" data-texto="pcua.cargandoCamiones">Cargando camiones...</option>
+            <option value="" data-texto="pcua.cargandoCamiones">
+              Cargando camiones...
+            </option>
           </select>
 
           <button
@@ -218,12 +260,16 @@
 
       function cerrarSesion() {
         localStorage.removeItem("logueado");
+        localStorage.removeItem("rol");
         localStorage.removeItem("nickname");
+        localStorage.removeItem("mail");
+
         window.location.href = "index.html";
       }
 
       function cargarUsuario() {
-        const nombre = localStorage.getItem("nickname") || traducir("usuario.porDefecto");
+        const nombre =
+          localStorage.getItem("nickname") || traducir("usuario.porDefecto");
         const inicial = nombre.charAt(0).toUpperCase();
 
         document.getElementById("usuario").innerHTML = `
@@ -254,9 +300,12 @@
         const contenedor = document.getElementById("cuadrillaMensaje");
         contenedor.textContent = texto;
         contenedor.style.display = "block";
-        contenedor.style.backgroundColor = tipo === "ok" ? "rgba(16, 185, 129, 0.12)" : "rgba(239, 68, 68, 0.12)";
+        contenedor.style.backgroundColor =
+          tipo === "ok"
+            ? "rgba(16, 185, 129, 0.12)"
+            : "rgba(239, 68, 68, 0.12)";
         contenedor.style.color = tipo === "ok" ? "#047857" : "#b91c1c";
-        
+
         setTimeout(() => {
           contenedor.style.display = "none";
         }, 4000);
@@ -298,7 +347,10 @@
           .map((cuadrilla) => {
             const miembrosHtml = (cuadrilla.miembros || []).length
               ? cuadrilla.miembros
-                  .map((m) => `<li>• ${m.nombre} ${m.apellido} (${m.nickname})</li>`)
+                  .map(
+                    (m) =>
+                      `<li>• ${m.nombre} ${m.apellido} (${m.nickname})</li>`,
+                  )
                   .join("")
               : `<li>${traducir("pcua.sinMiembros")}</li>`;
 
@@ -375,9 +427,11 @@
       }
 
       function cerrarModalCuadrilla() {
-        document.getElementById("cuadrillaModalFondo").classList.remove("activo");
+        document
+          .getElementById("cuadrillaModalFondo")
+          .classList.remove("activo");
       }
-      
+
       function cerrarModalCuadrillaFuera(evento) {
         if (evento.target.id === "cuadrillaModalFondo") {
           cerrarModalCuadrilla();
@@ -388,12 +442,19 @@
 
       let idCuadrillaParaAsignarCamion = null;
 
-      async function abrirModalAsignarCamion(idCuadrilla, nombreCuadrilla, event) {
+      async function abrirModalAsignarCamion(
+        idCuadrilla,
+        nombreCuadrilla,
+        event,
+      ) {
         if (event) event.stopPropagation();
 
         idCuadrillaParaAsignarCamion = idCuadrilla;
-        document.getElementById("asignarCamionCuadrillaNombre").textContent = traducir("pcua.tituloCamion").replace("{x}", nombreCuadrilla);
-        document.getElementById("modalAsignarCamionFondo").classList.add("activo");
+        document.getElementById("asignarCamionCuadrillaNombre").textContent =
+          traducir("pcua.tituloCamion").replace("{x}", nombreCuadrilla);
+        document
+          .getElementById("modalAsignarCamionFondo")
+          .classList.add("activo");
 
         const select = document.getElementById("selectCamionDisponible");
         select.innerHTML = `<option value="">${traducir("pcua.cargandoCamiones")}</option>`;
@@ -415,7 +476,10 @@
           select.innerHTML =
             `<option value="">${traducir("pcua.seleccioneCamion")}</option>` +
             json.data
-              .map((c) => `<option value="${c.matricula}">${c.matricula} — ${c.tipo}</option>`)
+              .map(
+                (c) =>
+                  `<option value="${c.matricula}">${c.matricula} — ${c.tipo}</option>`,
+              )
               .join("");
         } catch (error) {
           select.innerHTML = `<option value="">${traducir("comun.conexion")}</option>`;
@@ -424,7 +488,9 @@
 
       function cerrarModalAsignarCamion() {
         idCuadrillaParaAsignarCamion = null;
-        document.getElementById("modalAsignarCamionFondo").classList.remove("activo");
+        document
+          .getElementById("modalAsignarCamionFondo")
+          .classList.remove("activo");
         document.getElementById("formAsignarCamion").reset();
       }
 
@@ -435,7 +501,9 @@
       }
 
       async function asignarCamion() {
-        const matricula = document.getElementById("selectCamionDisponible").value;
+        const matricula = document.getElementById(
+          "selectCamionDisponible",
+        ).value;
         if (!matricula || !idCuadrillaParaAsignarCamion) {
           mostrarMensaje(traducir("pcua.faltaCamion"), "error");
           return;
@@ -514,7 +582,9 @@
       }
 
       async function eliminarCuadrilla(idCuadrilla, nombre) {
-        if (!confirm(traducir("pcua.confirmarEliminar").replace("{x}", nombre))) {
+        if (
+          !confirm(traducir("pcua.confirmarEliminar").replace("{x}", nombre))
+        ) {
           return;
         }
 

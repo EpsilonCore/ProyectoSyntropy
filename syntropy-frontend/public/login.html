@@ -18,13 +18,21 @@
       <div id="loginError" class="login-error"></div>
 
       <form id="loginForm">
-        <input type="text" name="mail" id="mail" placeholder="Mail" data-placeholder="login.mail" required />
+        <input
+          type="text"
+          name="mail"
+          id="mail"
+          placeholder="Mail"
+          data-placeholder="login.mail"
+          required
+        />
 
         <input
           type="password"
           name="contrasenia"
           id="password"
-          placeholder="Contraseña" data-placeholder="login.contrasenia"
+          placeholder="Contraseña"
+          data-placeholder="login.contrasenia"
           required
         />
 
@@ -32,65 +40,69 @@
       </form>
 
       <div class="login-links">
-        <a href="recuperar.html" data-texto="login.olvido"> ¿Olvidaste tu contraseña? </a>
+        <a href="recuperar.html" data-texto="login.olvido">
+          ¿Olvidaste tu contraseña?
+        </a>
 
-        <a href="registro.html" data-texto="login.crearCuenta"> Crear Cuenta </a>
+        <a href="registro.html" data-texto="login.crearCuenta">
+          Crear Cuenta
+        </a>
       </div>
     </div>
 
     <script>
-  const loginError = document.getElementById("loginError");
+      const loginError = document.getElementById("loginError");
 
-  function mostrarError(mensaje) {
-    loginError.textContent = mensaje;
-    loginError.classList.add("activo");
-  }
-
-  document
-    .getElementById("loginForm")
-    .addEventListener("submit", async function (e) {
-      e.preventDefault();
-      loginError.classList.remove("activo");
-
-      const formData = new FormData(e.target);
-      const data = Object.fromEntries(formData.entries());
-
-      try {
-        const response = await fetch(
-          "/api/usuarios/Login",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-          },
-        );
-
-        const result = await response.json();
-        if (response.ok && result.status === "ok") {
-          localStorage.setItem("logueado", "si");
-          localStorage.setItem("rol", result.usuario.rol);
-          localStorage.setItem("nickname", result.usuario.nickname);
-          localStorage.setItem("mail", data.mail);
-          window.location.href = "index.html";
-        } else {
-          localStorage.removeItem("logueado");
-          localStorage.removeItem("rol");
-          localStorage.removeItem("nickname");
-          localStorage.removeItem("mail");
-
-          if (result.status === "no_autorizado") {
-            mostrarError("Mail o contraseña incorrectos.");
-          } else {
-            mostrarError(result.mensaje || "No se pudo iniciar sesión.");
-          }
-        }
-      } catch (error) {
-        console.error("Detalle exacto del error:", error);
-        mostrarError("No se pudo conectar con el servidor.");
+      function mostrarError(mensaje) {
+        loginError.textContent = mensaje;
+        loginError.classList.add("activo");
       }
-    });
-</script>
+
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          loginError.classList.remove("activo");
+
+          const formData = new FormData(e.target);
+          const data = Object.fromEntries(formData.entries());
+
+          try {
+            const response = await fetch(
+              "/api/usuarios/Login",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+              },
+            );
+
+            const result = await response.json();
+            if (response.ok && result.status === "ok") {
+              localStorage.setItem("logueado", "si");
+              localStorage.setItem("rol", result.usuario.rol);
+              localStorage.setItem("nickname", result.usuario.nickname);
+              localStorage.setItem("mail", data.mail);
+              window.location.href = "index.html";
+            } else {
+              localStorage.removeItem("logueado");
+              localStorage.removeItem("rol");
+              localStorage.removeItem("nickname");
+              localStorage.removeItem("mail");
+
+              if (result.status === "no_autorizado") {
+                mostrarError("Mail o contraseña incorrectos.");
+              } else {
+                mostrarError(result.mensaje || "No se pudo iniciar sesión.");
+              }
+            }
+          } catch (error) {
+            console.error("Detalle exacto del error:", error);
+            mostrarError("No se pudo conectar con el servidor.");
+          }
+        });
+    </script>
   </body>
 </html>

@@ -1,14 +1,16 @@
 <?php
 require_once __DIR__ . "/CuadrillaModel.php";
+require_once __DIR__ . "/IncidenciaModel.php";
 
 class RutasModel {
     private $conexion;
     private $cuadrillaModel;
-
+    private $incidenciaModel;
 
 public function __construct($bd){
     $this->conexion = $bd;
     $this->cuadrillaModel = new CuadrillaModel($bd);
+    $this->incidenciaModel = new IncidenciaModel($bd);
 }
 
 public function crearRuta($nombre, array $paradas){
@@ -35,8 +37,8 @@ public function crearRuta($nombre, array $paradas){
 
     $orden = 1;
     foreach($paradas as $parada){
-        $idContenedor = $parada['ID_contenedor'] ?? null;
-        $idAcopio = $parada['ID_acopio'] ?? null;
+        $idContenedor = $parada['idContenedor'] ?? null;
+        $idAcopio = $parada['idAcopio'] ?? null;
         $lat = $parada['lat'] ?? null;
         $lon = $parada['lon'] ?? null;
 
@@ -285,6 +287,147 @@ public function finalizarRuta($idRuta, $mail){
     $stmt->close();
 
     $this->cuadrillaModel->liberarCamionSiCorresponde($ruta['ID_Cuadrilla']);
+    return ["ok" => true, "motivo" => null];
+}
+// Contenedores de la ruta del recolector
+public function getParadasPorRutaDeIntegrante($idRuta, $mail){
+    $sql = "SELECT p.ID_parada, p.orden, p.ID_contenedor, p.ID_acopio, p.estado,
+    c.calle, c.numero, c.barrio, c.tipo,
+    a.calle AS calle_acopio, a.numero AS numero_acopio, a.barrio AS barrio_acopio
+    FROM rutaparada p
+    INNER JOIN ruta r ON r.ID_ruta = p.ID_ruta
+    INNER JOIN integrante_cuadrilla ic ON ic.ID_cuadrilla = r.ID_Cuadrilla
+    LEFT JOIN contenedor c ON c.ID_contenedor = p.ID_contenedor
+    LEFT JOIN centro_acopio a ON a.ID_acopio = p.ID_acopio
+    WHERE p.ID_ruta = ? AND ic.mail = ?
+    ORDER BY p.orden ASC";
+    $stmt = mysqli_prepare($this->conexion, $sql);
+    if(!$stmt){
+        throw new Exception("Error al preparar la consulta: " . mysqli_error($this->conexion));
+    }
+    $stmt->bind_param("is", $idRuta, $mail);
+    if(! $stmt->execute()){
+        throw new Exception("Error al ejecutar la consulta: " . mysqli_error($this->conexion));
+    }
+    $resultado = $stmt->get_result();
+    $paradas = [];
+    while($fila = mysqli_fetch_assoc($resultado)){
+        $paradas[] = $fila;
+    }
+    $stmt->close();
+    return $paradas;
+}
+// Sugerencia de ruta
+public function getCentroAcopio($idAcopio){
+    $sql = "SELECT ID_acopio, tipoResiduo, calle, numero, barrio, lat, lon
+            FROM centro_acopio
+            WHERE ID_acopio = ?";
+    $stmt = mysqli_prepare($this->conexion, $sql);
+    if(!$stmt){
+        throw new Exception("Error al preparar la consulta: " . mysqli_error($this->conexion));
+    }
+    $stmt->bind_param("i", $idAcopio);
+    if(! $stmt->execute()){
+        throw new Exception("Error al ejecutar la consulta: " . mysqli_error($this->conexion));
+    }
+    $centro = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+    return $centro;
+}
+
+public function getContenedoresParaSugerir($tipo){
+    $sql = "SELECT ID_contenedor, capacidadCarga, estado, calle, numero, barrio, lat, lon
+            FROM contenedor
+            WHERE tipo = ? AND estado IN ('Lleno', 'Desbordado')
+            AND ID_contenedor NOT IN (
+                SELECT p.ID_contenedor
+                FROM rutaparada p
+                INNER JOIN ruta r ON r.ID_ruta = p.ID_ruta
+                WHERE p.ID_contenedor IS NOT NULL
+                AND r.estado IN ('Planificada', 'Pendiente', 'En Curso')
+            )";
+    $stmt = mysqli_prepare($this->conexion, $sql);
+    if(!$stmt){
+        throw new Exception("Error al preparar la consulta: " . mysqli_error($this->conexion));
+    }
+    $stmt->bind_param("s", $tipo);
+    if(! $stmt->execute()){
+        throw new Exception("Error al ejecutar la consulta: " . mysqli_error($this->conexion));
+    }
+    $resultado = $stmt->get_result();
+    $contenedores = [];
+    while($fila = mysqli_fetch_assoc($resultado)){
+        $fila['capacidadCarga'] = (int)$fila['capacidadCarga'];
+        $fila['lat'] = (float)$fila['lat'];
+        $fila['lon'] = (float)$fila['lon'];
+        $contenedores[] = $fila;
+    }
+    $stmt->close();
+    return $contenedores;
+}
+
+public function getCapacidadMaximaCamion(){
+    $sql = "SELECT MAX(capacidadCarga) AS maxima FROM camion WHERE estado = 'Disponible'";
+    $stmt = mysqli_prepare($this->conexion, $sql);
+    if(!$stmt){
+        throw new Exception("Error al preparar la consulta: " . mysqli_error($this->conexion));
+    }
+    if(! $stmt->execute()){
+        throw new Exception("Error al ejecutar la consulta: " . mysqli_error($this->conexion));
+    }
+    $fila = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+    return $fila['maxima'] === null ? null : (int)$fila['maxima'];
+}
+
+// Marcar contenedor
+public function marcarParada($idParada, $estado, $mail, $tipoIncidencia){
+    $sql = "SELECT p.ID_contenedor, p.estado, r.estado AS estado_ruta, r.ID_Cuadrilla
+    FROM rutaparada p
+    INNER JOIN ruta r ON r.ID_ruta = p.ID_ruta
+    INNER JOIN integrante_cuadrilla ic ON ic.ID_cuadrilla = r.ID_Cuadrilla
+    WHERE p.ID_parada = ? AND ic.mail = ?";
+    $stmt = mysqli_prepare($this->conexion, $sql);
+    if(!$stmt){
+        throw new Exception("Error al preparar la consulta: " . mysqli_error($this->conexion));
+    }
+    $stmt->bind_param("is", $idParada, $mail);
+    if(! $stmt->execute()){
+        throw new Exception("Error al ejecutar la consulta: " . mysqli_error($this->conexion));
+    }
+    $parada = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    if (!$parada) {
+        return ["ok" => false, "motivo" => "no_encontrado"];
+    }
+    if ($parada['estado_ruta'] !== 'En Curso') {
+        return ["ok" => false, "motivo" => "estado_invalido"];
+    }
+    if (!$parada['ID_contenedor']) {
+        return ["ok" => false, "motivo" => "sin_contenedor"];
+    }
+    if ($parada['estado'] !== 'Pendiente') {
+        return ["ok" => false, "motivo" => "ya_marcada"];
+    }
+
+    if ($estado === 'No recogido') {
+        $creada = $this->incidenciaModel->crearIncidencia($mail, $tipoIncidencia, 'Pendiente', '', null, null, null, null, $parada['ID_contenedor'], $parada['ID_Cuadrilla']);
+        if (!$creada) {
+            throw new Exception("No se pudo crear la incidencia.");
+        }
+    }
+
+    $sql = "UPDATE rutaparada SET estado = ? WHERE ID_parada = ?";
+    $stmt = mysqli_prepare($this->conexion, $sql);
+    if(!$stmt){
+        throw new Exception("Error al preparar la consulta: " . mysqli_error($this->conexion));
+    }
+    $stmt->bind_param("si", $estado, $idParada);
+    if(! $stmt->execute()){
+        throw new Exception("Error al ejecutar la consulta: " . mysqli_error($this->conexion));
+    }
+    $stmt->close();
     return ["ok" => true, "motivo" => null];
 }
 }

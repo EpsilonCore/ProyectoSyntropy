@@ -13,7 +13,8 @@
   <body>
     <script>
       if (localStorage.getItem("logueado") !== "si") {
-        window.location.href = "login.html";
+        document.documentElement.style.display = "none";
+        window.location.replace("login.html");
       }
     </script>
 
@@ -34,7 +35,7 @@
         <ul>
           <li>
             <button
-              data-rol="Administrador, Operario"
+              data-rol="Administrador"
               class="link-button"
               data-texto="menu.gestion"
               onclick="window.location.href = 'gestion.html'"

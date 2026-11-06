@@ -107,7 +107,10 @@ class RutaController
                 return ["status" => "datos_invalidos", "mensaje" => "Cada parada necesita latitud y longitud.", "data" => null];
             }
         }
-
+        $ultimaParada = end($datos->paradas);
+        if (empty($datos->paradas[0]->idAcopio) || empty($ultimaParada->idAcopio)) {
+            return ["status" => "datos_invalidos", "mensaje" => "La ruta debe empezar y terminar en un centro de acopio.", "data" => null];
+        }   
         $paradas = array_map(function ($p) {
             return [
                 'lat' => $p->lat,
@@ -215,5 +218,158 @@ class RutaController
             return ["status" => "no_disponible", "mensaje" => "Tu cuadrilla ya tiene una ruta en curso.", "data" => null];
         }
         return ["status" => "no_disponible", "mensaje" => "La ruta no está en un estado válido para esta acción.", "data" => null];
+    }
+    public function getParadasDeMiRuta()
+{
+    $json = file_get_contents('php://input');
+    $datos = json_decode($json);
+
+    if (!$datos || empty($datos->idRuta) || !ctype_digit((string)$datos->idRuta) || empty($datos->mail)) {
+        return ["status" => "datos_invalidos", "mensaje" => "Faltan el id de la ruta y el mail del usuario.", "data" => null];
+    }
+
+    try {
+        $paradas = $this->modeloObj->getParadasPorRutaDeIntegrante((int)$datos->idRuta, $datos->mail);
+    } catch (Exception $e) {
+        return ["status" => "error", "mensaje" => "No se pudieron obtener los contenedores de la ruta.", "data" => null];
+    }
+
+    return ["status" => "ok", "mensaje" => "Contenedores obtenidos correctamente.", "data" => $paradas];
+}
+
+public function marcarParada()
+{
+    $json = file_get_contents('php://input');
+    $datos = json_decode($json);
+
+    if (
+        !$datos || empty($datos->idParada) || !ctype_digit((string)$datos->idParada) || empty($datos->mail)
+        || !isset($datos->estado) || !in_array($datos->estado, ['Recogido', 'No recogido'], true)
+    ) {
+        return ["status" => "datos_invalidos", "mensaje" => "Faltan el id de la parada, el estado y el mail del usuario.", "data" => null];
+    }
+
+    $tipoIncidencia = $datos->tipoIncidencia ?? null;
+    if ($datos->estado === 'No recogido' && !in_array($tipoIncidencia, ['incendiado', 'rotura'], true)) {
+        return ["status" => "datos_invalidos", "mensaje" => "Elegí el tipo de incidencia: incendiado o dañado.", "data" => null];
+    }
+
+    try {
+        $resultado = $this->modeloObj->marcarParada((int)$datos->idParada, $datos->estado, $datos->mail, $tipoIncidencia);
+    } catch (Exception $e) {
+        return ["status" => "error", "mensaje" => "No se pudo marcar el contenedor.", "data" => null];
+    }
+
+    if ($resultado['ok']) {
+        return ["status" => "ok", "mensaje" => "Contenedor marcado correctamente.", "data" => null];
+    }
+    if ($resultado['motivo'] === 'no_encontrado') {
+        return ["status" => "no_encontrado", "mensaje" => "No se encontró la parada o no pertenece a tu cuadrilla.", "data" => null];
+    }
+    if ($resultado['motivo'] === 'sin_contenedor') {
+        return ["status" => "datos_invalidos", "mensaje" => "La parada no tiene un contenedor asociado.", "data" => null];
+    }
+    if ($resultado['motivo'] === 'ya_marcada') {
+    return ["status" => "no_disponible", "mensaje" => "El contenedor ya fue marcado.", "data" => null];
+}
+    return ["status" => "no_disponible", "mensaje" => "La ruta no está en curso.", "data" => null];
+}
+    public function sugerirRuta()
+    {
+        $json = file_get_contents('php://input');
+        $datos = json_decode($json);
+
+        if (
+            !$datos || empty($datos->tipo)
+            || empty($datos->idAcopioInicio) || !ctype_digit((string)$datos->idAcopioInicio)
+            || empty($datos->idAcopioFin) || !ctype_digit((string)$datos->idAcopioFin)
+        ) {
+            return ["status" => "datos_invalidos", "mensaje" => "Faltan el tipo de residuo o los centros de acopio.", "data" => null];
+        }
+
+        try {
+            $inicio = $this->modeloObj->getCentroAcopio((int)$datos->idAcopioInicio);
+            $fin = $this->modeloObj->getCentroAcopio((int)$datos->idAcopioFin);
+            $contenedores = $this->modeloObj->getContenedoresParaSugerir($datos->tipo);
+            $capacidadMaxima = $this->modeloObj->getCapacidadMaximaCamion();
+        } catch (Exception $e) {
+            return ["status" => "error", "mensaje" => "No se pudo calcular la ruta sugerida.", "data" => null];
+        }
+
+        if (!$inicio || !$fin) {
+            return ["status" => "no_encontrado", "mensaje" => "No existe uno de los centros de acopio.", "data" => null];
+        }
+
+        if ($inicio['tipoResiduo'] !== $datos->tipo || $fin['tipoResiduo'] !== $datos->tipo) {
+            return ["status" => "datos_invalidos", "mensaje" => "Los centros de acopio deben ser del mismo tipo de residuo que la ruta.", "data" => null];
+        }
+
+        $elegidos = $this->elegirContenedores($inicio, $contenedores, $capacidadMaxima);
+        if (empty($elegidos)) {
+            return ["status" => "sin_contenedores", "mensaje" => "No hay contenedores para sugerir.", "data" => null];
+        }
+
+        return [
+            "status" => "ok",
+            "mensaje" => "Ruta sugerida correctamente.",
+            "data" => [
+                "contenedores" => $this->ordenarPorCercania($inicio, $elegidos),
+                "dejadosFuera" => count($contenedores) - count($elegidos),
+            ],
+        ];
+    }
+
+    // Distancia en km entre dos puntos
+    private function distanciaKm($latA, $lonA, $latB, $lonB)
+    {
+        $norteSur = ($latB - $latA) * 110.57;
+        $esteOeste = ($lonB - $lonA) * cos(deg2rad(($latA + $latB) / 2)) * 111.32;
+        return sqrt($norteSur * $norteSur + $esteOeste * $esteOeste);
+    }
+
+    // Cuáles contenedores entran: primero los desbordados, después los más cercanos al centro de inicio
+    private function elegirContenedores($inicio, array $contenedores, $capacidadMaxima)
+    {
+        usort($contenedores, function ($a, $b) use ($inicio) {
+            if ($a['estado'] !== $b['estado']) {
+                return $a['estado'] === 'Desbordado' ? -1 : 1;
+            }
+            $distanciaA = $this->distanciaKm($inicio['lat'], $inicio['lon'], $a['lat'], $a['lon']);
+            $distanciaB = $this->distanciaKm($inicio['lat'], $inicio['lon'], $b['lat'], $b['lon']);
+            return $distanciaA <=> $distanciaB;
+        });
+
+        $elegidos = [];
+        $carga = 0;
+        foreach ($contenedores as $contenedor) {
+            if ($capacidadMaxima !== null && $carga + $contenedor['capacidadCarga'] > $capacidadMaxima) {
+                continue;
+            }
+            $elegidos[] = $contenedor;
+            $carga += $contenedor['capacidadCarga'];
+        }
+        return $elegidos;
+    }
+
+    // Orden de la ruta
+    private function ordenarPorCercania($inicio, array $contenedores)
+    {
+        $actual = $inicio;
+        $ordenados = [];
+        while (!empty($contenedores)) {
+            $indiceCercano = 0;
+            $menorDistancia = null;
+            foreach ($contenedores as $indice => $contenedor) {
+                $distancia = $this->distanciaKm($actual['lat'], $actual['lon'], $contenedor['lat'], $contenedor['lon']);
+                if ($menorDistancia === null || $distancia < $menorDistancia) {
+                    $menorDistancia = $distancia;
+                    $indiceCercano = $indice;
+                }
+            }
+            $actual = $contenedores[$indiceCercano];
+            $ordenados[] = $actual;
+            array_splice($contenedores, $indiceCercano, 1);
+        }
+        return $ordenados;
     }
 }
