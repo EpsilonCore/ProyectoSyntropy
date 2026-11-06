@@ -3371,3 +3371,124 @@ nav button:not(.link-button):hover {
   background: rgba(62, 98, 116, 0.12);
   color: var(--acero-hover);
 }
+/* =========================
+   MODAL DE MANUALES
+========================= */
+
+.modal-manuales {
+  background: var(--panel);
+  width: min(520px, calc(100% - 32px));
+  padding: 30px;
+  border-radius: 14px;
+  box-shadow: 0 20px 45px rgba(28, 35, 31, 0.22);
+  animation: aparecer-modal 0.2s ease-out;
+}
+
+.modal-manuales-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.modal-manuales-cabecera h3 {
+  font-family: var(--fuente-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--tinta);
+}
+
+.modal-manuales-cerrar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--tinta-suave);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modal-manuales-cerrar:hover {
+  background: var(--verde-tinte);
+}
+
+.modal-manuales-cerrar svg {
+  width: 20px;
+  height: 20px;
+}
+
+.modal-manuales-desc {
+  color: var(--tinta-suave);
+  margin-bottom: 20px;
+}
+
+.lista-manuales {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.manual-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  color: var(--tinta);
+  text-decoration: none;
+  transition:
+    border-color 0.2s,
+    background-color 0.2s,
+    transform 0.2s;
+}
+
+.manual-item:hover {
+  border-color: var(--verde);
+  background: var(--verde-tinte);
+  transform: translateY(-1px);
+}
+
+.manual-item-icono,
+.manual-item-descarga {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--verde);
+}
+
+.manual-item-icono {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: var(--verde-tinte);
+}
+
+.manual-item-icono svg,
+.manual-item-descarga svg {
+  width: 22px;
+  height: 22px;
+}
+
+.manual-item-texto {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 2px;
+}
+
+.manual-item-titulo {
+  font-family: var(--fuente-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.manual-item-desc {
+  color: var(--tinta-suave);
+  font-size: 0.88rem;
+}

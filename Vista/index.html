@@ -416,13 +416,13 @@
 
     <section class="franja-datos">
       <div class="dato-item">
-        <span class="dato-numero">+1.200</span>
+        <span class="dato-numero" id="datoContenedores">–</span>
         <span class="dato-label" data-texto="index.datoContenedores"
           >Contenedores monitoreados</span
         >
       </div>
       <div class="dato-item">
-        <span class="dato-numero">7</span>
+        <span class="dato-numero" id="datoResiduos">–</span>
         <span class="dato-label" data-texto="index.datoResiduos"
           >Tipos de residuo clasificados</span
         >
@@ -611,6 +611,8 @@
         "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/Incidencias/";
       const NOTIFICACIONES_URL =
         "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/Notificaciones/";
+      const GESTION_URL =
+        "http://localhost/Proyecto/ProyectoSyntropy/Gestion/miApi/";
       const ICON_URL = "https://unpkg.com/lucide-static@latest/icons/";
 
       const ICONOS_CONTENEDOR = {
@@ -1050,9 +1052,70 @@
 
       cargarUsuario();
 
+      // ===== ESTADISTICAS =====
+
+      async function obtenerLista(url) {
+        try {
+          const respuesta = await fetch(url);
+          if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
+          const json = await respuesta.json();
+          return Array.isArray(json) ? json : json?.data || [];
+        } catch (error) {
+          console.error("Error al obtener datos:", error);
+          return null;
+        }
+      }
+
+      function formatearNumero(numero) {
+        return Number(numero).toLocaleString(LOCALES[idioma]);
+      }
+
+      function animarNumero(id, total) {
+        const elemento = document.getElementById(id);
+        const pasos = 30;
+        let paso = 0;
+
+        elemento.dataset.total = total;
+        const intervalo = setInterval(() => {
+          paso++;
+          elemento.textContent = formatearNumero(
+            Math.round((total * paso) / pasos),
+          );
+          if (paso >= pasos) clearInterval(intervalo);
+        }, 40);
+      }
+
+      async function cargarEstadisticas() {
+        const [contenedores, centros] = await Promise.all([
+          obtenerLista(`${GESTION_URL}Contenedores`),
+          obtenerLista(`${GESTION_URL}CentrosAcopio/CentrosAcopio`),
+        ]);
+
+        if (contenedores) {
+          animarNumero("datoContenedores", contenedores.length);
+        }
+
+        if (contenedores && centros) {
+          const tipos = new Set(
+            [
+              ...contenedores.map((c) => c.tipo),
+              ...centros.map((c) => c.tipoResiduo),
+            ]
+              .filter(Boolean)
+              .map(normalizar),
+          );
+          animarNumero("datoResiduos", tipos.size);
+        }
+      }
+
+      cargarEstadisticas();
+
       // ===== IDIOMA =====
 
       function alCambiarIdioma() {
+        document.querySelectorAll("[data-total]").forEach((elemento) => {
+          elemento.textContent = formatearNumero(elemento.dataset.total);
+        });
         cargarUsuario();
         renderizarNotificaciones(ultimasNotificaciones);
         actualizarLista();
